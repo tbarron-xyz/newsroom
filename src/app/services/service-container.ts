@@ -11,6 +11,7 @@ import { AbilitiesService } from "./abilities.service";
 import { ConfigService } from "./config.service";
 import { ArtifactService } from "./artifact.service";
 import { ArtifactQueueService } from "./artifact-queue.service";
+import { DailyJobQueueService } from "./daily-job-queue.service";
 
 export class ServiceContainer {
   private static instance: ServiceContainer;
@@ -24,6 +25,7 @@ export class ServiceContainer {
   private configService: ConfigService | null = null;
   private artifactService: ArtifactService | null = null;
   private artifactQueueService: ArtifactQueueService | null = null;
+  private dailyJobQueueService: DailyJobQueueService | null = null;
 
   private constructor() {}
 
@@ -42,12 +44,12 @@ export class ServiceContainer {
       if (storageBackend === "sqlite") {
         console.log("Using SQLite data storage backend");
         this.dataStorageService = new SQLiteDataStorageService();
-      // } else if (
-      //   storageBackend === "postgres" ||
-      //   storageBackend === "postgresql"
-      // ) {
-      // console.log("Using PostgreSQL data storage backend");
-      // this.dataStorageService = new PostgreSQLDataStorageService();
+        // } else if (
+        //   storageBackend === "postgres" ||
+        //   storageBackend === "postgresql"
+        // ) {
+        // console.log("Using PostgreSQL data storage backend");
+        // this.dataStorageService = new PostgreSQLDataStorageService();
       } else {
         console.log("Using Redis data storage backend");
         this.dataStorageService = new RedisDataStorageService();
@@ -140,10 +142,25 @@ export class ServiceContainer {
     return this.artifactQueueService;
   }
 
+  async getDailyJobQueueService(): Promise<DailyJobQueueService> {
+    if (!this.dailyJobQueueService) {
+      const editorService = await this.getEditorService();
+      const dataStorage = await this.getDataStorageService();
+      this.dailyJobQueueService = new DailyJobQueueService(
+        editorService,
+        dataStorage
+      );
+    }
+    return this.dailyJobQueueService;
+  }
+
   // Cleanup method for testing or shutdown
   async disconnect(): Promise<void> {
     if (this.artifactQueueService) {
       await this.artifactQueueService.close();
+    }
+    if (this.dailyJobQueueService) {
+      await this.dailyJobQueueService.close();
     }
     if (this.dataStorageService) {
       await this.dataStorageService.disconnect();
@@ -159,5 +176,6 @@ export class ServiceContainer {
     this.configService = null;
     this.artifactService = null;
     this.artifactQueueService = null;
+    this.dailyJobQueueService = null;
   }
 }

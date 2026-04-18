@@ -44,11 +44,19 @@ export const POST = withAuth(
       );
     }
 
-    const result = await editorService.runJob(jobType as JobType, {
-      enforceTimeConstraint: false
-    });
-
-    return NextResponse.json({ message: result.message });
+    if (jobType === "daily") {
+      const dailyQueueService = await container.getDailyJobQueueService();
+      const jobId = await dailyQueueService.queueDailyEdition();
+      return NextResponse.json({
+        jobId,
+        message: "Queued daily edition generation"
+      });
+    } else {
+      const result = await editorService.runJob(jobType as JobType, {
+        enforceTimeConstraint: false
+      });
+      return NextResponse.json({ message: result.message });
+    }
   },
   { requiredRole: "admin" }
 );
