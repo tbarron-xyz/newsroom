@@ -26,7 +26,7 @@ export const POST = withAuth(
     const editorService = await container.getEditorService();
 
     const body = await request.json();
-    const { jobType } = body;
+    const { jobType, count } = body;
 
     if (!jobType || typeof jobType !== "string") {
       return NextResponse.json(
@@ -53,7 +53,8 @@ export const POST = withAuth(
       });
     } else {
       const result = await editorService.runJob(jobType as JobType, {
-        enforceTimeConstraint: false
+        enforceTimeConstraint: false,
+        ...(count && { count })
       });
       return NextResponse.json({ message: result.message });
     }

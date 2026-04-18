@@ -232,7 +232,7 @@ export class EditorService {
     return { dailyEdition, editions };
   }
 
-  async generateComment(): Promise<{ topicIndex: number; author: string }> {
+  async generateComment(count: number = 1): Promise<Array<{ topicIndex: number; author: string }>> {
     const currentTime = Date.now();
 
     const dailyEditions = await this.dataStorageService.getDailyEditions(1);
@@ -275,47 +275,58 @@ export class EditorService {
       .then((msgs) => msgs.map((m) => m.text))
       .catch(() => []);
 
-    const result = await this.aiService.generateComment(
-      dailyEditionText,
-      existingComments,
-      undefined,
-      recentPosts
-    );
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      const result = await this.aiService.generateComment(
+        dailyEditionText,
+        existingComments,
+        undefined,
+        recentPosts
+      );
 
-    if (!result) {
-      throw new Error("Failed to generate comment");
+      if (!result) {
+        throw new Error("Failed to generate comment");
+      }
+
+      const shuffledTopicIndex = result.topicIndex;
+      if (shuffledTopicIndex < 0 || shuffledTopicIndex >= shuffledTopics.length) {
+        throw new Error(`Invalid shuffled topic index: ${shuffledTopicIndex}`);
+      }
+
+      const topicIndex = shuffledIndices[shuffledTopicIndex];
+      if (topicIndex < 0 || topicIndex >= dailyEdition.topics.length) {
+        throw new Error(`Invalid original topic index: ${topicIndex}`);
+      }
+
+      if (!dailyEdition.topics[topicIndex].comments) {
+        dailyEdition.topics[topicIndex].comments = [];
+      }
+
+      const newComment = {
+        author: result.persona,
+        content: result.commentText,
+        createdAt: currentTime,
+        persona: result.persona
+      };
+      dailyEdition.topics[topicIndex].comments!.push(newComment);
+
+      // Add to existing comments to avoid duplicate generation
+      existingComments.push({
+        author: newComment.author,
+        content: newComment.content
+      });
+
+      results.push({ topicIndex, author: newComment.author });
     }
-
-    const shuffledTopicIndex = result.topicIndex;
-    if (shuffledTopicIndex < 0 || shuffledTopicIndex >= shuffledTopics.length) {
-      throw new Error(`Invalid shuffled topic index: ${shuffledTopicIndex}`);
-    }
-
-    const topicIndex = shuffledIndices[shuffledTopicIndex];
-    if (topicIndex < 0 || topicIndex >= dailyEdition.topics.length) {
-      throw new Error(`Invalid original topic index: ${topicIndex}`);
-    }
-
-    if (!dailyEdition.topics[topicIndex].comments) {
-      dailyEdition.topics[topicIndex].comments = [];
-    }
-
-    const newComment = {
-      author: result.persona,
-      content: result.commentText,
-      createdAt: currentTime,
-      persona: result.persona
-    };
-    dailyEdition.topics[topicIndex].comments!.push(newComment);
 
     await this.dataStorageService.saveDailyEdition(dailyEdition);
 
-    return { topicIndex, author: newComment.author };
+    return results;
   }
 
   async runJob(
     jobType: JobType,
-    options: { enforceTimeConstraint?: boolean } = {}
+    options: { enforceTimeConstraint?: boolean; count?: number } = {}
   ): Promise<JobResult> {
     const { enforceTimeConstraint = false } = options;
     const currentTime = Date.now();
@@ -338,7 +349,7 @@ export class EditorService {
     );
 
     try {
-      const result = await this.executeJob(jobType, currentTime, editor);
+      const result = await this.executeJob(jobType, currentTime, editor, options);
 
       await this.dataStorageService.setJobRunning(jobType, false);
       await this.dataStorageService.setJobLastSuccess(jobType, currentTime);
@@ -432,7 +443,8 @@ export class EditorService {
   private async executeJob(
     jobType: JobType,
     currentTime: number,
-    editor: Editor | null
+    editor: Editor | null,
+    options: { count?: number }
   ): Promise<JobResult> {
     switch (jobType) {
       case "events": {
@@ -541,12 +553,13 @@ export class EditorService {
       }
 
       case "comments": {
-        const { topicIndex, author } = await this.generateComment();
+        const count = options.count || 1;
+        const results = await this.generateComment(count);
         console.log(
-          `[${new Date().toISOString()}] Successfully added comment to topic ${topicIndex} as ${author}`
+          `[${new Date().toISOString()}] Successfully added ${count} comments to topics ${results.map(r => r.topicIndex).join(', ')}`
         );
         return {
-          message: `Comment generation job completed successfully. Added comment to topic ${topicIndex} as ${author}.`,
+          message: `Comment generation job completed successfully. Added ${count} comments.`,
           jobType
         };
       }

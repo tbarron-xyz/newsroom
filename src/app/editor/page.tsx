@@ -86,6 +86,7 @@ export default function EditorPage() {
   const [appName, setAppName] = useState("Newsroom");
   const [dailyJobId, setDailyJobId] = useState<string | null>(null);
   const [dailyJobStatus, setDailyJobStatus] = useState<any>(null);
+  const [numComments, setNumComments] = useState(1);
   const router = useRouter();
 
   // Check admin status and fetch data on component mount
@@ -169,13 +170,14 @@ export default function EditorPage() {
     }
   };
 
-  const triggerJob = async (jobType: string) => {
+  const triggerJob = async (jobType: string, count?: number) => {
     setJobTriggering(jobType);
     setMessage("");
 
     try {
       const requestBody = {
-        jobType
+        jobType,
+        ...(count && { count })
       };
 
       if (jobType === "daily") {
@@ -1573,8 +1575,19 @@ export default function EditorPage() {
                 <p className="text-sm text-white/70">
                   Generates AI comments on the latest daily edition articles.
                 </p>
+                <div>
+                  <label className="block text-xs text-white/70 mb-1">Number of Comments to Generate</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={numComments}
+                    onChange={(e) => setNumComments(parseInt(e.target.value) || 1)}
+                    className="w-full p-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/30"
+                  />
+                </div>
                 <button
-                  onClick={() => triggerJob("comments")}
+                  onClick={() => triggerJob("comments", numComments)}
                   disabled={jobTriggering === "comments" || !isAdmin}
                   className={`w-full relative px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 ${
                     !isAdmin ? "opacity-60 cursor-not-allowed" : ""
