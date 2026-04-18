@@ -473,10 +473,40 @@ export class RedisDataStorageService implements IDataStorageService {
     multi.set(REDIS_KEYS.ARTICLE_REPORTER(articleId), article.reporterId);
 
     await multi.exec();
+
+    // Trim per-reporter articles zset to 5000 most recent
+    const MAX_ARTICLES_PER_REPORTER = 5000;
+    const reporterArticlesKey = REDIS_KEYS.ARTICLES_BY_REPORTER(article.reporterId);
+    const card = await this.client.zCard(reporterArticlesKey);
+    if (card > MAX_ARTICLES_PER_REPORTER) {
+      const numToRemove = card - MAX_ARTICLES_PER_REPORTER;
+      const oldIds = await this.client.zRange(reporterArticlesKey, 0, numToRemove - 1);
+      await this.client.zRemRangeByRank(reporterArticlesKey, 0, -(MAX_ARTICLES_PER_REPORTER + 1));
+      for (const id of oldIds) {
+        await this.deleteArticleKeys(id);
+      }
+    }
+  }
+
+  private async deleteArticleKeys(articleId: string): Promise<void> {
+    const keys = [
+      REDIS_KEYS.ARTICLE_HEADLINE(articleId),
+      REDIS_KEYS.ARTICLE_BODY(articleId),
+      REDIS_KEYS.ARTICLE_TIME(articleId),
+      REDIS_KEYS.ARTICLE_PROMPT(articleId),
+      REDIS_KEYS.ARTICLE_MESSAGE_IDS(articleId),
+      REDIS_KEYS.ARTICLE_MESSAGE_TEXTS(articleId),
+      REDIS_KEYS.ARTICLE_MODEL_NAME(articleId),
+      REDIS_KEYS.ARTICLE_INPUT_TOKEN_COUNT(articleId),
+      REDIS_KEYS.ARTICLE_OUTPUT_TOKEN_COUNT(articleId),
+      REDIS_KEYS.ARTICLE_REPORTER(articleId)
+    ];
+    console.log(`Deleting ${keys.length} keys for article: ${articleId}`);
+    if (keys.length) await this.client.del(keys);
   }
 
   /**
-   * O(m) where m = number of articles returned (limited to 100). Sequential loop.
+    * O(m) where m = number of articles returned (limited to 100). Sequential loop.
    */
   async getLatestArticles(limit?: number): Promise<Article[]> {
     const count = limit || 100;
@@ -804,10 +834,42 @@ export class RedisDataStorageService implements IDataStorageService {
     multi.set(REDIS_KEYS.EVENT_REPORTER(eventId), event.reporterId);
 
     await multi.exec();
+
+    // Trim per-reporter events zset to 10000 most recent
+    const MAX_EVENTS_PER_REPORTER = 10000;
+    const reporterEventsKey = REDIS_KEYS.EVENTS_BY_REPORTER(event.reporterId);
+    const card = await this.client.zCard(reporterEventsKey);
+    if (card > MAX_EVENTS_PER_REPORTER) {
+      const numToRemove = card - MAX_EVENTS_PER_REPORTER;
+      const oldIds = await this.client.zRange(reporterEventsKey, 0, numToRemove - 1);
+      await this.client.zRemRangeByRank(reporterEventsKey, 0, -(MAX_EVENTS_PER_REPORTER + 1));
+      for (const id of oldIds) {
+        await this.deleteEventKeys(id);
+      }
+    }
+  }
+
+  private async deleteEventKeys(eventId: string): Promise<void> {
+    const keys = [
+      REDIS_KEYS.EVENT_TITLE(eventId),
+      REDIS_KEYS.EVENT_CREATED_TIME(eventId),
+      REDIS_KEYS.EVENT_UPDATED_TIME(eventId),
+      REDIS_KEYS.EVENT_FACTS(eventId),
+      REDIS_KEYS.EVENT_WHERE(eventId),
+      REDIS_KEYS.EVENT_WHEN(eventId),
+      REDIS_KEYS.EVENT_MESSAGE_IDS(eventId),
+      REDIS_KEYS.EVENT_MESSAGE_TEXTS(eventId),
+      REDIS_KEYS.EVENT_MODEL_NAME(eventId),
+      REDIS_KEYS.EVENT_INPUT_TOKEN_COUNT(eventId),
+      REDIS_KEYS.EVENT_OUTPUT_TOKEN_COUNT(eventId),
+      REDIS_KEYS.EVENT_REPORTER(eventId)
+    ];
+    console.log(`Deleting ${keys.length} keys for event: ${eventId}`);
+    if (keys.length) await this.client.del(keys);
   }
 
   /**
-   * O(m) where m = number of events for this reporter.
+    * O(m) where m = number of events for this reporter.
    */
   async getEventsByReporter(
     reporterId: string,
