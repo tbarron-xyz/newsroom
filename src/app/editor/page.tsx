@@ -97,6 +97,13 @@ export default function EditorPage() {
     fetchMemoryInfo();
   }, []);
 
+  // Auto-resume polling if daily job is running
+  useEffect(() => {
+    if (isAdmin && jobStatus?.status?.dailyJob && !dailyJobId) {
+      fetchActiveDailyJobId();
+    }
+  }, [jobStatus, isAdmin]);
+
   // Load app configuration
   useEffect(() => {
     const loadConfig = async () => {
@@ -248,6 +255,21 @@ export default function EditorPage() {
       }
     } catch (error) {
       console.error("Error polling job status:", error);
+    }
+  };
+
+  const fetchActiveDailyJobId = async () => {
+    try {
+      const result = await apiService.get<{ jobId: string | null }>(
+        "/api/editor/jobs/daily"
+      );
+      if (result.jobId) {
+        setDailyJobId(result.jobId);
+        setDailyJobStatus({ status: "active" }); // assume active
+        pollDailyJobStatus(); // start polling immediately if reloads
+      }
+    } catch (error) {
+      console.error("Error fetching active daily job:", error);
     }
   };
 

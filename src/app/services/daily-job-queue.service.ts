@@ -76,6 +76,11 @@ export class DailyJobQueueService {
     };
   }
 
+  async getActiveJobId(): Promise<string | null> {
+    const jobs = await this.queue.getJobs(["active"]);
+    return jobs.length > 0 ? jobs[0].id || null : null;
+  }
+
   async getJobs(
     status?: "waiting" | "active" | "completed" | "failed",
     limit = 10
