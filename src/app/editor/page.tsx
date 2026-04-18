@@ -86,6 +86,8 @@ export default function EditorPage() {
   const [appName, setAppName] = useState("Newsroom");
   const [dailyJobId, setDailyJobId] = useState<string | null>(null);
   const [dailyJobStatus, setDailyJobStatus] = useState<any>(null);
+  const [reporterJobId, setReporterJobId] = useState<string | null>(null);
+  const [reporterJobStatus, setReporterJobStatus] = useState<any>(null);
   const [numComments, setNumComments] = useState(1);
   const router = useRouter();
 
@@ -98,10 +100,13 @@ export default function EditorPage() {
     fetchMemoryInfo();
   }, []);
 
-  // Auto-resume polling if daily job is running
+  // Auto-resume polling if jobs are running
   useEffect(() => {
     if (isAdmin && jobStatus?.status?.dailyJob && !dailyJobId) {
       fetchActiveDailyJobId();
+    }
+    if (isAdmin && jobStatus?.status?.reporterJob && !reporterJobId) {
+      fetchActiveReporterJobId();
     }
   }, [jobStatus, isAdmin]);
 
@@ -190,6 +195,16 @@ export default function EditorPage() {
         setDailyJobStatus({ status: "waiting" });
         // start polling
         setTimeout(pollDailyJobStatus, 5000);
+      } else if (jobType === "reporter") {
+        const result = await apiService.post<{
+          jobId: string;
+          message: string;
+        }>("/api/editor/jobs", requestBody);
+        setMessage(result.message);
+        setReporterJobId(result.jobId);
+        setReporterJobStatus({ status: "waiting" });
+        // start polling
+        setTimeout(pollReporterJobStatus, 5000);
       } else {
         const result = await apiService.post<{ message: string }>(
           "/api/editor/jobs",
@@ -260,6 +275,33 @@ export default function EditorPage() {
     }
   };
 
+  const pollReporterJobStatus = async () => {
+    if (!reporterJobId) return;
+    try {
+      const status = await apiService.get<any>(
+        `/api/editor/jobs/${reporterJobId}`
+      );
+      setReporterJobStatus(status);
+      if (status.status === "completed") {
+        setMessage("Reporter articles generated successfully");
+        setTimeout(() => setMessage(""), 5000);
+        setReporterJobId(null);
+        setReporterJobStatus(null);
+        fetchJobStatus(); // update last runs
+      } else if (status.status === "failed") {
+        setMessage("Reporter articles generation failed");
+        setTimeout(() => setMessage(""), 5000);
+        setReporterJobId(null);
+        setReporterJobStatus(null);
+      } else {
+        // still running or waiting, keep polling
+        setTimeout(pollReporterJobStatus, 5000);
+      }
+    } catch (error) {
+      console.error("Error polling reporter job status:", error);
+    }
+  };
+
   const fetchActiveDailyJobId = async () => {
     try {
       const result = await apiService.get<{ jobId: string | null }>(
@@ -272,6 +314,21 @@ export default function EditorPage() {
       }
     } catch (error) {
       console.error("Error fetching active daily job:", error);
+    }
+  };
+
+  const fetchActiveReporterJobId = async () => {
+    try {
+      const result = await apiService.get<{ jobId: string | null }>(
+        "/api/editor/jobs/reporter"
+      );
+      if (result.jobId) {
+        setReporterJobId(result.jobId);
+        setReporterJobStatus({ status: "active" }); // assume active
+        pollReporterJobStatus(); // start polling immediately if reloads
+      }
+    } catch (error) {
+      console.error("Error fetching active reporter job:", error);
     }
   };
 
@@ -1377,17 +1434,25 @@ export default function EditorPage() {
                 </p>
                 <button
                   onClick={() => triggerJob("reporter")}
-                  disabled={jobTriggering === "reporter" || !isAdmin}
+                  disabled={jobTriggering === "reporter" || reporterJobId !== null || !isAdmin}
                   className={`w-full relative px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 ${
                     !isAdmin ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                   <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "reporter" ? (
+                    {jobTriggering === "reporter" || reporterJobStatus ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Generating...</span>
+                        <span>
+                          {reporterJobStatus?.status === "completed"
+                            ? "Completing..."
+                            : reporterJobStatus?.status === "failed"
+                            ? "Failed"
+                            : jobTriggering === "reporter"
+                            ? "Generating..."
+                            : "Running..."}
+                        </span>
                       </>
                     ) : (
                       <>

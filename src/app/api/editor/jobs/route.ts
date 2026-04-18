@@ -51,6 +51,13 @@ export const POST = withAuth(
         jobId,
         message: "Queued daily edition generation"
       });
+    } else if (jobType === "reporter") {
+      const reporterQueueService = await container.getReporterJobQueueService();
+      const jobId = await reporterQueueService.queueReporterArticles();
+      return NextResponse.json({
+        jobId,
+        message: "Queued reporter article generation"
+      });
     } else {
       const result = await editorService.runJob(jobType as JobType, {
         enforceTimeConstraint: false,

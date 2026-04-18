@@ -13,26 +13,16 @@ async function getContainer(): Promise<ServiceContainer> {
 
 export const GET = withAuth(
   async (request: NextRequest, user, dataStorage, context) => {
-    const { jobId } = context.params;
     const container = await getContainer();
-    const dailyQueueService = await container.getDailyJobQueueService();
     const reporterQueueService = await container.getReporterJobQueueService();
 
     try {
-      // Try daily queue first
-      let status = await dailyQueueService.getJobStatus(jobId);
-      if (!status) {
-        // Try reporter queue
-        status = await reporterQueueService.getJobStatus(jobId);
-      }
-      if (!status) {
-        return NextResponse.json({ error: "Job not found" }, { status: 404 });
-      }
-      return NextResponse.json(status);
+      const jobId = await reporterQueueService.getActiveJobId();
+      return NextResponse.json({ jobId });
     } catch (error) {
-      console.error("Error fetching job status:", error);
+      console.error("Error fetching latest reporter job:", error);
       return NextResponse.json(
-        { error: "Failed to fetch job status" },
+        { error: "Failed to fetch latest reporter job" },
         { status: 500 }
       );
     }

@@ -12,6 +12,7 @@ import { ConfigService } from "./config.service";
 import { ArtifactService } from "./artifact.service";
 import { ArtifactQueueService } from "./artifact-queue.service";
 import { DailyJobQueueService } from "./daily-job-queue.service";
+import { ReporterJobQueueService } from "./reporter-job-queue.service";
 
 export class ServiceContainer {
   private static instance: ServiceContainer;
@@ -26,6 +27,7 @@ export class ServiceContainer {
   private artifactService: ArtifactService | null = null;
   private artifactQueueService: ArtifactQueueService | null = null;
   private dailyJobQueueService: DailyJobQueueService | null = null;
+  private reporterJobQueueService: ReporterJobQueueService | null = null;
 
   private constructor() {}
 
@@ -154,6 +156,18 @@ export class ServiceContainer {
     return this.dailyJobQueueService;
   }
 
+  async getReporterJobQueueService(): Promise<ReporterJobQueueService> {
+    if (!this.reporterJobQueueService) {
+      const reporterService = await this.getReporterService();
+      const dataStorage = await this.getDataStorageService();
+      this.reporterJobQueueService = new ReporterJobQueueService(
+        reporterService,
+        dataStorage
+      );
+    }
+    return this.reporterJobQueueService;
+  }
+
   // Cleanup method for testing or shutdown
   async disconnect(): Promise<void> {
     if (this.artifactQueueService) {
@@ -161,6 +175,9 @@ export class ServiceContainer {
     }
     if (this.dailyJobQueueService) {
       await this.dailyJobQueueService.close();
+    }
+    if (this.reporterJobQueueService) {
+      await this.reporterJobQueueService.close();
     }
     if (this.dataStorageService) {
       await this.dataStorageService.disconnect();
@@ -177,5 +194,6 @@ export class ServiceContainer {
     this.artifactService = null;
     this.artifactQueueService = null;
     this.dailyJobQueueService = null;
+    this.reporterJobQueueService = null;
   }
 }
