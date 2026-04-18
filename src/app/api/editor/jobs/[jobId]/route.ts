@@ -15,15 +15,15 @@ export const GET = withAuth(
   async (request: NextRequest, user, dataStorage, context) => {
     const { jobId } = context.params;
     const container = await getContainer();
-    const dailyQueueService = await container.getDailyJobQueueService();
-    const reporterQueueService = await container.getReporterJobQueueService();
+    const jobQueueService = await container.getJobQueueService();
 
     try {
+      let status;
       // Try daily queue first
-      let status = await dailyQueueService.getJobStatus(jobId);
+      status = await jobQueueService.getJobStatus("daily_edition", jobId);
       if (!status) {
         // Try reporter queue
-        status = await reporterQueueService.getJobStatus(jobId);
+        status = await jobQueueService.getJobStatus("reporter_articles", jobId);
       }
       if (!status) {
         return NextResponse.json({ error: "Job not found" }, { status: 404 });

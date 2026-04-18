@@ -44,16 +44,16 @@ export const POST = withAuth(
       );
     }
 
+    const jobQueueService = await container.getJobQueueService();
+
     if (jobType === "daily") {
-      const dailyQueueService = await container.getDailyJobQueueService();
-      const jobId = await dailyQueueService.queueDailyEdition();
+      const jobId = await jobQueueService.addJob("daily_edition", {});
       return NextResponse.json({
         jobId,
         message: "Queued daily edition generation"
       });
     } else if (jobType === "reporter") {
-      const reporterQueueService = await container.getReporterJobQueueService();
-      const jobId = await reporterQueueService.queueReporterArticles();
+      const jobId = await jobQueueService.addJob("reporter_articles", {});
       return NextResponse.json({
         jobId,
         message: "Queued reporter article generation"

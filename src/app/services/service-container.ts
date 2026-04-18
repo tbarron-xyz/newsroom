@@ -10,9 +10,7 @@ import { AIService } from "./ai.service";
 import { AbilitiesService } from "./abilities.service";
 import { ConfigService } from "./config.service";
 import { ArtifactService } from "./artifact.service";
-import { ArtifactQueueService } from "./artifact-queue.service";
-import { DailyJobQueueService } from "./daily-job-queue.service";
-import { ReporterJobQueueService } from "./reporter-job-queue.service";
+import { JobQueueService } from "./job-queue.service";
 
 export class ServiceContainer {
   private static instance: ServiceContainer;
@@ -25,9 +23,7 @@ export class ServiceContainer {
   private abilitiesService: AbilitiesService | null = null;
   private configService: ConfigService | null = null;
   private artifactService: ArtifactService | null = null;
-  private artifactQueueService: ArtifactQueueService | null = null;
-  private dailyJobQueueService: DailyJobQueueService | null = null;
-  private reporterJobQueueService: ReporterJobQueueService | null = null;
+  private jobQueueService: JobQueueService | null = null;
 
   private constructor() {}
 
@@ -132,52 +128,17 @@ export class ServiceContainer {
     return this.artifactService;
   }
 
-  async getArtifactQueueService(): Promise<ArtifactQueueService> {
-    if (!this.artifactQueueService) {
-      const artifactService = await this.getArtifactService();
-      const dataStorage = await this.getDataStorageService();
-      this.artifactQueueService = new ArtifactQueueService(
-        artifactService,
-        dataStorage
-      );
+  async getJobQueueService(): Promise<JobQueueService> {
+    if (!this.jobQueueService) {
+      this.jobQueueService = new JobQueueService(this);
     }
-    return this.artifactQueueService;
-  }
-
-  async getDailyJobQueueService(): Promise<DailyJobQueueService> {
-    if (!this.dailyJobQueueService) {
-      const editorService = await this.getEditorService();
-      const dataStorage = await this.getDataStorageService();
-      this.dailyJobQueueService = new DailyJobQueueService(
-        editorService,
-        dataStorage
-      );
-    }
-    return this.dailyJobQueueService;
-  }
-
-  async getReporterJobQueueService(): Promise<ReporterJobQueueService> {
-    if (!this.reporterJobQueueService) {
-      const reporterService = await this.getReporterService();
-      const dataStorage = await this.getDataStorageService();
-      this.reporterJobQueueService = new ReporterJobQueueService(
-        reporterService,
-        dataStorage
-      );
-    }
-    return this.reporterJobQueueService;
+    return this.jobQueueService;
   }
 
   // Cleanup method for testing or shutdown
   async disconnect(): Promise<void> {
-    if (this.artifactQueueService) {
-      await this.artifactQueueService.close();
-    }
-    if (this.dailyJobQueueService) {
-      await this.dailyJobQueueService.close();
-    }
-    if (this.reporterJobQueueService) {
-      await this.reporterJobQueueService.close();
+    if (this.jobQueueService) {
+      await this.jobQueueService.close();
     }
     if (this.dataStorageService) {
       await this.dataStorageService.disconnect();
@@ -192,8 +153,6 @@ export class ServiceContainer {
     this.abilitiesService = null;
     this.configService = null;
     this.artifactService = null;
-    this.artifactQueueService = null;
-    this.dailyJobQueueService = null;
-    this.reporterJobQueueService = null;
+    this.jobQueueService = null;
   }
 }

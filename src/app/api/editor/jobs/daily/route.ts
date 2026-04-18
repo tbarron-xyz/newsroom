@@ -14,10 +14,10 @@ async function getContainer(): Promise<ServiceContainer> {
 export const GET = withAuth(
   async (request: NextRequest, user, dataStorage, context) => {
     const container = await getContainer();
-    const dailyQueueService = await container.getDailyJobQueueService();
+    const jobQueueService = await container.getJobQueueService();
 
     try {
-      const jobId = await dailyQueueService.getActiveJobId();
+      const jobId = await jobQueueService.getActiveJobId("daily_edition");
       return NextResponse.json({ jobId });
     } catch (error) {
       console.error("Error fetching latest daily job:", error);

@@ -9,7 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write --list-different .",
     "format:check": "prettier --check .",
-    "workers": "tsx watch src/app/workers/artifact.worker.ts",
+    "workers": "tsx watch src/app/workers/worker.ts",
     "bull-board": "node -r tsx ./node_modules/@bull-board/fastify/dist/main.js --port 8081 --queues artifact_generate"
   },
   "dependencies": {

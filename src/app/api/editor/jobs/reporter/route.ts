@@ -14,10 +14,10 @@ async function getContainer(): Promise<ServiceContainer> {
 export const GET = withAuth(
   async (request: NextRequest, user, dataStorage, context) => {
     const container = await getContainer();
-    const reporterQueueService = await container.getReporterJobQueueService();
+    const jobQueueService = await container.getJobQueueService();
 
     try {
-      const jobId = await reporterQueueService.getActiveJobId();
+      const jobId = await jobQueueService.getActiveJobId("reporter_articles");
       return NextResponse.json({ jobId });
     } catch (error) {
       console.error("Error fetching latest reporter job:", error);
