@@ -474,8 +474,8 @@ export class RedisDataStorageService implements IDataStorageService {
 
     await multi.exec();
 
-    // Trim per-reporter articles zset to 5000 most recent
-    const MAX_ARTICLES_PER_REPORTER = 5000;
+    // Trim per-reporter articles zset to 200 most recent
+    const MAX_ARTICLES_PER_REPORTER = 200;
     const reporterArticlesKey = REDIS_KEYS.ARTICLES_BY_REPORTER(article.reporterId);
     const card = await this.client.zCard(reporterArticlesKey);
     if (card > MAX_ARTICLES_PER_REPORTER) {
@@ -835,8 +835,8 @@ export class RedisDataStorageService implements IDataStorageService {
 
     await multi.exec();
 
-    // Trim per-reporter events zset to 10000 most recent
-    const MAX_EVENTS_PER_REPORTER = 10000;
+    // Trim per-reporter events zset to 400 most recent
+    const MAX_EVENTS_PER_REPORTER = 400;
     const reporterEventsKey = REDIS_KEYS.EVENTS_BY_REPORTER(event.reporterId);
     const card = await this.client.zCard(reporterEventsKey);
     if (card > MAX_EVENTS_PER_REPORTER) {
