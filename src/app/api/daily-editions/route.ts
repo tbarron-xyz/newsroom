@@ -3,25 +3,10 @@ import { withRedis } from "../../utils/redis";
 import { AuthService } from "../../services/auth.service";
 import { AbilitiesService } from "../../services/abilities.service";
 
-// GET /api/daily-editions - Get daily editions (limited for non-Reader users)
+// GET /api/daily-editions - Get daily editions (limited to 3 results for all users)
 export const GET = withRedis(async (request: NextRequest, redis) => {
-  // Check authentication and Reader ability
-  let hasReaderAccess = false;
-  const authHeader = request.headers.get("authorization");
-
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const authService = new AuthService(redis);
-    const user = await authService.getUserFromToken(token);
-
-    if (user) {
-      const abilitiesService = new AbilitiesService();
-      hasReaderAccess = abilitiesService.userIsReader(user);
-    }
-  }
-
-  // If user is not authenticated or doesn't have Reader ability, limit to 3 results
-  const limit = hasReaderAccess ? undefined : 3;
+  // Limit to 3 results for all users
+  const limit = 3;
   const dailyEditions = await redis.getDailyEditions(limit);
 
   return NextResponse.json(dailyEditions);
