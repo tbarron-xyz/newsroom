@@ -13,8 +13,8 @@ export async function GET() {
 // POST /api/artifacts - Create new artifact
 export const POST = withAuth(
   async (request: Request, user) => {
-    const { type, inputs, prompt_system, prompt_user_template, output_schema } =
-      await request.json();
+    const body = await request.json();
+    const { type, inputs, prompt_system, prompt_user_template, output_schema, metadata } = body;
 
     if (
       !type ||
@@ -42,7 +42,7 @@ export const POST = withAuth(
       prompt_system,
       prompt_user_template,
       output_schema,
-      metadata: { status: "pending" as const }
+      metadata: { status: "pending" as const, ...(metadata || {}) }
     };
 
     const dataStorage =
