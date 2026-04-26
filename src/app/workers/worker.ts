@@ -24,8 +24,6 @@ async function run() {
     limiter: { max: 10, duration: 60000 } // Fallback
   });
 
-
-
   process.on("SIGINT", async () => {
     console.log("Shutting down unified worker...");
     await worker.close();

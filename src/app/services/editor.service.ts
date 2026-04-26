@@ -232,7 +232,9 @@ export class EditorService {
     return { dailyEdition, editions };
   }
 
-  async generateComment(count: number = 1): Promise<Array<{ topicIndex: number; author: string }>> {
+  async generateComment(
+    count: number = 1
+  ): Promise<Array<{ topicIndex: number; author: string }>> {
     const currentTime = Date.now();
 
     const dailyEditions = await this.dataStorageService.getDailyEditions(1);
@@ -289,7 +291,10 @@ export class EditorService {
       }
 
       const shuffledTopicIndex = result.topicIndex;
-      if (shuffledTopicIndex < 0 || shuffledTopicIndex >= shuffledTopics.length) {
+      if (
+        shuffledTopicIndex < 0 ||
+        shuffledTopicIndex >= shuffledTopics.length
+      ) {
         throw new Error(`Invalid shuffled topic index: ${shuffledTopicIndex}`);
       }
 
@@ -349,7 +354,12 @@ export class EditorService {
     );
 
     try {
-      const result = await this.executeJob(jobType, currentTime, editor, options);
+      const result = await this.executeJob(
+        jobType,
+        currentTime,
+        editor,
+        options
+      );
 
       await this.dataStorageService.setJobRunning(jobType, false);
       await this.dataStorageService.setJobLastSuccess(jobType, currentTime);
@@ -556,7 +566,7 @@ export class EditorService {
         const count = options.count || 1;
         const results = await this.generateComment(count);
         console.log(
-          `[${new Date().toISOString()}] Successfully added ${count} comments to topics ${results.map(r => r.topicIndex).join(', ')}`
+          `[${new Date().toISOString()}] Successfully added ${count} comments to topics ${results.map((r) => r.topicIndex).join(", ")}`
         );
         return {
           message: `Comment generation job completed successfully. Added ${count} comments.`,

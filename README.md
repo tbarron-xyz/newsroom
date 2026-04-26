@@ -52,19 +52,11 @@ All users can freely access recent content without registration. Visit the follo
    ```
 
 2. **Set up environment variables**:
-     Create a `.env.local` file with:
-     ```
-     OPENAI_API_KEY=your_openai_api_key
-      DATA_STORAGE_BACKEND=redis
-     ```
-
-3. **Database Configuration**:
-
-    **Redis (Default)**:
-    - Ensure Redis is running on `redis://localhost:6379`
-    - Set `DATA_STORAGE_BACKEND=redis` (or omit for default)
-
-
+   Create a `.env.local` file with:
+   ```
+   OPENAI_API_KEY=your_openai_api_key
+   DATA_STORAGE_BACKEND=redis
+   ```
 
 3. **Start the development server**:
    ```bash
@@ -72,12 +64,6 @@ All users can freely access recent content without registration. Visit the follo
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) to access the application.
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start built production server
 
 ## Project Structure
 

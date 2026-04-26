@@ -1434,7 +1434,11 @@ export default function EditorPage() {
                 </p>
                 <button
                   onClick={() => triggerJob("reporter")}
-                  disabled={jobTriggering === "reporter" || reporterJobId !== null || !isAdmin}
+                  disabled={
+                    jobTriggering === "reporter" ||
+                    reporterJobId !== null ||
+                    !isAdmin
+                  }
                   className={`w-full relative px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 ${
                     !isAdmin ? "opacity-60 cursor-not-allowed" : ""
                   }`}
@@ -1448,10 +1452,10 @@ export default function EditorPage() {
                           {reporterJobStatus?.status === "completed"
                             ? "Completing..."
                             : reporterJobStatus?.status === "failed"
-                            ? "Failed"
-                            : jobTriggering === "reporter"
-                            ? "Generating..."
-                            : "Running..."}
+                              ? "Failed"
+                              : jobTriggering === "reporter"
+                                ? "Generating..."
+                                : "Running..."}
                         </span>
                       </>
                     ) : (
@@ -1641,13 +1645,17 @@ export default function EditorPage() {
                   Generates AI comments on the latest daily edition articles.
                 </p>
                 <div>
-                  <label className="block text-xs text-white/70 mb-1">Number of Comments to Generate</label>
+                  <label className="block text-xs text-white/70 mb-1">
+                    Number of Comments to Generate
+                  </label>
                   <input
                     type="number"
                     min="1"
                     max="10"
                     value={numComments}
-                    onChange={(e) => setNumComments(parseInt(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setNumComments(parseInt(e.target.value) || 1)
+                    }
                     className="w-full p-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/30"
                   />
                 </div>

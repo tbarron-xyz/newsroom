@@ -476,12 +476,22 @@ export class RedisDataStorageService implements IDataStorageService {
 
     // Trim per-reporter articles zset to 200 most recent
     const MAX_ARTICLES_PER_REPORTER = 200;
-    const reporterArticlesKey = REDIS_KEYS.ARTICLES_BY_REPORTER(article.reporterId);
+    const reporterArticlesKey = REDIS_KEYS.ARTICLES_BY_REPORTER(
+      article.reporterId
+    );
     const card = await this.client.zCard(reporterArticlesKey);
     if (card > MAX_ARTICLES_PER_REPORTER) {
       const numToRemove = card - MAX_ARTICLES_PER_REPORTER;
-      const oldIds = await this.client.zRange(reporterArticlesKey, 0, numToRemove - 1);
-      await this.client.zRemRangeByRank(reporterArticlesKey, 0, -(MAX_ARTICLES_PER_REPORTER + 1));
+      const oldIds = await this.client.zRange(
+        reporterArticlesKey,
+        0,
+        numToRemove - 1
+      );
+      await this.client.zRemRangeByRank(
+        reporterArticlesKey,
+        0,
+        -(MAX_ARTICLES_PER_REPORTER + 1)
+      );
       for (const id of oldIds) {
         await this.deleteArticleKeys(id);
       }
@@ -506,7 +516,7 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   /**
-    * O(m) where m = number of articles returned (limited to 100). Sequential loop.
+   * O(m) where m = number of articles returned (limited to 100). Sequential loop.
    */
   async getLatestArticles(limit?: number): Promise<Article[]> {
     const count = limit || 100;
@@ -841,8 +851,16 @@ export class RedisDataStorageService implements IDataStorageService {
     const card = await this.client.zCard(reporterEventsKey);
     if (card > MAX_EVENTS_PER_REPORTER) {
       const numToRemove = card - MAX_EVENTS_PER_REPORTER;
-      const oldIds = await this.client.zRange(reporterEventsKey, 0, numToRemove - 1);
-      await this.client.zRemRangeByRank(reporterEventsKey, 0, -(MAX_EVENTS_PER_REPORTER + 1));
+      const oldIds = await this.client.zRange(
+        reporterEventsKey,
+        0,
+        numToRemove - 1
+      );
+      await this.client.zRemRangeByRank(
+        reporterEventsKey,
+        0,
+        -(MAX_EVENTS_PER_REPORTER + 1)
+      );
       for (const id of oldIds) {
         await this.deleteEventKeys(id);
       }
@@ -869,7 +887,7 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   /**
-    * O(m) where m = number of events for this reporter.
+   * O(m) where m = number of events for this reporter.
    */
   async getEventsByReporter(
     reporterId: string,

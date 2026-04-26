@@ -77,17 +77,15 @@ export class JobQueueService {
   ): Promise<any[]> {
     const queue = this.queues.get(queueKey);
     if (!queue) return [];
-    const jobs = await queue.getJobs(
-      status ? [status] : undefined,
-      0,
-      limit
+    const jobs = await queue.getJobs(status ? [status] : undefined, 0, limit);
+    return await Promise.all(
+      jobs.map(async (job) => ({
+        id: job.id,
+        status: await job.getState(),
+        progress: job.progress,
+        createdAt: job.timestamp
+      }))
     );
-    return await Promise.all(jobs.map(async (job) => ({
-      id: job.id,
-      status: await job.getState(),
-      progress: job.progress,
-      createdAt: job.timestamp
-    })));
   }
 
   async processJob(job: Job): Promise<void> {
@@ -177,7 +175,9 @@ export class JobQueueService {
       await dataStorageService.setJobRunning("reporter", false);
       await dataStorageService.setJobLastSuccess("reporter", Date.now());
 
-      console.log(`Reporter articles generation completed successfully - generated ${results.totalArticles} articles`);
+      console.log(
+        `Reporter articles generation completed successfully - generated ${results.totalArticles} articles`
+      );
     } catch (error) {
       console.error(`Reporter articles generation failed:`, error);
       const dataStorageService = await this.container.getDataStorageService();
@@ -187,6 +187,6 @@ export class JobQueueService {
   }
 
   async close(): Promise<void> {
-    await Promise.all(Array.from(this.queues.values()).map(q => q.close()));
+    await Promise.all(Array.from(this.queues.values()).map((q) => q.close()));
   }
 }
