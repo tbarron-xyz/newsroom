@@ -179,9 +179,22 @@ The forum provides a discussion platform with sections, forums, threads, and pos
   - Member: Post ID
 - `forum:thread:{threadId}:post:{postId}` - JSON string containing post details (id, content, author, createdAt)
 
+### Artifacts
+Artifacts are reusable AI processing nodes with prompts, inputs, and output schemas for the flow editor.
+
+**Keys:**
+- `artifacts` - Set containing all artifact IDs
+- `artifact:{id}:type` - String containing the artifact type (e.g., "event", "article", "edition")
+- `artifact:{id}:inputs` - JSON string array of input definitions (name, source, type, filter)
+- `artifact:{id}:prompt_system` - String containing the system prompt
+- `artifact:{id}:prompt_user_template` - String containing the user prompt template
+- `artifact:{id}:output_schema` - JSON string containing the output schema (type, properties, etc.)
+- `artifact:{id}:output` - JSON string containing the generated output (optional)
+- `artifact:{id}:metadata` - JSON string containing status, generated_at, reporterId
+
 ## Key Naming Conventions
 - Use colons (`:`) as separators for hierarchical key names
-- Use descriptive prefixes (`editor:`, `reporter:`, `article:`, `edition:`, `daily_edition:`, `event:`, `ad:`, `user:`, `ai:`, `job:`, `kpi:`, `forum:`)
+- Use descriptive prefixes (`editor:`, `reporter:`, `article:`, `edition:`, `daily_edition:`, `event:`, `ad:`, `user:`, `ai:`, `job:`, `kpi:`, `forum:`, `artifact:`)
 - Include IDs in curly braces for dynamic key generation
 - Use consistent data types (Strings for text, Sets for collections, Sorted Sets for time-ordered data)
 - Use reverse lookup patterns like `user_by_email:{email}` for efficient lookups by non-ID fields
@@ -215,6 +228,8 @@ The forum provides a discussion platform with sections, forums, threads, and pos
 - **Thread posts**: `ZREVRANGE forum:thread:{threadId}:posts 0 -1 WITHSCORES` for posts in a thread
 - **Post details**: `GET forum:thread:{threadId}:post:{postId}` to get a specific post
 - **KPI lookup**: `GET kpi:{name}:value`, `GET kpi:{name}:last_updated` for KPI values
+- **Artifact enumeration**: `SMEMBERS artifacts` to get all artifact IDs
+- **Artifact details**: Direct key access with `GET artifact:{id}:type`, `GET artifact:{id}:inputs`, `GET artifact:{id}:prompt_system`, `GET artifact:{id}:prompt_user_template`, `GET artifact:{id}:output_schema`, etc.
 
 ## Performance Considerations
 - Use connection pooling for Redis connections

@@ -115,7 +115,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
         <input
           value={localData.type}
           onChange={(e) => updateNodeData({ type: e.target.value })}
-          className="font-bold text-lg bg-transparent outline-none w-full"
+          className="font-bold text-lg text-gray-900 bg-transparent outline-none w-full placeholder-gray-400"
           placeholder="Type"
         />
         <div
@@ -150,7 +150,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
             <input
               value={input.name}
               onChange={(e) => updateInput(i, "name", e.target.value)}
-              className="flex-1 ml-2 p-1 border rounded text-sm"
+              className="flex-1 ml-2 p-1 border rounded text-sm text-gray-900 placeholder-gray-400"
               placeholder="Input name"
             />
           </div>
@@ -168,7 +168,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
         <textarea
           value={localData.prompt_system}
           onChange={(e) => updateNodeData({ prompt_system: e.target.value })}
-          className="w-full p-2 border rounded resize-none h-20 text-sm"
+          className="w-full p-2 border rounded resize-none h-20 text-sm text-gray-900 placeholder-gray-400"
           placeholder="System prompt"
         />
         <textarea
@@ -176,7 +176,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
           onChange={(e) =>
             updateNodeData({ prompt_user_template: e.target.value })
           }
-          className="w-full p-2 border rounded resize-none h-20 text-sm"
+          className="w-full p-2 border rounded resize-none h-20 text-sm text-gray-900 placeholder-gray-400"
           placeholder="User prompt template"
         />
         <textarea
@@ -186,7 +186,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
               updateNodeData({ output_schema: JSON.parse(e.target.value) });
             } catch {}
           }}
-          className="w-full p-2 border rounded resize-none h-24 text-xs font-mono"
+          className="w-full p-2 border rounded resize-none h-24 text-xs font-mono text-gray-900 placeholder-gray-400"
           placeholder='{ "type": "object", ... }'
         />
       </div>
