@@ -18,6 +18,7 @@ import {
 import type { Connection } from "@xyflow/system";
 import ArtifactNode from "./ArtifactNode";
 import { apiService } from "../services/api.service";
+import { SchemaInput } from "../components/SchemaInput";
 
 interface ArtifactInput {
   name: string;
@@ -432,40 +433,11 @@ function FlowPage() {
                 }
                 className="w-full p-2 border rounded h-20"
               />
-              <textarea
-                placeholder='Output Schema JSON (e.g., { "type": "object", "properties": {} })'
-                value={JSON.stringify(formData.output_schema, null, 2)}
-                onChange={(e) => {
-                  try {
-                    updateFormField(
-                      "output_schema",
-                      JSON.parse(e.target.value)
-                    );
-                  } catch {}
-                }}
-                className="w-full p-2 border rounded h-24 text-sm font-mono"
+              <SchemaInput
+                value={formData.output_schema}
+                onChange={(v) => updateFormField("output_schema", v)}
+                placeholder='{ "type": "object", "properties": {} }'
               />
-              <a
-                href="/schema-editor"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Schema Editor
-              </a>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowCreateModal(false)}
