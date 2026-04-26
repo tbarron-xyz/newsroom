@@ -295,7 +295,7 @@ export default function ArtifactsPage() {
                         type: e.target.value
                       }))
                     }
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-900"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-900 high-contrast-input"
                     placeholder="e.g., event, article, custom_news"
                   />
                 </div>
@@ -321,7 +321,7 @@ export default function ArtifactsPage() {
                                 e.target.value || undefined
                               )
                             }
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900"
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900 high-contrast-input"
                             placeholder="e.g., event, article"
                           />
                         </div>
@@ -337,7 +337,7 @@ export default function ArtifactsPage() {
                                 updateInput(index, "filter", val);
                               } catch {}
                             }}
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900"
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900 high-contrast-input"
                             rows={2}
                           />
                         </div>
@@ -375,7 +375,7 @@ export default function ArtifactsPage() {
                                     e.target.value || undefined
                                   )
                                 }
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm"
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm high-contrast-input"
                               >
                                 <option value="">any</option>
                                 <option value="event">event</option>
@@ -403,7 +403,7 @@ export default function ArtifactsPage() {
                                     updateInput(index, "filter", val);
                                   } catch {}
                                 }}
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm"
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm high-contrast-input"
                                 rows={2}
                               />
                             </div>
@@ -426,7 +426,7 @@ export default function ArtifactsPage() {
                                   updateInput(index, "filter", val);
                                 } catch {}
                               }}
-                              className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900"
+className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900 high-contrast-input"
                               rows={2}
                             />
                           </div>
@@ -464,7 +464,7 @@ export default function ArtifactsPage() {
                         prompt_system: e.target.value
                       }))
                     }
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 high-contrast-input"
                     rows={3}
                   />
                 </div>
@@ -481,7 +481,7 @@ export default function ArtifactsPage() {
                         prompt_user_template: e.target.value
                       }))
                     }
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 high-contrast-input"
                     rows={5}
                   />
                 </div>

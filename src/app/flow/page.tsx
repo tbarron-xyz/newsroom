@@ -351,14 +351,16 @@ function FlowPage() {
       {/* Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
-            <h2 className="text-xl font-bold mb-4">New Artifact</h2>
+          <div className="bg-white p-6 rounded-lg max-w-lg w-full mx-4 max-h-[80vh] overflow-auto text-gray-900">
+            <h2 className="text-xl font-bold mb-4 text-gray-900">
+              New Artifact
+            </h2>
             <div className="space-y-4">
               <input
                 placeholder="Type (e.g., event, article, edition)"
                 value={formData.type}
                 onChange={(e) => updateFormField("type", e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded high-contrast-input"
               />
               <input
                 placeholder="Model name (optional, e.g., gpt-4o)"
@@ -369,7 +371,7 @@ function FlowPage() {
                     model_name: e.target.value
                   })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded high-contrast-input"
               />
 
               {/* Inputs array */}
@@ -386,7 +388,7 @@ function FlowPage() {
                           e.target.value as "artifacts" | "external"
                         )
                       }
-                      className="p-1 border rounded text-xs"
+                      className="p-1 border rounded text-xs high-contrast-input"
                     >
                       <option value="artifacts">artifacts</option>
                       <option value="external">external</option>
@@ -396,7 +398,7 @@ function FlowPage() {
                       onChange={(e) =>
                         updateFormInput(i, "type", e.target.value)
                       }
-                      className="ml-1 p-1 border rounded text-xs w-16"
+                      className="ml-1 p-1 border rounded text-xs w-16 high-contrast-input"
                       placeholder="type"
                     />
                     <input
@@ -404,7 +406,7 @@ function FlowPage() {
                       onChange={(e) =>
                         updateFormInput(i, "name", e.target.value)
                       }
-                      className="flex-1 ml-1 p-1 border rounded text-sm"
+                      className="flex-1 ml-1 p-1 border rounded text-sm high-contrast-input"
                       placeholder="Input name"
                     />
                   </div>
@@ -423,7 +425,7 @@ function FlowPage() {
                 onChange={(e) =>
                   updateFormField("prompt_system", e.target.value)
                 }
-                className="w-full p-2 border rounded h-20"
+                className="w-full p-2 border rounded h-20 high-contrast-input"
               />
               <textarea
                 placeholder="User Template"
@@ -431,7 +433,7 @@ function FlowPage() {
                 onChange={(e) =>
                   updateFormField("prompt_user_template", e.target.value)
                 }
-                className="w-full p-2 border rounded h-20"
+                className="w-full p-2 border rounded h-20 high-contrast-input"
               />
               <SchemaInput
                 value={formData.output_schema}

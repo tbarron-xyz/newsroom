@@ -12,3 +12,9 @@ The frontend (/src/app) features these pages with key functionalities:
 - **Pricing (`/pricing`)**: Subscription and pricing plans.
 - **Reporters (`/reporters`)**: List/edit reporters (beats/prompts), toggle active, links to their articles.
 - **Users (`/users`)**: User management list.
+- **Artifacts (`/artifacts`)**: AI artifacts management.
+- **Editions (`/editions`)**: List newspaper editions.
+- **Flow (`/flow`)**: Visual workflow editor.
+- **Logs (`/logs`)**: View server logs.
+- **Schema Editor (`/schema-editor`)**: Edit Zod schemas.
+- **Forum (`/forum`, `/forum/[forumId]`, `/forum/[forumId]/new`, `/forum/[forumId]/act-as`, `/thread/[threadId]`)**: Forum browsing/posting/AI replies.

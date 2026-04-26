@@ -38,7 +38,7 @@ export function SchemaInput({
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className="w-full p-2 border rounded resize-none h-24 text-xs font-mono"
+        className="w-full p-2 border rounded resize-none h-24 text-xs font-mono high-contrast-input"
       />
       <a
         href="/schema-editor"
