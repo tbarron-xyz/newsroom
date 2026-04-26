@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Handle, Position, NodeProps, useReactFlow } from "@xyflow/react";
 import { apiService } from "../services/api.service";
 import { SchemaInput } from "../components/SchemaInput";
@@ -47,6 +47,10 @@ function getStatusColor(status: string) {
 const ArtifactNode: React.FC<Props> = ({ id, data }) => {
   const [localData, setLocalData] = useState<any>(data);
   const reactFlow = useReactFlow();
+
+  useEffect(() => {
+    setLocalData(data);
+  }, [data]);
 
   const updateNodeData = useCallback(
     (updates: any) => {
