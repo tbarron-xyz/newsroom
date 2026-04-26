@@ -419,10 +419,10 @@ export default function EditorPage() {
                   setEditorData({ ...editorData, bio: e.target.value })
                 }
                 placeholder="Enter the editor's biography..."
-                className={`w-full h-32 p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg resize-none text-white/90 placeholder-white/50 ${
+                className={`w-full h-32 p-4 bg-white border border-gray-300 rounded-lg resize-none text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-600 ${
                   isAdmin
-                    ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                    : "bg-white/5 cursor-not-allowed opacity-60"
+                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                 }`}
                 rows={4}
                 readOnly={!isAdmin}
@@ -463,10 +463,10 @@ export default function EditorPage() {
                   setEditorData({ ...editorData, prompt: e.target.value })
                 }
                 placeholder="Enter the editorial guidelines and prompt..."
-                className={`w-full h-48 p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg resize-none text-white/90 placeholder-white/50 ${
+                className={`w-full h-48 p-4 bg-white border border-gray-300 rounded-lg resize-none text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-600 ${
                   isAdmin
-                    ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                    : "bg-white/5 cursor-not-allowed opacity-60"
+                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                 }`}
                 rows={6}
                 readOnly={!isAdmin}
@@ -516,10 +516,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -544,10 +544,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -572,10 +572,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -600,10 +600,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -628,10 +628,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -653,10 +653,10 @@ export default function EditorPage() {
                     setEditorData({ ...editorData, baseUrl: e.target.value })
                   }
                   placeholder="https://api.openai.com/v1 (leave empty for default)"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -684,10 +684,10 @@ export default function EditorPage() {
                   placeholder="0.050"
                   min="0"
                   step="0.001"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -714,10 +714,10 @@ export default function EditorPage() {
                   placeholder="0.400"
                   min="0"
                   step="0.001"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -764,10 +764,10 @@ export default function EditorPage() {
                 placeholder="Enter message slice count (e.g., 200)"
                 min="1"
                 max="1000"
-                className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                className={`w-full p-4 high-contrast-input ${
                   isAdmin
-                    ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                    : "bg-white/5 cursor-not-allowed opacity-60"
+                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                 }`}
                 readOnly={!isAdmin}
               />
@@ -819,10 +819,10 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 15)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -898,10 +898,10 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 30)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -977,10 +977,10 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 180)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 ${
+                  className={`w-full p-4 high-contrast-input ${
                     isAdmin
-                      ? "focus:ring-2 focus:ring-white/50 focus:border-white/30"
-                      : "bg-white/5 cursor-not-allowed opacity-60"
+                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
                   }`}
                   readOnly={!isAdmin}
                 />
@@ -1656,7 +1656,7 @@ export default function EditorPage() {
                     onChange={(e) =>
                       setNumComments(parseInt(e.target.value) || 1)
                     }
-                    className="w-full p-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/30"
+                    className="w-full p-3 high-contrast-input focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
                   />
                 </div>
                 <button

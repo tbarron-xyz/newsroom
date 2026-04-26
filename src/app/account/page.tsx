@@ -268,7 +268,7 @@ export default function AccountPage() {
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+                  className="high-contrast-input"
                   placeholder="Enter your first name"
                 />
               </div>
@@ -285,7 +285,7 @@ export default function AccountPage() {
                   id="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+                  className="high-contrast-input"
                   placeholder="Enter your last name"
                 />
               </div>
@@ -321,7 +321,7 @@ export default function AccountPage() {
                   id="phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+                  className="high-contrast-input"
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -338,7 +338,7 @@ export default function AccountPage() {
                   id="company"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+                  className="high-contrast-input"
                   placeholder="Enter your company or organization"
                 />
               </div>
@@ -355,7 +355,7 @@ export default function AccountPage() {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 resize-none"
+                  className="high-contrast-input resize-none"
                   placeholder="Tell us a bit about yourself"
                 />
               </div>

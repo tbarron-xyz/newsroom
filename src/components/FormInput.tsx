@@ -14,12 +14,12 @@ export default function FormInput({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-white/90">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
       )}
       <input
-        className={`w-full px-3 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 ${className}`}
+        className={`high-contrast-input w-full px-3 py-2 rounded-lg focus:ring-2 transition-all duration-300 ${className}`}
         {...props}
       />
       {error && <p className="text-sm text-red-300">{error}</p>}

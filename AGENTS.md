@@ -9,3 +9,7 @@ Four cron pipelines drive content generation: events → articles → editions �
 
 After making any code changes to typescript files (.ts/.tsx), run `npm run build` to check the typescript build
 <!-- Then run the Prettier formatter: `npm run format` -->
+
+# Code Style Guidelines
+- When patterns repeat, extract to a shared location.
+- Examples: repeated input styles → reusable CSS classes (globals.css) or components (e.g., FormInput.tsx).

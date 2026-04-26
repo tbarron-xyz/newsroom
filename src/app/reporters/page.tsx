@@ -394,7 +394,7 @@ export default function ReportersPage() {
                   <input
                     type="text"
                     placeholder="Add a beat (e.g., Technology, Politics)"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all duration-300 backdrop-blur-sm"
+                    className="flex-1 px-4 py-3 high-contrast-input"
                     onKeyPress={(e) => {
                       if (e.key === "Enter") {
                         addNewBeat((e.target as HTMLInputElement).value);
@@ -448,7 +448,7 @@ export default function ReportersPage() {
                     setNewReporter({ ...newReporter, prompt: e.target.value })
                   }
                   placeholder="Enter the reporter's writing guidelines and prompt..."
-                  className="w-full h-32 p-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 backdrop-blur-sm resize-vertical"
+                  className="high-contrast-input w-full h-32 p-4 rounded-xl resize-vertical"
                   rows={4}
                 />
                 <p className="text-sm text-white/70 mt-2">
@@ -762,7 +762,7 @@ export default function ReportersPage() {
                         <input
                           type="text"
                           placeholder="Add a new beat"
-                          className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all duration-300 backdrop-blur-sm"
+                          className="flex-1 px-4 py-3 high-contrast-input"
                           onKeyPress={(e) => {
                             if (e.key === "Enter") {
                               addBeat(
@@ -801,7 +801,7 @@ export default function ReportersPage() {
                             prompt: e.target.value
                           })
                         }
-                        className="w-full h-32 p-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 backdrop-blur-sm resize-vertical"
+                        className="high-contrast-input w-full h-32 p-4 rounded-xl resize-vertical"
                         rows={4}
                       />
                     </div>

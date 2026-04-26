@@ -82,10 +82,10 @@ schema;`);
               <textarea
                 value={schemaCode}
                 onChange={(e) => setSchemaCode(e.target.value)}
-                className={`w-full h-[500px] p-4 backdrop-blur-sm bg-white/10 border rounded-lg resize-none font-mono text-sm text-white/90 placeholder-white/50 ${
+                className={`w-full h-[500px] p-4 bg-white border border-gray-300 rounded-lg resize-none font-mono text-sm text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-600 ${
                   error
-                    ? "border-red-500/50"
-                    : "border-white/20 focus:ring-2 focus:ring-white/50 focus:border-white/30"
+                    ? "border-red-500"
+                    : "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
                 }`}
                 placeholder="Write your Zod schema here..."
                 spellCheck={false}

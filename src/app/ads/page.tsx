@@ -198,7 +198,7 @@ const AdsPage: React.FC = () => {
               onChange={(e) =>
                 setNewAd((prev) => ({ ...prev, name: e.target.value }))
               }
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="high-contrast-input"
               placeholder="Enter ad name"
             />
           </div>
@@ -215,7 +215,7 @@ const AdsPage: React.FC = () => {
               onChange={(e) =>
                 setNewAd((prev) => ({ ...prev, bidPrice: e.target.value }))
               }
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="high-contrast-input"
               placeholder="0.00"
             />
           </div>
@@ -241,7 +241,7 @@ const AdsPage: React.FC = () => {
               setNewAd((prev) => ({ ...prev, promptContent: e.target.value }))
             }
             rows={4}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm resize-vertical"
+            className="high-contrast-input w-full px-4 py-3 rounded-xl resize-vertical"
             placeholder="Enter prompt content here..."
           />
         </div>
@@ -282,7 +282,7 @@ const AdsPage: React.FC = () => {
                     type="text"
                     value={ad.name}
                     onChange={(e) => updateAd(ad.id, "name", e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+                    className="high-contrast-input"
                   />
                 </div>
 
@@ -302,7 +302,7 @@ const AdsPage: React.FC = () => {
                         parseFloat(e.target.value) || 0
                       )
                     }
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+                    className="high-contrast-input"
                   />
                 </div>
 
@@ -326,7 +326,7 @@ const AdsPage: React.FC = () => {
                     updateAd(ad.id, "promptContent", e.target.value)
                   }
                   rows={4}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm resize-vertical"
+                  className="high-contrast-input resize-vertical"
                   placeholder="Enter prompt content here..."
                 />
               </div>
