@@ -10,6 +10,7 @@ import PageHeader from "@/components/PageHeader";
 import GradientButton from "@/components/GradientButton";
 import ExpandableSection from "@/components/ExpandableSection";
 import { apiService } from "@/app/services/api.service";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Article {
   id: string;
@@ -22,19 +23,11 @@ interface Article {
   messageTexts: string[];
 }
 
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "editor" | "reporter" | "user";
-  hasReader: boolean;
-  hasReporter: boolean;
-  hasEditor: boolean;
-}
-
 function ArticlesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const reporterId = searchParams.get("reporterId");
+  const { user, hasReader } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,52 +37,8 @@ function ArticlesContent() {
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(
     new Set()
   );
-  const [_user, setUser] = useState<User | null>(null);
-  const [hasReaderAccess, setHasReaderAccess] = useState(false);
   const [appName, setAppName] = useState("Newsroom");
 
-  const checkUserAccess = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        // Allow public access - no redirect needed
-        return;
-      }
-
-      // Check reader ability if no reporterId (all articles view)
-      if (!reporterId) {
-        try {
-          const data = await apiService.get<{ hasReader: boolean }>(
-            "/api/abilities/reader"
-          );
-          setHasReaderAccess(data.hasReader);
-        } catch {
-          // If we can't check permissions, assume no reader access
-          setHasReaderAccess(false);
-        }
-      }
-
-      // Get user info for display
-      try {
-        const userData = await apiService.get<{ user: User }>(
-          "/api/auth/verify"
-        );
-        setUser(userData.user);
-      } catch (error) {
-        console.error("Error getting user data:", error);
-      }
-    } catch (error) {
-      console.error("Error checking user access:", error);
-      // Continue with public access if there's an error
-    }
-  }, [reporterId]);
-
-  // Check user authentication and reader access
-  useEffect(() => {
-    checkUserAccess();
-  }, [checkUserAccess]);
-
-  // Load app configuration
   useEffect(() => {
     const loadConfig = async () => {
       try {
@@ -108,17 +57,13 @@ function ArticlesContent() {
     try {
       let data;
       if (reporterId) {
-        // Fetch articles by specific reporter
         data = await apiService.get<Article[]>(
           `/api/articles?reporterId=${reporterId}`
         );
       } else {
-        // Check if user has reader access for all articles
-        if (hasReaderAccess) {
-          // User has reader access - fetch all articles
+        if (hasReader) {
           data = await apiService.get<Article[]>("/api/articles/all");
         } else {
-          // User doesn't have reader access - fetch latest 5 articles
           data = await apiService.get<Article[]>("/api/articles/public");
         }
       }
@@ -130,7 +75,7 @@ function ArticlesContent() {
     } finally {
       setLoading(false);
     }
-  }, [reporterId, hasReaderAccess]);
+  }, [reporterId, hasReader]);
 
   useEffect(() => {
     if (reporterId) {
@@ -217,14 +162,14 @@ function ArticlesContent() {
           title={
             reporterId
               ? "Articles by Reporter"
-              : !hasReaderAccess
+              : !hasReader
                 ? "Latest Articles"
                 : "All Articles"
           }
           description={
             reporterId
               ? `Reporter ${reporterId.split("_")[2] || reporterId} (${articles.length} articles)`
-              : !hasReaderAccess
+              : !hasReader
                 ? `Showing the ${articles.length} most recent articles (login with Reader access to see all articles)`
                 : `Chronological list of all published articles (${articles.length} articles)`
           }

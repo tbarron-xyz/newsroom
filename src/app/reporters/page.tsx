@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { apiService } from "@/app/services/api.service";
+import { useAuth } from "@/hooks/useAuth";
+import { useList } from "@/hooks/useList";
 
 interface Reporter {
   id: string;
@@ -11,18 +13,9 @@ interface Reporter {
   enabled: boolean;
 }
 
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "editor" | "reporter" | "user";
-  hasReader: boolean;
-  hasReporter: boolean;
-  hasEditor: boolean;
-}
-
 export default function ReportersPage() {
-  const [reporters, setReporters] = useState<Reporter[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const [appName, setAppName] = useState("Newsroom");
   const [editingReporter, setEditingReporter] = useState<Reporter | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -31,21 +24,12 @@ export default function ReportersPage() {
     beats: [] as string[],
     prompt: ""
   });
-  const [user, setUser] = useState<User | null>(null);
-  const [appName, setAppName] = useState("Newsroom");
-  const [userLoading, setUserLoading] = useState(true);
-
-  // Check user authentication and abilities
-  useEffect(() => {
-    checkUserAuth();
-  }, []);
-
-  // Fetch reporters on component mount
-  useEffect(() => {
-    if (!userLoading) {
-      fetchReporters();
-    }
-  }, [userLoading]);
+  const {
+    data: reporters,
+    setData: setReporters,
+    loading,
+    refetch
+  } = useList<Reporter>("/api/reporters");
 
   // Load app configuration
   useEffect(() => {
@@ -61,40 +45,6 @@ export default function ReportersPage() {
     };
     loadConfig();
   }, []);
-
-  const checkUserAuth = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setUserLoading(false);
-        return;
-      }
-
-      const data = await apiService.get<{ user: User }>("/api/auth/verify");
-      setUser(data.user);
-    } catch (error) {
-      console.error("Auth check failed:", error);
-    } finally {
-      setUserLoading(false);
-    }
-  };
-
-  const fetchReporters = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setMessage("Not authenticated");
-        return;
-      }
-      const data = await apiService.get<Reporter[]>("/api/reporters");
-      setReporters(data);
-    } catch (error) {
-      setMessage("Error loading reporters");
-      console.error("Error fetching reporters:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const saveReporter = async (reporter: Reporter) => {
     setSaving(true);
@@ -114,7 +64,7 @@ export default function ReportersPage() {
       setMessage("Reporter updated successfully!");
       setEditingReporter(null);
       setTimeout(() => setMessage(""), 3000);
-      fetchReporters(); // Refresh the list
+      refetch();
     } catch (error) {
       setMessage("Error updating reporter");
       console.error("Error updating reporter:", error);
@@ -139,7 +89,7 @@ export default function ReportersPage() {
       setShowCreateForm(false);
       setNewReporter({ beats: [], prompt: "" });
       setTimeout(() => setMessage(""), 3000);
-      fetchReporters(); // Refresh the list
+      refetch();
     } catch (error) {
       setMessage("Error creating reporter");
       console.error("Error creating reporter:", error);
@@ -166,7 +116,7 @@ export default function ReportersPage() {
       await apiService.delete(`/api/reporters/${reporterId}`);
       setMessage("Reporter deleted successfully!");
       setTimeout(() => setMessage(""), 3000);
-      fetchReporters(); // Refresh the list
+      refetch();
     } catch (error) {
       setMessage("Error deleting reporter");
       console.error("Error deleting reporter:", error);
@@ -235,7 +185,7 @@ export default function ReportersPage() {
       );
       setMessage(data.message);
       setTimeout(() => setMessage(""), 3000);
-      fetchReporters(); // Refresh the list
+      refetch();
     } catch (error) {
       setMessage("Error toggling reporter status");
       console.error("Error toggling reporter status:", error);

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Event } from "../schemas/types";
 import { apiService } from "@/app/services/api.service";
+import { useAuth } from "@/hooks/useAuth";
+import { useList } from "@/hooks/useList";
 
 interface SafeEvent {
   id: string;
@@ -18,73 +20,20 @@ interface SafeEvent {
   messageTexts?: string[];
 }
 
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "editor" | "reporter" | "user";
-  hasReader: boolean;
-  hasReporter: boolean;
-  hasEditor: boolean;
-}
-
 export default function EventsPage() {
-  const [publicEvents, setPublicEvents] = useState<SafeEvent[]>([]);
+  const { isAdmin } = useAuth();
+  const { data: publicEvents, loading, refetch: refetchPublic } = useList<SafeEvent>("/api/events/public");
   const [adminEvents, setAdminEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
   const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    fetchPublicEvents();
-    checkAuthStatus();
-  }, []);
-
-  const fetchPublicEvents = async () => {
-    try {
-      const eventsData =
-        await apiService.get<SafeEvent[]>("/api/events/public");
-      setPublicEvents(eventsData || []);
-    } catch (err) {
-      console.error("Error fetching public events:", err);
-      // Don't set error for public events, just log it
-    }
-  };
-
-  const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const userData = await apiService.get<{ user: User }>("/api/auth/verify");
-      setCurrentUser(userData.user);
-      setIsAdmin(userData.user.role === "admin");
-
-      if (userData.user.role === "admin") {
-        await fetchAdminEvents(token);
-      }
-    } catch (err) {
-      console.error("Auth check failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAdminEvents = async (token: string) => {
+  const fetchAdminEvents = async () => {
     try {
       setAdminLoading(true);
-      const eventsData = await apiService.get<{ events: Event[] }>(
-        "/api/events"
-      );
+      const eventsData = await apiService.get<{ events: Event[] }>("/api/events");
       setAdminEvents(eventsData.events || []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch admin events"
-      );
+      setError(err instanceof Error ? err.message : "Failed to fetch admin events");
     } finally {
       setAdminLoading(false);
     }
@@ -105,17 +54,11 @@ export default function EventsPage() {
 
     try {
       setAdminLoading(true);
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setError("Not authenticated");
-        return;
-      }
-
       await apiService.post("/api/events/generate");
 
       // Refresh both public and admin events
-      await fetchPublicEvents();
-      await fetchAdminEvents(token);
+      await refetchPublic();
+      await fetchAdminEvents();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to generate events"
@@ -129,20 +72,9 @@ export default function EventsPage() {
 
     try {
       setAdminLoading(true);
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setError("Not authenticated");
-        return;
-      }
-
-      const result = await apiService.post(
-        "/api/articles/generate-from-events"
-      );
-      console.log("Articles generated from events:", result);
-
-      // Refresh events (articles are generated from events, so events remain the same)
-      await fetchPublicEvents();
-      if (token) await fetchAdminEvents(token);
+      await apiService.post("/api/articles/generate-from-events");
+      await refetchPublic();
+      await fetchAdminEvents();
     } catch (err) {
       setError(
         err instanceof Error

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PageContainer from "@/components/PageContainer";
 import ContentCard from "@/components/ContentCard";
 import PageHeader from "@/components/PageHeader";
 import { apiService } from "../services/api.service";
+import { useList } from "@/hooks/useList";
 
 interface LatestThread {
   id: number;
@@ -43,30 +44,8 @@ function formatTime(timestamp: number): string {
 }
 
 export default function ForumPage() {
-  const [sections, setSections] = useState<Section[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: sections, loading, error, refetch } = useList<Section>("/api/forum");
   const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-    fetchForumData();
-  }, [router]);
-
-  const fetchForumData = async () => {
-    try {
-      const data = await apiService.get<Section[]>("/api/forum");
-      setSections(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load forum");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

@@ -1,13 +1,26 @@
 import React from "react";
 
-interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface FormInputProps {
   label?: string;
   error?: string;
+  as?: "input" | "textarea";
+  rows?: number;
+  className?: string;
+  type?: string;
+  value?: string | number | readonly string[];
+  placeholder?: string;
+  disabled?: boolean;
+  id?: string;
+  name?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  [key: string]: unknown;
 }
 
 export default function FormInput({
   label,
   error,
+  as: Component = "input",
+  rows,
   className = "",
   ...props
 }: FormInputProps) {
@@ -18,10 +31,18 @@ export default function FormInput({
           {label}
         </label>
       )}
-      <input
-        className={`high-contrast-input w-full px-3 py-2 rounded-lg focus:ring-2 transition-all duration-300 ${className}`}
-        {...props}
-      />
+      {Component === "textarea" ? (
+        <textarea
+          className={`high-contrast-input w-full px-3 py-2 rounded-lg focus:ring-2 transition-all duration-300 resize-none ${className}`}
+          rows={rows}
+          {...props}
+        />
+      ) : (
+        <input
+          className={`high-contrast-input w-full px-3 py-2 rounded-lg focus:ring-2 transition-all duration-300 ${className}`}
+          {...props}
+        />
+      )}
       {error && <p className="text-sm text-red-300">{error}</p>}
     </div>
   );

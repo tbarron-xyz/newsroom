@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User } from "../schemas/types";
 import { apiService } from "@/app/services/api.service";
+import { useAuth } from "@/hooks/useAuth";
+import { useList } from "@/hooks/useList";
 
 interface SafeUser {
   id: string;
@@ -13,45 +15,21 @@ interface SafeUser {
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<SafeUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user: currentUser, isAdmin, loading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [_currentUser, setCurrentUser] = useState<User | null>(null);
+  const { data: users, loading, refetch } = useList<SafeUser>("/api/users");
 
-  useEffect(() => {
-    checkAuthAndFetchUsers();
-  }, []);
+  if (authLoading || loading) {
+    return <div>Loading...</div>;
+  }
 
-  const checkAuthAndFetchUsers = async () => {
-    try {
-      // Get token from localStorage (assuming it's stored there after login)
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setError("Not authenticated");
-        setLoading(false);
-        return;
-      }
+  if (!currentUser) {
+    return <div>Please log in to access this page.</div>;
+  }
 
-      // First, verify the current user
-      const userData = await apiService.get<{ user: User }>("/api/auth/verify");
-      setCurrentUser(userData.user);
-
-      // Check if user is admin
-      if (userData.user.role !== "admin") {
-        setError("Admin access required");
-        setLoading(false);
-        return;
-      }
-
-      // Fetch users
-      const usersData = await apiService.get<SafeUser[]>("/api/users");
-      setUsers(usersData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!isAdmin) {
+    return <div>Admin access required.</div>;
+  }
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
@@ -78,7 +56,6 @@ export default function UsersPage() {
 
   const handleGenerateEvents = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem("accessToken");
       if (!token) {
         setError("Not authenticated");
@@ -93,8 +70,6 @@ export default function UsersPage() {
       setError(
         err instanceof Error ? err.message : "Failed to generate events"
       );
-    } finally {
-      setLoading(false);
     }
   };
 

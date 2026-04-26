@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PageContainer from "../../components/PageContainer";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ContentCard from "../../components/ContentCard";
@@ -9,6 +9,7 @@ import GradientButton from "../../components/GradientButton";
 import FormInput from "../../components/FormInput";
 import EmptyState from "../../components/EmptyState";
 import { apiService } from "@/app/services/api.service";
+import { useList } from "@/hooks/useList";
 
 interface AdEntry {
   id: string;
@@ -19,8 +20,7 @@ interface AdEntry {
 }
 
 const AdsPage: React.FC = () => {
-  const [ads, setAds] = useState<AdEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: ads, setData: setAds, loading, error: listError, refetch } = useList<AdEntry>("/api/ads");
   const [error, setError] = useState<string | null>(null);
   const [newAd, setNewAd] = useState({
     name: "",
@@ -28,23 +28,6 @@ const AdsPage: React.FC = () => {
     promptContent: ""
   });
 
-  // Fetch ads from API
-  const fetchAds = async () => {
-    try {
-      const data = await apiService.get<AdEntry[]>("/api/ads");
-      setAds(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch ads");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAds();
-  }, []);
-
-  // Create new ad
   const createAd = async () => {
     if (!newAd.name || !newAd.bidPrice || !newAd.promptContent) {
       setError("All fields are required");
@@ -188,37 +171,27 @@ const AdsPage: React.FC = () => {
           Create New Ad
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
-          <div>
-            <label className="block text-sm font-medium text-white/90 mb-3">
-              Name
-            </label>
-            <input
-              type="text"
-              value={newAd.name}
-              onChange={(e) =>
-                setNewAd((prev) => ({ ...prev, name: e.target.value }))
-              }
-              className="high-contrast-input"
-              placeholder="Enter ad name"
-            />
-          </div>
+          <FormInput
+            type="text"
+            label="Ad Name"
+            value={newAd.name}
+            onChange={(e) =>
+              setNewAd((prev) => ({ ...prev, name: e.target.value }))
+            }
+            placeholder="Enter ad name"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-white/90 mb-3">
-              Bid Price ($)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={newAd.bidPrice}
-              onChange={(e) =>
-                setNewAd((prev) => ({ ...prev, bidPrice: e.target.value }))
-              }
-              className="high-contrast-input"
-              placeholder="0.00"
-            />
-          </div>
+          <FormInput
+            type="number"
+            label="Bid Price ($)"
+            step="0.01"
+            min="0"
+            value={newAd.bidPrice}
+            onChange={(e) =>
+              setNewAd((prev) => ({ ...prev, bidPrice: e.target.value }))
+            }
+            placeholder="0.00"
+          />
 
           <div className="flex items-end">
             <GradientButton
@@ -232,18 +205,16 @@ const AdsPage: React.FC = () => {
         </div>
 
         <div className="relative z-10">
-          <label className="block text-sm font-medium text-white/90 mb-3">
-            Prompt Content
-          </label>
-          <textarea
-            value={newAd.promptContent}
-            onChange={(e) =>
-              setNewAd((prev) => ({ ...prev, promptContent: e.target.value }))
-            }
-            rows={4}
-            className="high-contrast-input w-full px-4 py-3 rounded-xl resize-vertical"
-            placeholder="Enter prompt content here..."
-          />
+          <FormInput
+              as="textarea"
+              label="Prompt Content"
+              rows={4}
+              value={newAd.promptContent}
+              onChange={(e) =>
+                setNewAd((prev) => ({ ...prev, promptContent: e.target.value }))
+              }
+              placeholder="Enter prompt content here..."
+            />
         </div>
       </div>
 
@@ -273,38 +244,28 @@ const AdsPage: React.FC = () => {
                 </GradientButton>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-3">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={ad.name}
-                    onChange={(e) => updateAd(ad.id, "name", e.target.value)}
-                    className="high-contrast-input"
-                  />
-                </div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
+                <FormInput
+                  type="text"
+                  label="Name"
+                  value={ad.name}
+                  onChange={(e) => updateAd(ad.id, "name", e.target.value)}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-3">
-                    Bid Price ($)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={ad.bidPrice}
-                    onChange={(e) =>
-                      updateAd(
-                        ad.id,
-                        "bidPrice",
-                        parseFloat(e.target.value) || 0
-                      )
-                    }
-                    className="high-contrast-input"
-                  />
-                </div>
+                <FormInput
+                  type="number"
+                  label="Bid Price ($)"
+                  step="0.01"
+                  min="0"
+                  value={ad.bidPrice}
+                  onChange={(e) =>
+                    updateAd(
+                      ad.id,
+                      "bidPrice",
+                      parseFloat(e.target.value) || 0
+                    )
+                  }
+                />
 
                 <div className="md:col-span-1">
                   <label className="block text-sm font-medium text-white/90 mb-3">
@@ -320,14 +281,14 @@ const AdsPage: React.FC = () => {
                 <label className="block text-sm font-medium text-white/90 mb-3">
                   Prompt Content
                 </label>
-                <textarea
+<FormInput
+                  as="textarea"
+                  label="Prompt Content"
+                  rows={4}
                   value={ad.promptContent}
                   onChange={(e) =>
                     updateAd(ad.id, "promptContent", e.target.value)
                   }
-                  rows={4}
-                  className="high-contrast-input resize-vertical"
-                  placeholder="Enter prompt content here..."
                 />
               </div>
             </div>

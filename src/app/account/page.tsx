@@ -256,109 +256,63 @@ export default function AccountPage() {
               Personal Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="firstName"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="high-contrast-input"
-                  placeholder="Enter your first name"
-                />
-              </div>
+              <FormInput
+                type="text"
+                id="firstName"
+                label="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Enter your first name"
+              />
 
-              <div>
-                <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="high-contrast-input"
-                  placeholder="Enter your last name"
-                />
-              </div>
+              <FormInput
+                type="text"
+                id="lastName"
+                label="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Enter your last name"
+              />
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={user.email}
-                  disabled
-                  className="w-full px-3 py-2 backdrop-blur-xl bg-white/5 border border-white/10 rounded-lg text-white/70 cursor-not-allowed"
-                />
-                <p className="text-xs text-white/50 mt-1">
-                  Email cannot be changed
-                </p>
-              </div>
+              <FormInput
+                type="email"
+                id="email"
+                label="Email Address"
+                value={user.email}
+                disabled
+                placeholder="Email cannot be changed"
+              />
+              <p className="text-xs text-white/50 -mt-2">
+                Email cannot be changed
+              </p>
 
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="high-contrast-input"
-                  placeholder="Enter your phone number"
-                />
-              </div>
+              <FormInput
+                type="tel"
+                id="phone"
+                label="Phone Number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your phone number"
+              />
 
-              <div className="md:col-span-2">
-                <label
-                  htmlFor="company"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  Company/Organization
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="high-contrast-input"
-                  placeholder="Enter your company or organization"
-                />
-              </div>
+              <FormInput
+                type="text"
+                id="company"
+                label="Company/Organization"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Enter your company or organization"
+              />
 
-              <div className="md:col-span-2">
-                <label
-                  htmlFor="bio"
-                  className="block text-sm font-medium text-white/90 mb-2"
-                >
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  rows={4}
-                  className="high-contrast-input resize-none"
-                  placeholder="Tell us a bit about yourself"
-                />
-              </div>
+              <FormInput
+                as="textarea"
+                id="bio"
+                label="Bio"
+                rows={4}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell us a bit about yourself"
+              />
             </div>
           </div>
 

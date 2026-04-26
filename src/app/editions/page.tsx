@@ -7,6 +7,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import PageHeader from "../../components/PageHeader";
 import EmptyState from "../../components/EmptyState";
 import { apiService } from "../services/api.service";
+import { useList } from "@/hooks/useList";
 
 interface Article {
   id: string;
@@ -25,17 +26,13 @@ interface NewspaperEdition {
 }
 
 export default function EditionsPage() {
+  const { data: editionsData, loading, refetch: refetchEditions } = useList<NewspaperEdition>("/api/editions/latest");
   const [editions, setEditions] = useState<NewspaperEdition[]>([]);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [appName, setAppName] = useState("Newsroom");
   const [expandedEdition, setExpandedEdition] = useState<string | null>(null);
   const [loadingArticles, setLoadingArticles] = useState<string | null>(null);
   const [showAllArticles, setShowAllArticles] = useState(true);
-
-  useEffect(() => {
-    fetchEditions();
-  }, []);
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -51,29 +48,28 @@ export default function EditionsPage() {
     loadConfig();
   }, []);
 
-  const fetchEditions = async () => {
-    try {
-      const editionsData = await apiService.get<NewspaperEdition[]>(
-        "/api/editions/latest"
-      );
+  useEffect(() => {
+    const loadEditions = async () => {
+      if (!editionsData || editionsData.length === 0) return;
 
-      const fullEditions = await Promise.all(
-        editionsData.map(
-          async (edition: NewspaperEdition) =>
-            await apiService.get<NewspaperEdition>(
-              `/api/editions/${edition.id}`
-            )
-        )
-      );
+      try {
+        const fullEditions = await Promise.all(
+          editionsData.map(
+            async (edition: NewspaperEdition) =>
+              await apiService.get<NewspaperEdition>(
+                `/api/editions/${edition.id}`
+              )
+          )
+        );
 
-      setEditions(fullEditions);
-    } catch (error) {
-      setMessage("Error loading newspaper editions");
-      console.error("Error fetching newspaper editions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setEditions(fullEditions);
+      } catch (error) {
+        setMessage("Error loading newspaper editions");
+        console.error("Error fetching newspaper editions:", error);
+      }
+    };
+    loadEditions();
+  }, [editionsData]);
 
   const fetchEditionWithArticles = async (editionId: string) => {
     setLoadingArticles(editionId);
