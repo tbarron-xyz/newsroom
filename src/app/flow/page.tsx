@@ -19,15 +19,28 @@ import type { Connection } from "@xyflow/system";
 import ArtifactNode from "./ArtifactNode";
 import { apiService } from "../services/api.service";
 
+interface ArtifactInput {
+  name: string;
+  source: "artifacts" | "external";
+  type?: string;
+}
+
 interface Artifact extends Record<string, unknown> {
   id: string;
   type: string;
   status: string;
-  inputs: { name: string; source: string; type?: string }[];
+  inputs: ArtifactInput[];
   prompt_system: string;
   prompt_user_template: string;
   output_schema: Record<string, unknown>;
   output?: string;
+  metadata?: {
+    model_name?: string;
+    reporterId?: string;
+    generated_at?: number;
+    status: string;
+    error_message?: string;
+  };
 }
 
 interface FlowNode {
@@ -193,7 +206,7 @@ function FlowPage() {
       if (targetNode?.data && sourceNode?.data) {
         const newInput = {
           name: `${sourceNode.data.type}#${connection.source.slice(-4)}`,
-          source: "artifacts",
+          source: "artifacts" as const,
           type: sourceNode.data.type
         };
         const newData = {

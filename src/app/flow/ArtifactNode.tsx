@@ -6,7 +6,7 @@ import { apiService } from "../services/api.service";
 
 interface ArtifactInput {
   name: string;
-  source: string;
+  source: "artifacts" | "external";
   type?: string;
 }
 
@@ -19,6 +19,13 @@ interface ArtifactData {
   prompt_user_template: string;
   output_schema: any;
   output?: string;
+  metadata?: {
+    model_name?: string;
+    reporterId?: string;
+    generated_at?: number;
+    status: string;
+    error_message?: string;
+  };
 }
 
 type Props = NodeProps;
@@ -89,7 +96,7 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
 
   const addInput = () => {
     updateNodeData({
-      inputs: [...localData.inputs, { name: "", source: "artifacts", type: "" }]
+      inputs: [...localData.inputs, { name: "", source: "external", type: "" }]
     });
   };
 
@@ -146,6 +153,26 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
               position={Position.Left}
               id={`input-${i}`}
               style={{ top: `${inputHandleTop + i * handleSpacing}px` }}
+            />
+            <select
+              value={input.source}
+              onChange={(e) =>
+                updateInput(
+                  i,
+                  "source",
+                  e.target.value as "artifacts" | "external"
+                )
+              }
+              className="ml-2 p-1 border rounded text-xs text-gray-900"
+            >
+              <option value="artifacts">artifacts</option>
+              <option value="external">external</option>
+            </select>
+            <input
+              value={input.type}
+              onChange={(e) => updateInput(i, "type", e.target.value)}
+              className="ml-1 p-1 border rounded text-xs text-gray-900 w-16"
+              placeholder="type"
             />
             <input
               value={input.name}
@@ -218,6 +245,16 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
           View
         </button>
       </div>
+      <input
+        value={localData.metadata?.model_name || ""}
+        onChange={(e) =>
+          updateNodeData({
+            metadata: { ...localData.metadata, model_name: e.target.value }
+          })
+        }
+        className="w-full p-1 border rounded text-xs text-gray-900 placeholder-gray-400"
+        placeholder="Model name (e.g., gpt-4o)"
+      />
       <Handle type="source" position={Position.Right} id="output" />
       {localData.output && (
         <div className="text-xs text-gray-500 mt-1 p-1 bg-gray-100 rounded">
