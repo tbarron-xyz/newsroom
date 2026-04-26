@@ -238,15 +238,50 @@ function FlowPage() {
     setShowCreateModal(true);
   };
 
-  // Create modal placeholder (expand later)
-  const handleCreate = async (
-    formData: Omit<Artifact, "id" | "status" | "output">
+  const [formData, setFormData] = useState<{
+    type: string;
+    inputs: ArtifactInput[];
+    prompt_system: string;
+    prompt_user_template: string;
+    output_schema: Record<string, unknown>;
+    metadata: { model_name?: string };
+  }>({
+    type: "",
+    inputs: [],
+    prompt_system: "",
+    prompt_user_template: "",
+    output_schema: {},
+    metadata: {}
+  });
+
+  const updateFormField = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const addFormInput = () => {
+    setFormData((prev) => ({
+      ...prev,
+      inputs: [...prev.inputs, { name: "", source: "external", type: "" }]
+    }));
+  };
+
+  const updateFormInput = (
+    index: number,
+    field: keyof ArtifactInput,
+    value: string
   ) => {
+    const newInputs = [...formData.inputs];
+    newInputs[index] = { ...newInputs[index], [field]: value };
+    setFormData((prev) => ({ ...prev, inputs: newInputs }));
+  };
+
+  const handleCreateClick = async () => {
     try {
-      const newArtifact = await apiService.post<Artifact>(
-        "/api/artifacts",
-        formData
-      );
+      const newArtifact = await apiService.post<Artifact>("/api/artifacts", {
+        ...formData,
+        output_schema: JSON.stringify(formData.output_schema),
+        status: "pending"
+      });
       setNodes((nds) => [
         ...nds,
         {
@@ -257,6 +292,14 @@ function FlowPage() {
         } as FlowNode
       ]);
       setShowCreateModal(false);
+      setFormData({
+        type: "",
+        inputs: [],
+        prompt_system: "",
+        prompt_user_template: "",
+        output_schema: {},
+        metadata: {}
+      });
     } catch (error) {
       alert("Create failed");
     }
@@ -304,46 +347,118 @@ function FlowPage() {
         </ReactFlow>
       </div>
 
-      {/* Create Modal - Simplified form */}
+      {/* Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-auto">
+          <div className="bg-white p-6 rounded-lg max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
             <h2 className="text-xl font-bold mb-4">New Artifact</h2>
-            {/* Add form fields similar to node */}
             <div className="space-y-4">
               <input
-                placeholder="Type"
-                id="type"
+                placeholder="Type (e.g., event, article, edition)"
+                value={formData.type}
+                onChange={(e) => updateFormField("type", e.target.value)}
                 className="w-full p-2 border rounded"
               />
+              <input
+                placeholder="Model name (optional, e.g., gpt-4o)"
+                value={formData.metadata.model_name || ""}
+                onChange={(e) =>
+                  updateFormField("metadata", {
+                    ...formData.metadata,
+                    model_name: e.target.value
+                  })
+                }
+                className="w-full p-2 border rounded"
+              />
+
+              {/* Inputs array */}
+              <div className="border rounded p-2">
+                <div className="text-sm font-medium mb-2">Inputs</div>
+                {formData.inputs.map((input, i) => (
+                  <div key={i} className="flex items-center mb-2">
+                    <select
+                      value={input.source}
+                      onChange={(e) =>
+                        updateFormInput(
+                          i,
+                          "source",
+                          e.target.value as "artifacts" | "external"
+                        )
+                      }
+                      className="p-1 border rounded text-xs"
+                    >
+                      <option value="artifacts">artifacts</option>
+                      <option value="external">external</option>
+                    </select>
+                    <input
+                      value={input.type || ""}
+                      onChange={(e) =>
+                        updateFormInput(i, "type", e.target.value)
+                      }
+                      className="ml-1 p-1 border rounded text-xs w-16"
+                      placeholder="type"
+                    />
+                    <input
+                      value={input.name}
+                      onChange={(e) =>
+                        updateFormInput(i, "name", e.target.value)
+                      }
+                      className="flex-1 ml-1 p-1 border rounded text-sm"
+                      placeholder="Input name"
+                    />
+                  </div>
+                ))}
+                <button
+                  onClick={addFormInput}
+                  className="text-blue-500 text-sm hover:underline"
+                >
+                  + Add Input
+                </button>
+              </div>
+
               <textarea
                 placeholder="System Prompt"
+                value={formData.prompt_system}
+                onChange={(e) =>
+                  updateFormField("prompt_system", e.target.value)
+                }
                 className="w-full p-2 border rounded h-20"
               />
               <textarea
                 placeholder="User Template"
+                value={formData.prompt_user_template}
+                onChange={(e) =>
+                  updateFormField("prompt_user_template", e.target.value)
+                }
                 className="w-full p-2 border rounded h-20"
               />
               <textarea
-                placeholder="Output Schema JSON"
-                className="w-full p-2 border rounded h-24 text-sm"
+                placeholder='Output Schema JSON (e.g., { "type": "object", "properties": {} })'
+                value={JSON.stringify(formData.output_schema, null, 2)}
+                onChange={(e) => {
+                  try {
+                    updateFormField(
+                      "output_schema",
+                      JSON.parse(e.target.value)
+                    );
+                  } catch {}
+                }}
+                className="w-full p-2 border rounded h-24 text-sm font-mono"
               />
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="w-full px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() =>
-                  handleCreate({
-                    /* form data */
-                  })
-                }
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Create
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateClick}
+                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Create
+                </button>
+              </div>
             </div>
           </div>
         </div>
