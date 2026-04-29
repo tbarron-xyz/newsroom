@@ -14,7 +14,14 @@ export async function GET() {
 export const POST = withAuth(
   async (request: Request, user) => {
     const body = await request.json();
-    const { type, inputs, prompt_system, prompt_user_template, output_schema, metadata } = body;
+    const {
+      type,
+      inputs,
+      prompt_system,
+      prompt_user_template,
+      output_schema,
+      metadata
+    } = body;
 
     if (
       !type ||

@@ -44,7 +44,12 @@ function formatTime(timestamp: number): string {
 }
 
 export default function ForumPage() {
-  const { data: sections, loading, error, refetch } = useList<Section>("/api/forum");
+  const {
+    data: sections,
+    loading,
+    error,
+    refetch
+  } = useList<Section>("/api/forum");
   const router = useRouter();
 
   if (loading) {

@@ -33,7 +33,7 @@ interface Artifact extends Record<string, unknown> {
   inputs: ArtifactInput[];
   prompt_system: string;
   prompt_user_template: string;
-  output_schema: Record<string, unknown>;
+  output_schema: string;
   output?: string;
   metadata?: {
     model_name?: string;
@@ -66,7 +66,7 @@ interface Job {
   inputs: any[];
   prompt_system: string;
   prompt_user_template: string;
-  output_schema: any;
+  output_schema: string;
   output?: string;
 }
 
@@ -244,14 +244,14 @@ function FlowPage() {
     inputs: ArtifactInput[];
     prompt_system: string;
     prompt_user_template: string;
-    output_schema: Record<string, unknown>;
+    output_schema: string;
     metadata: { model_name?: string };
   }>({
     type: "",
     inputs: [],
     prompt_system: "",
     prompt_user_template: "",
-    output_schema: {},
+    output_schema: "",
     metadata: {}
   });
 
@@ -280,7 +280,7 @@ function FlowPage() {
     try {
       const newArtifact = await apiService.post<Artifact>("/api/artifacts", {
         ...formData,
-        output_schema: JSON.stringify(formData.output_schema),
+        output_schema: formData.output_schema,
         status: "pending"
       });
       setNodes((nds) => [
@@ -298,7 +298,7 @@ function FlowPage() {
         inputs: [],
         prompt_system: "",
         prompt_user_template: "",
-        output_schema: {},
+        output_schema: "",
         metadata: {}
       });
     } catch (error) {
@@ -438,7 +438,7 @@ function FlowPage() {
               <SchemaInput
                 value={formData.output_schema}
                 onChange={(v) => updateFormField("output_schema", v)}
-                placeholder='{ "type": "object", "properties": {} }'
+                placeholder="z.object({ title: z.string(), lead: z.string() })"
               />
               <div className="flex gap-2">
                 <button

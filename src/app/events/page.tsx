@@ -22,7 +22,11 @@ interface SafeEvent {
 
 export default function EventsPage() {
   const { isAdmin } = useAuth();
-  const { data: publicEvents, loading, refetch: refetchPublic } = useList<SafeEvent>("/api/events/public");
+  const {
+    data: publicEvents,
+    loading,
+    refetch: refetchPublic
+  } = useList<SafeEvent>("/api/events/public");
   const [adminEvents, setAdminEvents] = useState<Event[]>([]);
   const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,10 +34,14 @@ export default function EventsPage() {
   const fetchAdminEvents = async () => {
     try {
       setAdminLoading(true);
-      const eventsData = await apiService.get<{ events: Event[] }>("/api/events");
+      const eventsData = await apiService.get<{ events: Event[] }>(
+        "/api/events"
+      );
       setAdminEvents(eventsData.events || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch admin events");
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch admin events"
+      );
     } finally {
       setAdminLoading(false);
     }

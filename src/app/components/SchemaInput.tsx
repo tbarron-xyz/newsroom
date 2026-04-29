@@ -3,8 +3,8 @@
 import React from "react";
 
 interface SchemaInputProps {
-  value: Record<string, unknown>;
-  onChange: (value: Record<string, unknown>) => void;
+  value: string;
+  onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
@@ -12,29 +12,21 @@ interface SchemaInputProps {
 export function SchemaInput({
   value,
   onChange,
-  placeholder = '{ "type": "object", "properties": {} }',
+  placeholder = "z.object({ title: z.string(), lead: z.string() })",
   className = ""
 }: SchemaInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    try {
-      onChange(JSON.parse(e.target.value));
-    } catch {
-      // Allow invalid JSON while typing
-    }
+    onChange(e.target.value);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    try {
-      onChange(JSON.parse(e.target.value));
-    } catch {
-      // Reset to last valid value on parse error
-    }
+    onChange(e.target.value);
   };
 
   return (
     <div className={`space-y-1 ${className}`}>
       <textarea
-        value={JSON.stringify(value, null, 2)}
+        value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}

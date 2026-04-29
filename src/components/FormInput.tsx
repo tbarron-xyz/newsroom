@@ -12,7 +12,9 @@ interface FormInputProps {
   disabled?: boolean;
   id?: string;
   name?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   [key: string]: unknown;
 }
 

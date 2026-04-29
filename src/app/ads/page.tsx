@@ -20,7 +20,13 @@ interface AdEntry {
 }
 
 const AdsPage: React.FC = () => {
-  const { data: ads, setData: setAds, loading, error: listError, refetch } = useList<AdEntry>("/api/ads");
+  const {
+    data: ads,
+    setData: setAds,
+    loading,
+    error: listError,
+    refetch
+  } = useList<AdEntry>("/api/ads");
   const [error, setError] = useState<string | null>(null);
   const [newAd, setNewAd] = useState({
     name: "",
@@ -206,15 +212,15 @@ const AdsPage: React.FC = () => {
 
         <div className="relative z-10">
           <FormInput
-              as="textarea"
-              label="Prompt Content"
-              rows={4}
-              value={newAd.promptContent}
-              onChange={(e) =>
-                setNewAd((prev) => ({ ...prev, promptContent: e.target.value }))
-              }
-              placeholder="Enter prompt content here..."
-            />
+            as="textarea"
+            label="Prompt Content"
+            rows={4}
+            value={newAd.promptContent}
+            onChange={(e) =>
+              setNewAd((prev) => ({ ...prev, promptContent: e.target.value }))
+            }
+            placeholder="Enter prompt content here..."
+          />
         </div>
       </div>
 
@@ -244,7 +250,7 @@ const AdsPage: React.FC = () => {
                 </GradientButton>
               </div>
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
                 <FormInput
                   type="text"
                   label="Name"
@@ -259,11 +265,7 @@ const AdsPage: React.FC = () => {
                   min="0"
                   value={ad.bidPrice}
                   onChange={(e) =>
-                    updateAd(
-                      ad.id,
-                      "bidPrice",
-                      parseFloat(e.target.value) || 0
-                    )
+                    updateAd(ad.id, "bidPrice", parseFloat(e.target.value) || 0)
                   }
                 />
 
@@ -281,7 +283,7 @@ const AdsPage: React.FC = () => {
                 <label className="block text-sm font-medium text-white/90 mb-3">
                   Prompt Content
                 </label>
-<FormInput
+                <FormInput
                   as="textarea"
                   label="Prompt Content"
                   rows={4}

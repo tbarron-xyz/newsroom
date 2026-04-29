@@ -26,7 +26,11 @@ interface NewspaperEdition {
 }
 
 export default function EditionsPage() {
-  const { data: editionsData, loading, refetch: refetchEditions } = useList<NewspaperEdition>("/api/editions/latest");
+  const {
+    data: editionsData,
+    loading,
+    refetch: refetchEditions
+  } = useList<NewspaperEdition>("/api/editions/latest");
   const [editions, setEditions] = useState<NewspaperEdition[]>([]);
   const [message, setMessage] = useState("");
   const [appName, setAppName] = useState("Newsroom");

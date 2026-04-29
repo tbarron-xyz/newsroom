@@ -426,7 +426,7 @@ export default function ArtifactsPage() {
                                   updateInput(index, "filter", val);
                                 } catch {}
                               }}
-className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900 high-contrast-input"
+                              className="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm text-gray-900 high-contrast-input"
                               rows={2}
                             />
                           </div>

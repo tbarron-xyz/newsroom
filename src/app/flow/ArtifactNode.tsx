@@ -18,7 +18,7 @@ interface ArtifactData {
   inputs: ArtifactInput[];
   prompt_system: string;
   prompt_user_template: string;
-  output_schema: any;
+  output_schema: string;
   output?: string;
   metadata?: {
     model_name?: string;
@@ -212,9 +212,9 @@ const ArtifactNode: React.FC<Props> = ({ id, data }) => {
           placeholder="User prompt template"
         />
         <SchemaInput
-          value={localData.output_schema as Record<string, unknown>}
+          value={localData.output_schema}
           onChange={(v) => updateNodeData({ output_schema: v })}
-          placeholder='{ "type": "object", ... }'
+          placeholder="z.object({ title: z.string(), lead: z.string() })"
         />
       </div>
 
