@@ -92,3 +92,5 @@ export const DynamicPersonaSchema = z.object({
 });
 
 export const DynamicPersonasSchema = z.array(DynamicPersonaSchema);
+
+export const threadRepliesSchema = z.array(z.string()).length(3);

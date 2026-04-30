@@ -18,7 +18,8 @@ import {
   reporterArticleSchema,
   eventGenerationResponseSchema,
   generatedCommentSchema,
-  DynamicPersonasSchema
+  DynamicPersonasSchema,
+  threadRepliesSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -172,13 +173,12 @@ export class AIService {
         mostRecentAd
       );
 
-      const { systemPrompt, userPrompt } =
-        AIPrompts.generateStructuredArticlePrompts(
-          reporter,
-          beatsList,
-          socialMediaContext
-        );
-      const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+      const config = AIPrompts.generateStructuredArticlePrompts(
+        reporter,
+        beatsList,
+        socialMediaContext
+      );
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
         `Calling openai article generation with ${AIModelOption.ARTICLE_GENERATION}`
@@ -189,17 +189,14 @@ export class AIService {
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: config.systemPrompt
             },
             {
               role: "user",
-              content: userPrompt
+              content: config.userPrompt
             }
           ],
-          response_format: zodResponseFormat(
-            reporterArticleSchema,
-            "reporter_article"
-          )
+          response_format: config.responseFormat
         }
       );
 
@@ -423,9 +420,11 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
 
     try {
       const editionsText = AIResponseUtils.formatEditionsText(editions);
-      const { systemPrompt, userPrompt } =
-        AIPrompts.selectNotableEditionsPrompts(editionsText, editorPrompt);
-      const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+      const config = AIPrompts.selectNotableEditionsPrompts(
+        editionsText,
+        editorPrompt
+      );
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
         `Calling openai daily edition generation with ${AIModelOption.EDITION_SELECTION}`
@@ -437,17 +436,14 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: config.systemPrompt
             },
             {
               role: "user",
-              content: userPrompt
+              content: config.userPrompt
             }
           ],
-          response_format: zodResponseFormat(
-            dailyEditionSchema,
-            "daily_edition"
-          )
+          response_format: config.responseFormat
         },
         modelName
       );
@@ -546,13 +542,13 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
           : "No social media messages available.";
 
       const beatsList = reporter.beats.join(", ");
-      const { systemPrompt, userPrompt } = AIPrompts.generateEventsPrompts(
+      const config = AIPrompts.generateEventsPrompts(
         reporter,
         beatsList,
         eventsContext,
         socialMediaContext
       );
-      const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
         `Calling openai event generation with ${AIModelOption.EVENT_GENERATION}`
@@ -563,17 +559,14 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: config.systemPrompt
             },
             {
               role: "user",
-              content: userPrompt
+              content: config.userPrompt
             }
           ],
-          response_format: zodResponseFormat(
-            eventGenerationResponseSchema,
-            "events"
-          )
+          response_format: config.responseFormat
         },
         modelName
       );
@@ -702,15 +695,14 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         false
       );
 
-      const { systemPrompt, userPrompt } =
-        AIPrompts.generateArticlesFromEventsPrompts(
-          reporter,
-          beatsList,
-          eventsContext,
-          articlesContext,
-          socialMediaContext
-        );
-      const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+      const config = AIPrompts.generateArticlesFromEventsPrompts(
+        reporter,
+        beatsList,
+        eventsContext,
+        articlesContext,
+        socialMediaContext
+      );
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
         `Calling openai articles from events generation with ${AIModelOption.ARTICLE_GENERATION}`
@@ -721,17 +713,14 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: config.systemPrompt
             },
             {
               role: "user",
-              content: userPrompt
+              content: config.userPrompt
             }
           ],
-          response_format: zodResponseFormat(
-            reporterArticleSchema,
-            "reporter_article"
-          )
+          response_format: config.responseFormat
         }
       );
 
@@ -832,23 +821,33 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         const last15 = postContents.slice(-15);
         const selectedPosts = [...first10, ...last15];
 
-        const { systemPrompt, userPrompt } =
-          AIPrompts.generateGenericThreadReplyPrompts(
-            personaData.system_prompt,
-            personaData.display,
-            thread.title,
-            selectedPosts
-          );
-        const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+        const config = AIPrompts.generateGenericThreadReplyPrompts(
+          personaData.system_prompt,
+          personaData.display,
+          thread.title,
+          selectedPosts
+        );
+        const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
-        return { thread, systemPrompt, userPrompt, fullPrompt };
+        return {
+          thread,
+          systemPrompt: config.systemPrompt,
+          userPrompt: config.userPrompt,
+          fullPrompt,
+          responseFormat: config.responseFormat
+        };
       });
-      const threadRepliesSchema = z.array(z.string()).length(3);
 
       let completionModel = null;
       const replies = await Promise.all(
         promptData.map(
-          async ({ thread, systemPrompt, userPrompt, fullPrompt }) => {
+          async ({
+            thread,
+            systemPrompt,
+            userPrompt,
+            fullPrompt,
+            responseFormat
+          }) => {
             try {
               console.log(
                 `Calling openai thread reply generation for thread ${thread.id} with ${AIModelOption.GENERAL}`
@@ -861,10 +860,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
                     { role: "system", content: systemPrompt },
                     { role: "user", content: userPrompt }
                   ],
-                  response_format: zodResponseFormat(
-                    threadRepliesSchema,
-                    "replies"
-                  )
+                  response_format: responseFormat
                 }
               );
               completionModel = completionResult.modelUsed;
@@ -957,26 +953,25 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         .map((c) => `- ${c.author}: ${c.content}`)
         .join("\n");
 
-      const { systemPrompt, userPrompt } =
-        AIPrompts.generateCommentPromptsGeneric(
-          persona.system_prompt,
-          persona.display,
-          dailyEditionText,
-          existingCommentsText,
-          recentPosts
-        );
+      const config = AIPrompts.generateCommentPromptsGeneric(
+        persona.system_prompt,
+        persona.display,
+        dailyEditionText,
+        existingCommentsText,
+        recentPosts
+      );
 
-      const fullPrompt = `System: ${systemPrompt}\n\nUser: ${userPrompt}`;
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       const result = await this.aiClient.createChatCompletion(
         AIModelOption.GENERAL,
         {
           messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
           ],
           reasoning_effort: "minimal",
-          response_format: zodResponseFormat(generatedCommentSchema, "comment")
+          response_format: config.responseFormat
         },
         modelName
       );
@@ -1033,8 +1028,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
   ): Promise<DynamicPersona[]> {
     console.log("Generating dynamic personas for edition");
 
-    const { systemPrompt, userPrompt } =
-      AIPrompts.generateDynamicPersonasPrompts(editionText);
+    const config = AIPrompts.generateDynamicPersonasPrompts(editionText);
 
     let attempts = 0;
     const maxAttempts = 2;
@@ -1044,14 +1038,11 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
           AIModelOption.GENERAL,
           {
             messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt }
+              { role: "system", content: config.systemPrompt },
+              { role: "user", content: config.userPrompt }
             ],
             reasoning_effort: "minimal",
-            response_format: zodResponseFormat(
-              DynamicPersonasSchema,
-              "personas"
-            )
+            response_format: config.responseFormat
           }
         );
         const content = result.response.choices[0]?.message?.content;

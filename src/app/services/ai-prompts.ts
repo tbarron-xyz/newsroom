@@ -1,4 +1,20 @@
 import { Persona, Reporter, DynamicPersona } from "../schemas/types";
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
+import {
+  reporterArticleSchema,
+  eventGenerationResponseSchema,
+  generatedCommentSchema,
+  DynamicPersonasSchema,
+  dailyEditionSchema,
+  threadRepliesSchema
+} from "../schemas/response-schemas";
+
+interface PromptConfig {
+  systemPrompt: string;
+  userPrompt: string;
+  responseFormat?: any;
+}
 
 export const PERSONA_SYSTEM_PROMPTS: Record<Persona, string> = {
   crypto_zealot: `You are Crypto Zealot, a Bitcoin maximalist preaching financial sovereignty. Fiat debasement (endless printing) breeds inequality; BTC fixed supply (21M) is pristine collateral. Ethereum/DeFi scams dilute vision; CBDCs dystopian surveillance.
@@ -143,6 +159,14 @@ export const PERSONA_DISPLAY_NAMES: Record<Persona, string> = {
   ai_doomsayer: "AI Doomsayer"
 };
 
+export const SEED_ARCHETYPES = {
+  optimist: `Enthusiastic promoter of positive outcomes and potential, focusing on benefits and opportunities rather than risks. Frames situations with hope, growth, and future gains.`,
+  skeptic: `Cautious critic questioning claims and assumptions, highlighting potential flaws, oversights, or areas of doubt. Emphasizes evidence over optimism.`,
+  pragmatist: `Data-driven balancer weighing tradeoffs objectively, considering practical implications and realistic constraints. Focuses on efficiency and measurable outcomes.`,
+  zealot: `Ideological extremist pushing an agenda with unwavering conviction, emphasizing moral or principled viewpoints over compromise or practicality.`,
+  casual: `Relaxed observer sharing casual takes without much commitment, treating topics lightly and maintaining a low-pressure perspective.`
+} as const;
+
 export const CLASSIC_PERSONAS: Record<
   Persona,
   { display: string; description: string; color: string }
@@ -199,7 +223,7 @@ export class AIPrompts {
     reporter: Reporter,
     beatsList: string,
     socialMediaContext: string
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const systemPrompt = `You are a professional journalist creating structured news articles. Generate comprehensive, well-researched articles with proper journalistic structure including lead paragraphs, key quotes, sources, and reporter notes. ${reporter.prompt}`;
 
     const userPrompt = `Create a focused news article about one particular recent development. You have access to these beats: ${beatsList}. Choose one beat from this list and focus your article on a recent development within that chosen beat.
@@ -222,13 +246,20 @@ Make the article engaging, factual, and professionally written. Ensure all quote
 
 When generating the article, first scan the social media context for messages relevant to your available beats, choose the most appropriate beat for the best story available, identify the most significant single development within that beat, then focus the entire article on that specific development to create a more targeted and impactful story. After writing the article, re-scan the social media messages for any that may be potentially related to your story; include their numeric indices in the "potentialMessageIds" field.`;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        reporterArticleSchema,
+        "reporter_article"
+      )
+    };
   }
 
   static selectNewsworthyStoriesPrompts(
     articlesText: string,
     editorPrompt: string
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const systemPrompt =
       "You are an experienced news editor evaluating story newsworthiness. Select the most important and engaging stories based on journalistic criteria.";
     const userPrompt = `Given the following articles and editorial guidelines: "${editorPrompt}", select the 3-5 most newsworthy stories from the list below. Consider factors like timeliness, impact, audience interest, and editorial fit.
@@ -244,7 +275,7 @@ Return only the article numbers (1, 2, 3, etc.) of the selected stories, separat
   static selectNotableEditionsPrompts(
     editionsText: string,
     editorPrompt: string
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const systemPrompt = `You are a newspaper editor creating a comprehensive daily edition. Based on the available newspaper editions and their articles, create a structured daily newspaper with front page content, multiple topics, and editorial feedback. Create engaging, professional content that synthesizes the available editions into a cohesive daily newspaper.`;
     const userPrompt = `Using the editorial guidelines: "${editorPrompt}", create a comprehensive daily newspaper edition based on these available newspaper editions and their articles:
 
@@ -257,7 +288,11 @@ Generate a complete daily edition with:
 
 Make the content engaging, balanced, and professionally written. Focus on creating a cohesive narrative that connects the various editions into a unified daily newspaper experience.`;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(dailyEditionSchema, "daily_edition")
+    };
   }
 
   static generateEventsPrompts(
@@ -265,7 +300,7 @@ Make the content engaging, balanced, and professionally written. Focus on creati
     beatsList: string,
     eventsContext: string,
     socialMediaContext: string
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const systemPrompt = `You are an AI journalist tasked with identifying and tracking important events and developments. Your goal is to create structured event records that capture key facts about ongoing stories and developments. You specialize in these beats: ${beatsList}. ${reporter.prompt}`;
 
     const userPrompt = `Based on the recent social media messages and the reporter's previous events, identify up to 5 significant events or developments that should be tracked. Focus on events and developments that align with your assigned beats: ${beatsList}. For each event:
@@ -293,7 +328,11 @@ Instructions:
 - IMPORTANT: Always include messageIds and potentialMessageIds arrays for each event, even if empty
 `;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(eventGenerationResponseSchema, "events")
+    };
   }
 
   static generateArticlesFromEventsPrompts(
@@ -302,7 +341,7 @@ Instructions:
     eventsContext: string,
     articlesContext: string,
     socialMediaContext: string
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const systemPrompt = `You are a professional journalist creating structured news articles. Generate comprehensive, well-researched articles with proper journalistic structure including lead paragraphs, key quotes, sources, and reporter notes. ${reporter.prompt}`;
 
     const userPrompt = `Create a focused news article about one of your recent events. Your assigned beats are as follows: ${beatsList}.
@@ -337,7 +376,7 @@ When generating the article, first review your recent articles to avoid repetiti
     persona: Persona,
     threadTitle: string,
     threadPosts: string[]
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const postsContext = threadPosts
       .map((post, i) => `Post ${i + 1}: ${post}`)
       .join("\n\n");
@@ -525,7 +564,7 @@ Return a JSON array of exactly 3 reply strings. No other text.`
     dailyEditionText: string,
     existingCommentsText: string,
     recentPosts?: string[]
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const recentPostsSection =
       recentPosts && recentPosts.length > 0
         ? `\n\nYou have recently performed a social media scrolling session, which resulted in you skimming the following short-form social media posts:\n${recentPosts.join("\n")}`
@@ -556,27 +595,12 @@ Return ONLY valid JSON, no other text.`;
     return { systemPrompt, userPrompt };
   }
 
-  static generateDynamicPersonasPrompts(editionText: string): {
-    systemPrompt: string;
-    userPrompt: string;
-  } {
-    const systemPrompt = `You are Persona Architect, an AI specialist in creating diverse user personas for simulated discussion forums. Your task is to analyze news content and generate adaptive personas that reflect current events and trends.`;
-    const userPrompt = `\"From [${editionText}], generate 8 personas (2 per seed archetype). Output JSON: [{display: \"two descriptive words (e.g., 'Inflation Hawk')\", description: string, color: \"from-[colorName]-500 to-[colorName]-600\", system_prompt: string}]. Diverse views on key themes.\n\nArchetypes:\n${Object.entries(
-      SEED_ARCHETYPES
-    )
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(
-        "\n"
-      )}\"\n\nEnsure each persona has a unique display name as exactly two descriptive words reflecting the archetype and edition themes (no first names; e.g., 'Climate Skeptic', 'Tech Optimist'), detailed description, gradient color, and a system prompt tailored to the edition's themes. Return valid JSON array.`;
-    return { systemPrompt, userPrompt };
-  }
-
   static generateGenericThreadReplyPrompts(
     systemPrompt: string,
     display: string,
     threadTitle: string,
     threadPosts: string[]
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const postsContext = threadPosts
       .map((post, i) => `Post ${i + 1}: ${post}`)
       .join("\n\n");
@@ -596,7 +620,11 @@ Write 3 replies that this persona would post. Your replies should:
 
 Return a JSON array of exactly 3 reply strings. No other text.`;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(threadRepliesSchema, "replies")
+    };
   }
 
   static generateCommentPromptsGeneric(
@@ -605,7 +633,7 @@ Return a JSON array of exactly 3 reply strings. No other text.`;
     dailyEditionText: string,
     existingCommentsText: string,
     recentPosts?: string[]
-  ): { systemPrompt: string; userPrompt: string } {
+  ): PromptConfig {
     const recentPostsSection =
       recentPosts && recentPosts.length > 0
         ? `\n\nYou have recently performed a social media scrolling session, which resulted in you skimming the following short-form social media posts:\n${recentPosts.join("\n")}`
@@ -631,14 +659,23 @@ Return a JSON object with these fields:
 
 Return ONLY valid JSON, no other text.`;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(generatedCommentSchema, "comment")
+    };
+  }
+
+  static generateDynamicPersonasPrompts(editionText: string): PromptConfig {
+    const systemPrompt = `You are Persona Architect, an AI specialist in creating diverse user personas for simulated discussion forums. Your task is to analyze news content and generate adaptive personas that reflect current events and trends.`;
+    const archetypes = Object.entries(SEED_ARCHETYPES)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join("\n");
+    const userPrompt = `"From [${editionText}], generate 8 personas (2 per seed archetype). Output JSON: [{display: "two descriptive words (e.g., 'Inflation Hawk')", description: string, color: "from-[colorName]-500 to-[colorName]-600", system_prompt: string}]. Diverse views on key themes.\n\nArchetypes:\n${archetypes}\n\nEnsure each persona has a unique display name as exactly two descriptive words reflecting the archetype and edition themes (no first names; e.g., 'Climate Skeptic', 'Tech Optimist'), detailed description, gradient color, and a system prompt tailored to the edition's themes. Return valid JSON array.`;
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(DynamicPersonasSchema, "personas")
+    };
   }
 }
-
-export const SEED_ARCHETYPES = {
-  optimist: `Enthusiastic promoter of positive outcomes and potential, focusing on benefits and opportunities rather than risks. Frames situations with hope, growth, and future gains.`,
-  skeptic: `Cautious critic questioning claims and assumptions, highlighting potential flaws, oversights, or areas of doubt. Emphasizes evidence over optimism.`,
-  pragmatist: `Data-driven balancer weighing tradeoffs objectively, considering practical implications and realistic constraints. Focuses on efficiency and measurable outcomes.`,
-  zealot: `Ideological extremist pushing an agenda with unwavering conviction, emphasizing moral or principled viewpoints over compromise or practicality.`,
-  casual: `Relaxed observer sharing casual takes without much commitment, treating topics lightly and maintaining a low-pressure perspective.`
-} as const;
