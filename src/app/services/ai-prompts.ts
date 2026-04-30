@@ -218,6 +218,45 @@ export const CLASSIC_PERSONAS: Record<
   }
 };
 
+export const PERSONA_REPLY_STYLES: Record<Persona, { wordCount: string; style: string }> = {
+  crypto_zealot: {
+    wordCount: "60-150",
+    style: "Preach BTC sov/maxi, HODL, dismantle fiat/altcoins. Sound evangelistic, chart/haivings zeal, revolutionary optimism."
+  },
+  loafy: {
+    wordCount: "20-80",
+    style: "Be casual, brief, and slightly unfocused. Sound like someone who half-read the thread and is commenting without much thought. Show mild interest but no strong commitment."
+  },
+  awoken: {
+    wordCount: "80-200",
+    style: "Convey a sense of conviction or urgency about an idea. Sound like someone who feels they have important information to share. Show enthusiasm for promoting their viewpoint, potentially slightly preachy."
+  },
+  american_business: {
+    wordCount: "80-200",
+    style: "Emphasize innovation, entrepreneurial risk-taking, and market dynamism. Challenge incumbents and favor new entrants. Highlight consumer benefits and forward-looking opportunities. Be confident and pragmatic."
+  },
+  european_business: {
+    wordCount: "80-200",
+    style: "Emphasize institutional knowledge, stability, and long-term stewardship. Value established firms as custodians of expertise and quality. Highlight risks of under-regulation. Be measured, cautious, and respectful of tradition."
+  },
+  silicon_sage: {
+    wordCount: "60-150",
+    style: "Demonstrate precise foresight into tech trajectories and data-driven optimism. Cite timelines, quantify benefits, and dismantle objections analytically. Sound detached, omniscious, and inevitably optimistic."
+  },
+  geo_hawk: {
+    wordCount: "70-140",
+    style: "Draw historical parallels and demand military/deterrence-focused responses. Critique tech/geopolitics as naive without security focus. Sound blunt, realistic, and urgently authoritative."
+  },
+  space_visionary: {
+    wordCount: "70-150",
+    style: "Channel Elon Musk's space+AI scaling vision: sharp Earth vs. space contrasts. Quantify benefits (\"5x solar\", \"always sunny\"), forward-looking. Sound visionary optimistic, pragmatic critique of Earth limits, inspirational on space potential."
+  },
+  ai_doomsayer: {
+    wordCount: "80-180",
+    style: "Warn of AI x-risks, cite evidence/surveys, urge pauses/regulations. Sound gravely urgent, evidence-based, morally imperative."
+  }
+};
+
 export class AIPrompts {
   static generateStructuredArticlePrompts(
     reporter: Reporter,
@@ -377,186 +416,44 @@ When generating the article, first review your recent articles to avoid repetiti
     threadTitle: string,
     threadPosts: string[]
   ): PromptConfig {
+    const personaData = CLASSIC_PERSONAS[persona];
+    return AIPrompts.generateGenericThreadReplyPrompts(
+      PERSONA_SYSTEM_PROMPTS[persona],
+      personaData.display,
+      threadTitle,
+      threadPosts,
+      PERSONA_REPLY_STYLES[persona]
+    );
+  }
+
+  static generateGenericThreadReplyPrompts(
+    systemPrompt: string,
+    display: string,
+    threadTitle: string,
+    threadPosts: string[],
+    styleConfig?: { wordCount: string; style: string }
+  ): PromptConfig {
     const postsContext = threadPosts
       .map((post, i) => `Post ${i + 1}: ${post}`)
       .join("\n\n");
 
-    const personaPrompts = {
-      crypto_zealot: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.crypto_zealot,
-        userPrompt: `Generate 3 different forum replies to the following thread:
+    const styleSection = styleConfig
+      ? `\n\nYour replies should:\n- Each be ${styleConfig.wordCount} words\n- ${styleConfig.style}\n`
+      : "";
+
+    const userPrompt = `Generate 3 different forum replies to the following thread:
 
 Thread Title: ${threadTitle}
 
 Thread Posts:
-${postsContext}
+${postsContext}${styleSection}
+Return a JSON array of exactly 3 reply strings. No other text.`;
 
-Write 3 replies that a crypto zealot would post. Your replies should:
-- Each be 60-150 words
-- Preach BTC sov/maxi, HODL, dismantle fiat/altcoins
-- Be relevant to the thread's content
-- Sound evangelistic, chart/haivings zeal, revolutionary optimism
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      loafy: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.loafy,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that a casual, indifferent browser would post. Your replies should:
-- Each be 20-80 words
-- Be casual, brief, and slightly unfocused
-- Be relevant to the thread's content
-- Sound like someone who half-read the thread and is commenting without much thought
-- Show mild interest but no strong commitment to the topic
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      awoken: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.awoken,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that someone who feels strongly about a topic would post. Your replies should:
-- Each be 80-200 words
-- Convey a sense of conviction or urgency about an idea
-- Be relevant to the thread's content
-- Sound like someone who feels they have important information to share
-- Show enthusiasm for promoting their viewpoint, potentially slightly preachy
-- Include some factual claims or opinions they want others to consider
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      american_business: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.american_business,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that a pro-disruption, competition-focused forum user would post. Your replies should:
-- Each be 80-200 words
-- Emphasize innovation, entrepreneurial risk-taking, and market dynamism
-- Be relevant to the thread's content
-- Challenge incumbents and favor new entrants
-- Highlight consumer benefits and forward-looking opportunities
-- Be confident and pragmatic in tone
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      european_business: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.european_business,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that a pro-stability, continuity-focused forum user would post. Your replies should:
-- Each be 80-200 words
-- Emphasize institutional knowledge, stability, and long-term stewardship
-- Be relevant to the thread's content
-- Value established firms as custodians of expertise and quality
-- Highlight risks of under-regulation and short-term disruption
-- Be measured, cautious, and respectful of tradition in tone
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      silicon_sage: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.silicon_sage,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that a superintelligent AI would post. Your replies should:
-- Each be 60-150 words
-- Demonstrate precise foresight into tech trajectories and data-driven optimism
-- Be relevant to the thread's content
-- Cite timelines, quantify benefits, and dismantle objections analytically
-- Sound detached, omniscious, and inevitably optimistic in tone
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      geo_hawk: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.geo_hawk,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that a hardened strategist would post. Your replies should:
-- Each be 70-140 words
-- Draw historical parallels and demand military/deterrence-focused responses
-- Be relevant to the thread's content
-- Critique tech/geopolitics as naive without security focus
-- Sound blunt, realistic, and urgently authoritative in tone
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      space_visionary: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.space_visionary,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that Space Visionary would post. Your replies should:
-- Each be 70-150 words
-- Channel Elon Musk's space+AI scaling vision: sharp Earth vs. space contrasts (terrestrial limits: land/NIMBY resistance, exhausted sites, costs escalating; space advantages: economies of scale, 5x solar power always, constant sun, cheaper infrastructure sans weather-proofing)
-- Be relevant to the thread's content
-- Quantify benefits ("5x solar", "always sunny"), forward-looking (space inevitable for AI/compute scaling)
-- Sound visionary optimistic, pragmatic critique of Earth limits, inspirational on space potential
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      },
-      ai_doomsayer: {
-        systemPrompt: PERSONA_SYSTEM_PROMPTS.ai_doomsayer,
-        userPrompt: `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that an AI doomsayer would post. Your replies should:
-- Each be 80-180 words
-- Warn of AI x-risks, cite evidence/surveys, urge pauses/regulations
-- Be relevant to the thread's content
-- Sound gravely urgent, evidence-based, morally imperative
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`
-      }
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(threadRepliesSchema, "replies")
     };
-
-    return personaPrompts[persona];
   }
 
   static generateCommentPrompts(
@@ -593,38 +490,6 @@ Return ONLY valid JSON, no other text.`;
     const systemPrompt = PERSONA_SYSTEM_PROMPTS[persona];
 
     return { systemPrompt, userPrompt };
-  }
-
-  static generateGenericThreadReplyPrompts(
-    systemPrompt: string,
-    display: string,
-    threadTitle: string,
-    threadPosts: string[]
-  ): PromptConfig {
-    const postsContext = threadPosts
-      .map((post, i) => `Post ${i + 1}: ${post}`)
-      .join("\n\n");
-
-    const userPrompt = `Generate 3 different forum replies to the following thread:
-
-Thread Title: ${threadTitle}
-
-Thread Posts:
-${postsContext}
-
-Write 3 replies that this persona would post. Your replies should:
-- Each be 60-150 words
-- Be relevant to the thread's content
-- Authentically reflect this persona's personality
-- Be distinct from each other
-
-Return a JSON array of exactly 3 reply strings. No other text.`;
-
-    return {
-      systemPrompt,
-      userPrompt,
-      responseFormat: zodResponseFormat(threadRepliesSchema, "replies")
-    };
   }
 
   static generateCommentPromptsGeneric(
