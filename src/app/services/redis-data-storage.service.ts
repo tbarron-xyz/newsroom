@@ -1292,26 +1292,26 @@ export class RedisDataStorageService implements IDataStorageService {
     }
 
     // Store model feedback
-    if (dailyEdition.modelFeedbackAboutThePrompt) {
-      console.log(
-        "Redis Write: SET",
-        `daily_edition:${dailyEditionId}:model_feedback_positive`,
-        dailyEdition.modelFeedbackAboutThePrompt.positive
-      );
-      multi.set(
-        `daily_edition:${dailyEditionId}:model_feedback_positive`,
-        dailyEdition.modelFeedbackAboutThePrompt.positive
-      );
-      console.log(
-        "Redis Write: SET",
-        `daily_edition:${dailyEditionId}:model_feedback_negative`,
-        dailyEdition.modelFeedbackAboutThePrompt.negative
-      );
-      multi.set(
-        `daily_edition:${dailyEditionId}:model_feedback_negative`,
-        dailyEdition.modelFeedbackAboutThePrompt.negative
-      );
-    }
+    // if (dailyEdition.modelFeedbackAboutThePrompt) {
+    //   console.log(
+    //     "Redis Write: SET",
+    //     `daily_edition:${dailyEditionId}:model_feedback_positive`,
+    //     dailyEdition.modelFeedbackAboutThePrompt.positive
+    //   );
+    //   multi.set(
+    //     `daily_edition:${dailyEditionId}:model_feedback_positive`,
+    //     dailyEdition.modelFeedbackAboutThePrompt.positive
+    //   );
+    //   console.log(
+    //     "Redis Write: SET",
+    //     `daily_edition:${dailyEditionId}:model_feedback_negative`,
+    //     dailyEdition.modelFeedbackAboutThePrompt.negative
+    //   );
+    //   multi.set(
+    //     `daily_edition:${dailyEditionId}:model_feedback_negative`,
+    //     dailyEdition.modelFeedbackAboutThePrompt.negative
+    //   );
+    // }
 
     // Store topics as JSON
     console.log(
@@ -1448,13 +1448,13 @@ export class RedisDataStorageService implements IDataStorageService {
       frontPageHeadline: frontPageHeadline || "",
       frontPageArticle: frontPageArticle || "",
       newspaperName: newspaperName || undefined,
-      modelFeedbackAboutThePrompt:
-        modelFeedbackPositive || modelFeedbackNegative
-          ? {
-              positive: modelFeedbackPositive || "",
-              negative: modelFeedbackNegative || ""
-            }
-          : undefined,
+      // modelFeedbackAboutThePrompt:
+      //   modelFeedbackPositive || modelFeedbackNegative
+      //     ? {
+      //         positive: modelFeedbackPositive || "",
+      //         negative: modelFeedbackNegative || ""
+      //       }
+      //     : undefined,
       topics,
       prompt:
         prompt ||

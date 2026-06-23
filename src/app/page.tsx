@@ -33,10 +33,10 @@ interface DailyEdition {
   frontPageArticle: string;
   newspaperName?: string;
   topics: Topic[];
-  modelFeedbackAboutThePrompt?: {
-    positive: string;
-    negative: string;
-  };
+  // modelFeedbackAboutThePrompt?: {
+  //   positive: string;
+  //   negative: string;
+  // };
   prompt: string;
 }
 
@@ -336,7 +336,7 @@ export default function Home() {
                   </div>
 
                   {/* Model Feedback */}
-                  {user?.role === "admin" &&
+                  {/* {user?.role === "admin" &&
                     selectedEdition.modelFeedbackAboutThePrompt?.positive && (
                       <div className="backdrop-blur-xl sparkly-bg border border-white/20 rounded-2xl p-8 shadow-2xl">
                         <h2 className="text-xl font-bold text-white/90 mb-6">
@@ -367,7 +367,7 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                   {/* Generation Prompt */}
                   <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">

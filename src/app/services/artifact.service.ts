@@ -43,17 +43,19 @@ export class ArtifactService {
     const editor = await this.dataStorageService.getEditor();
     if (!editor) throw new Error("Editor not found");
 
+    const modelName = artifact.metadata?.model_name || editor.articleModelName;
+
     // Get AI response with JSON mode
     const { response, modelUsed } = await this.aiClient.createChatCompletion(
-      "articleModelName" as AIModelOption, // or dynamic per type
+      "articleModelName" as AIModelOption,
       {
         messages: [
           { role: "system", content: artifact.prompt_system },
           { role: "user", content: renderedPrompt }
         ],
-        response_format: { type: "json_object" } // Use json_object for now
+        response_format: { type: "json_object" }
       },
-      editor.articleModelName
+      modelName
     );
 
     // Parse response

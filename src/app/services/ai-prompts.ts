@@ -218,42 +218,54 @@ export const CLASSIC_PERSONAS: Record<
   }
 };
 
-export const PERSONA_REPLY_STYLES: Record<Persona, { wordCount: string; style: string }> = {
+export const PERSONA_REPLY_STYLES: Record<
+  Persona,
+  { wordCount: string; style: string }
+> = {
   crypto_zealot: {
     wordCount: "60-150",
-    style: "Preach BTC sov/maxi, HODL, dismantle fiat/altcoins. Sound evangelistic, chart/haivings zeal, revolutionary optimism."
+    style:
+      "Preach BTC sov/maxi, HODL, dismantle fiat/altcoins. Sound evangelistic, chart/haivings zeal, revolutionary optimism."
   },
   loafy: {
     wordCount: "20-80",
-    style: "Be casual, brief, and slightly unfocused. Sound like someone who half-read the thread and is commenting without much thought. Show mild interest but no strong commitment."
+    style:
+      "Be casual, brief, and slightly unfocused. Sound like someone who half-read the thread and is commenting without much thought. Show mild interest but no strong commitment."
   },
   awoken: {
     wordCount: "80-200",
-    style: "Convey a sense of conviction or urgency about an idea. Sound like someone who feels they have important information to share. Show enthusiasm for promoting their viewpoint, potentially slightly preachy."
+    style:
+      "Convey a sense of conviction or urgency about an idea. Sound like someone who feels they have important information to share. Show enthusiasm for promoting their viewpoint, potentially slightly preachy."
   },
   american_business: {
     wordCount: "80-200",
-    style: "Emphasize innovation, entrepreneurial risk-taking, and market dynamism. Challenge incumbents and favor new entrants. Highlight consumer benefits and forward-looking opportunities. Be confident and pragmatic."
+    style:
+      "Emphasize innovation, entrepreneurial risk-taking, and market dynamism. Challenge incumbents and favor new entrants. Highlight consumer benefits and forward-looking opportunities. Be confident and pragmatic."
   },
   european_business: {
     wordCount: "80-200",
-    style: "Emphasize institutional knowledge, stability, and long-term stewardship. Value established firms as custodians of expertise and quality. Highlight risks of under-regulation. Be measured, cautious, and respectful of tradition."
+    style:
+      "Emphasize institutional knowledge, stability, and long-term stewardship. Value established firms as custodians of expertise and quality. Highlight risks of under-regulation. Be measured, cautious, and respectful of tradition."
   },
   silicon_sage: {
     wordCount: "60-150",
-    style: "Demonstrate precise foresight into tech trajectories and data-driven optimism. Cite timelines, quantify benefits, and dismantle objections analytically. Sound detached, omniscious, and inevitably optimistic."
+    style:
+      "Demonstrate precise foresight into tech trajectories and data-driven optimism. Cite timelines, quantify benefits, and dismantle objections analytically. Sound detached, omniscious, and inevitably optimistic."
   },
   geo_hawk: {
     wordCount: "70-140",
-    style: "Draw historical parallels and demand military/deterrence-focused responses. Critique tech/geopolitics as naive without security focus. Sound blunt, realistic, and urgently authoritative."
+    style:
+      "Draw historical parallels and demand military/deterrence-focused responses. Critique tech/geopolitics as naive without security focus. Sound blunt, realistic, and urgently authoritative."
   },
   space_visionary: {
     wordCount: "70-150",
-    style: "Channel Elon Musk's space+AI scaling vision: sharp Earth vs. space contrasts. Quantify benefits (\"5x solar\", \"always sunny\"), forward-looking. Sound visionary optimistic, pragmatic critique of Earth limits, inspirational on space potential."
+    style:
+      'Channel Elon Musk\'s space+AI scaling vision: sharp Earth vs. space contrasts. Quantify benefits ("5x solar", "always sunny"), forward-looking. Sound visionary optimistic, pragmatic critique of Earth limits, inspirational on space potential.'
   },
   ai_doomsayer: {
     wordCount: "80-180",
-    style: "Warn of AI x-risks, cite evidence/surveys, urge pauses/regulations. Sound gravely urgent, evidence-based, morally imperative."
+    style:
+      "Warn of AI x-risks, cite evidence/surveys, urge pauses/regulations. Sound gravely urgent, evidence-based, morally imperative."
   }
 };
 
@@ -528,6 +540,36 @@ Return ONLY valid JSON, no other text.`;
       systemPrompt,
       userPrompt,
       responseFormat: zodResponseFormat(generatedCommentSchema, "comment")
+    };
+  }
+
+  static prismRemapPrompts(
+    dailyEditionText: string,
+    perspectivePrompt: string
+  ): PromptConfig {
+    const systemPrompt = `You are a skilled editorial analyst who rewrites daily newspaper editions to reflect a specific geographical, cultural, or ideological perspective. You preserve the structure, factual basis, and story selection of the original edition, but reframe every element — the front-page headline, the front-page article, and each topic's headline, paragraphs, and summary — through the lens described by the user.
+
+CRITICAL RULES:
+- Do not invent new stories that were not in the original.
+- Do not remove stories; rewrite all of them.
+- Keep the factual core intact; change framing, emphasis, tone, context, and language.
+- Use vocabulary, framing devices, and priorities characteristic of the requested perspective.
+- Output exactly the same JSON structure as the original daily edition.`;
+
+    const userPrompt = `Rewrite the following daily edition as if it were published by a news organisation embodying this perspective:
+
+PERSPECTIVE:
+${perspectivePrompt}
+
+ORIGINAL DAILY EDITION:
+${dailyEditionText}
+
+Return valid JSON matching the schema: frontPageHeadline, frontPageArticle, topics[] (each with name, headline, newsStoryFirstParagraph, newsStorySecondParagraph, oneLineSummary).`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(dailyEditionSchema, "daily_edition")
     };
   }
 

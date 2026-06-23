@@ -106,10 +106,10 @@ export interface DailyEdition {
     oneLineSummary: string;
     comments?: DailyEditionComment[];
   }>;
-  modelFeedbackAboutThePrompt?: {
-    positive: string;
-    negative: string;
-  };
+  // modelFeedbackAboutThePrompt?: {
+  //   positive: string;
+  //   negative: string;
+  // };
   newspaperName?: string;
   prompt: string; // The full prompt used to generate this daily edition
   modelName: string; // The AI model used to generate this daily edition

@@ -5,7 +5,8 @@ import {
   ArticleGenerationMetadata,
   EventGenerationMetadata,
   DynamicPersona,
-  AIModelOption
+  AIModelOption,
+  DailyEdition
 } from "../schemas/types";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -489,6 +490,118 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       );
       throw error;
     }
+  }
+
+  async remapDailyEdition(
+    dailyEdition: DailyEdition,
+    perspectivePrompt: string,
+    modelName?: string
+  ): Promise<{
+    content: DailyEdition;
+    fullPrompt: string;
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    try {
+      const editionText = this.serialiseDailyEdition(dailyEdition);
+      const config = AIPrompts.prismRemapPrompts(editionText, perspectivePrompt);
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
+
+      console.log(
+        `Calling openai prism remap with ${AIModelOption.EDITION_SELECTION}`
+      );
+      console.log("Full prompt:", fullPrompt);
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.EDITION_SELECTION,
+        {
+          messages: [
+            {
+              role: "system",
+              content: config.systemPrompt
+            },
+            {
+              role: "user",
+              content: config.userPrompt
+            }
+          ],
+          response_format: config.responseFormat
+        },
+        modelName
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      await this.logAIResponse("Prism remap", result.response);
+
+      const content = result.response.choices[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error("No response content from AI service");
+      }
+
+      const parsedContent = dailyEditionSchema.parse(
+        JSON.parse(content)
+      ) as any;
+
+      if (
+        !parsedContent.frontPageHeadline ||
+        !parsedContent.frontPageArticle ||
+        !Array.isArray(parsedContent.topics)
+      ) {
+        throw new Error("Invalid response structure from AI service");
+      }
+
+      const remapped: DailyEdition = {
+        ...dailyEdition,
+        frontPageHeadline: parsedContent.frontPageHeadline,
+        frontPageArticle: parsedContent.frontPageArticle,
+        topics: parsedContent.topics,
+        prompt: fullPrompt,
+        modelName: result.modelUsed,
+        inputTokenCount: result.response.usage?.prompt_tokens,
+        outputTokenCount: result.response.usage?.completion_tokens
+      };
+
+      return {
+        content: remapped,
+        fullPrompt,
+        modelName: result.modelUsed,
+        inputTokenCount: result.response.usage?.prompt_tokens,
+        outputTokenCount: result.response.usage?.completion_tokens
+      };
+    } catch (error) {
+      await this.logOpenAIError(
+        "Error remapping daily edition",
+        "Prism remap",
+        error
+      );
+      throw error;
+    }
+  }
+
+  private serialiseDailyEdition(dailyEdition: DailyEdition): string {
+    let text = `Front Page Headline: ${dailyEdition.frontPageHeadline}\n\n`;
+    text += `Front Page Article:\n${dailyEdition.frontPageArticle}\n\n`;
+
+    if (dailyEdition.topics && dailyEdition.topics.length > 0) {
+      text += `Topics:\n`;
+      for (const topic of dailyEdition.topics) {
+        text += `\n--- ${topic.name} ---\n`;
+        text += `Headline: ${topic.headline}\n`;
+        text += `First Paragraph: ${topic.newsStoryFirstParagraph}\n`;
+        text += `Second Paragraph: ${topic.newsStorySecondParagraph}\n`;
+        text += `Summary: ${topic.oneLineSummary}\n`;
+      }
+    }
+
+    if (dailyEdition.newspaperName) {
+      text = `Newspaper: ${dailyEdition.newspaperName}\n\n${text}`;
+    }
+
+    return text;
   }
 
   async generateEvents(

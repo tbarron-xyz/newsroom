@@ -28,10 +28,10 @@ async function testDailyEditionStorage(): Promise<void> {
           oneLineSummary: "Test news summary in one line."
         }
       ],
-      modelFeedbackAboutThePrompt: {
-        positive: "Test feedback - positive aspects noted.",
-        negative: "Test feedback - some areas for improvement."
-      },
+      // modelFeedbackAboutThePrompt: {
+      //   positive: "Test feedback - positive aspects noted.",
+      //   negative: "Test feedback - some areas for improvement."
+      // },
       prompt: "Test prompt for daily edition generation",
       modelName: "gpt-5-nano"
     };

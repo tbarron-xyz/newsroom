@@ -827,8 +827,8 @@ export class PostgreSQLDataStorageService {
         dailyEdition.frontPageHeadline,
         dailyEdition.frontPageArticle,
         dailyEdition.newspaperName || null,
-        dailyEdition.modelFeedbackAboutThePrompt?.positive || null,
-        dailyEdition.modelFeedbackAboutThePrompt?.negative || null,
+        // dailyEdition.modelFeedbackAboutThePrompt?.positive || null,
+        // dailyEdition.modelFeedbackAboutThePrompt?.negative || null,
         JSON.stringify(dailyEdition.topics),
         dailyEdition.prompt,
         dailyEdition.modelName,
@@ -858,13 +858,13 @@ export class PostgreSQLDataStorageService {
         frontPageHeadline: row.front_page_headline,
         frontPageArticle: row.front_page_article,
         newspaperName: row.newspaper_name || undefined,
-        modelFeedbackAboutThePrompt:
-          row.model_feedback_positive || row.model_feedback_negative
-            ? {
-                positive: row.model_feedback_positive || "",
-                negative: row.model_feedback_negative || ""
-              }
-            : undefined,
+        // modelFeedbackAboutThePrompt:
+        //   row.model_feedback_positive || row.model_feedback_negative
+        //     ? {
+        //         positive: row.model_feedback_positive || "",
+        //         negative: row.model_feedback_negative || ""
+        //       }
+        //     : undefined,
         topics: row.topics,
         prompt: row.prompt,
         modelName: row.model_name,
@@ -894,13 +894,13 @@ export class PostgreSQLDataStorageService {
         frontPageHeadline: row.front_page_headline,
         frontPageArticle: row.front_page_article,
         newspaperName: row.newspaper_name || undefined,
-        modelFeedbackAboutThePrompt:
-          row.model_feedback_positive || row.model_feedback_negative
-            ? {
-                positive: row.model_feedback_positive || "",
-                negative: row.model_feedback_negative || ""
-              }
-            : undefined,
+        // modelFeedbackAboutThePrompt:
+        //   row.model_feedback_positive || row.model_feedback_negative
+        //     ? {
+        //         positive: row.model_feedback_positive || "",
+        //         negative: row.model_feedback_negative || ""
+        //       }
+        //     : undefined,
         topics: row.topics,
         prompt: row.prompt,
         modelName: row.model_name,

@@ -86,10 +86,10 @@ interface MongoDailyEdition {
     newsStorySecondParagraph: string;
     oneLineSummary: string;
   }>;
-  modelFeedbackAboutThePrompt: {
-    positive: string;
-    negative: string;
-  };
+  // modelFeedbackAboutThePrompt: {
+  //   positive: string;
+  //   negative: string;
+  // };
   newspaperName: string;
   prompt: string;
   modelName: string;
@@ -537,7 +537,7 @@ export class MongoDBDataStorageService implements IDataStorageService {
       frontPageHeadline: dailyEdition.frontPageHeadline,
       frontPageArticle: dailyEdition.frontPageArticle,
       topics: dailyEdition.topics,
-      modelFeedbackAboutThePrompt: dailyEdition.modelFeedbackAboutThePrompt,
+      // modelFeedbackAboutThePrompt: dailyEdition.modelFeedbackAboutThePrompt,
       newspaperName: dailyEdition.newspaperName,
       prompt: dailyEdition.prompt,
       modelName: dailyEdition.modelName
@@ -562,7 +562,7 @@ export class MongoDBDataStorageService implements IDataStorageService {
       frontPageHeadline: mongo.frontPageHeadline,
       frontPageArticle: mongo.frontPageArticle,
       topics: mongo.topics,
-      modelFeedbackAboutThePrompt: mongo.modelFeedbackAboutThePrompt,
+      // modelFeedbackAboutThePrompt: mongo.modelFeedbackAboutThePrompt,
       newspaperName: mongo.newspaperName,
       prompt: mongo.prompt,
       modelName: mongo.modelName
@@ -582,7 +582,7 @@ export class MongoDBDataStorageService implements IDataStorageService {
       frontPageHeadline: mongoDailyEdition.frontPageHeadline,
       frontPageArticle: mongoDailyEdition.frontPageArticle,
       topics: mongoDailyEdition.topics,
-      modelFeedbackAboutThePrompt: mongoDailyEdition.modelFeedbackAboutThePrompt,
+      // modelFeedbackAboutThePrompt: mongoDailyEdition.modelFeedbackAboutThePrompt,
       newspaperName: mongoDailyEdition.newspaperName,
       prompt: mongoDailyEdition.prompt,
       modelName: mongoDailyEdition.modelName

@@ -578,8 +578,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       dailyEdition.frontPageHeadline,
       dailyEdition.frontPageArticle,
       dailyEdition.newspaperName,
-      dailyEdition.modelFeedbackAboutThePrompt?.positive,
-      dailyEdition.modelFeedbackAboutThePrompt?.negative,
+      // dailyEdition.modelFeedbackAboutThePrompt?.positive,
+      // dailyEdition.modelFeedbackAboutThePrompt?.negative,
       JSON.stringify(dailyEdition.topics || []),
       dailyEdition.prompt,
       dailyEdition.modelName,
@@ -610,13 +610,13 @@ export class SQLiteDataStorageService implements IDataStorageService {
 
   private mapDailyEditionRow(row: any): DailyEdition {
     const topics = JSON.parse(row.topics || "[]");
-    const modelFeedbackAboutThePrompt =
-      row.modelFeedbackPositive && row.modelFeedbackNegative
-        ? {
-            positive: row.modelFeedbackPositive,
-            negative: row.modelFeedbackNegative
-          }
-        : undefined;
+    // const modelFeedbackAboutThePrompt =
+    //   row.modelFeedbackPositive && row.modelFeedbackNegative
+    //     ? {
+    //         positive: row.modelFeedbackPositive,
+    //         negative: row.modelFeedbackNegative
+    //       }
+    //     : undefined;
     return {
       id: row.id,
       editions: JSON.parse(row.editions || "[]"),
@@ -625,7 +625,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
       frontPageArticle: row.frontPageArticle,
       newspaperName: row.newspaperName,
       topics: topics,
-      modelFeedbackAboutThePrompt,
+      // modelFeedbackAboutThePrompt,
       prompt: row.prompt,
       modelName: row.modelName,
       inputTokenCount: row.inputTokenCount || undefined,
