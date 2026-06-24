@@ -439,6 +439,24 @@ export class RedisDataStorageService implements IDataStorageService {
     );
     console.log(
       "Redis Write: SET",
+      REDIS_KEYS.ARTICLE_MESSAGE_DIDS(articleId),
+      JSON.stringify(article.messageDids)
+    );
+    multi.set(
+      REDIS_KEYS.ARTICLE_MESSAGE_DIDS(articleId),
+      JSON.stringify(article.messageDids)
+    );
+    console.log(
+      "Redis Write: SET",
+      REDIS_KEYS.ARTICLE_MESSAGE_RKEYS(articleId),
+      JSON.stringify(article.messageRkeys)
+    );
+    multi.set(
+      REDIS_KEYS.ARTICLE_MESSAGE_RKEYS(articleId),
+      JSON.stringify(article.messageRkeys)
+    );
+    console.log(
+      "Redis Write: SET",
       REDIS_KEYS.ARTICLE_MODEL_NAME(articleId),
       article.modelName
     );
@@ -507,6 +525,8 @@ export class RedisDataStorageService implements IDataStorageService {
       REDIS_KEYS.ARTICLE_PROMPT(articleId),
       REDIS_KEYS.ARTICLE_MESSAGE_IDS(articleId),
       REDIS_KEYS.ARTICLE_MESSAGE_TEXTS(articleId),
+      REDIS_KEYS.ARTICLE_MESSAGE_DIDS(articleId),
+      REDIS_KEYS.ARTICLE_MESSAGE_RKEYS(articleId),
       REDIS_KEYS.ARTICLE_MODEL_NAME(articleId),
       REDIS_KEYS.ARTICLE_INPUT_TOKEN_COUNT(articleId),
       REDIS_KEYS.ARTICLE_OUTPUT_TOKEN_COUNT(articleId),
@@ -624,6 +644,8 @@ export class RedisDataStorageService implements IDataStorageService {
       prompt,
       messageIdsJson,
       messageTextsJson,
+      messageDidsJson,
+      messageRkeysJson,
       modelName,
       inputTokenCountStr,
       outputTokenCountStr
@@ -634,6 +656,8 @@ export class RedisDataStorageService implements IDataStorageService {
       this.client.get(REDIS_KEYS.ARTICLE_PROMPT(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_MESSAGE_IDS(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_MESSAGE_TEXTS(articleId)),
+      this.client.get(REDIS_KEYS.ARTICLE_MESSAGE_DIDS(articleId)),
+      this.client.get(REDIS_KEYS.ARTICLE_MESSAGE_RKEYS(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_MODEL_NAME(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_INPUT_TOKEN_COUNT(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_OUTPUT_TOKEN_COUNT(articleId))
@@ -653,6 +677,8 @@ export class RedisDataStorageService implements IDataStorageService {
     // Parse messageIds and messageTexts JSON
     let messageIds: number[] = [];
     let messageTexts: string[] = [];
+    let messageDids: string[] = [];
+    let messageRkeys: string[] = [];
 
     if (messageIdsJson) {
       try {
@@ -672,6 +698,24 @@ export class RedisDataStorageService implements IDataStorageService {
       }
     }
 
+    if (messageDidsJson) {
+      try {
+        messageDids = JSON.parse(messageDidsJson);
+      } catch (error) {
+        console.error("Error parsing messageDids JSON:", error);
+        messageDids = [];
+      }
+    }
+
+    if (messageRkeysJson) {
+      try {
+        messageRkeys = JSON.parse(messageRkeysJson);
+      } catch (error) {
+        console.error("Error parsing messageRkeys JSON:", error);
+        messageRkeys = [];
+      }
+    }
+
     return {
       id: articleId,
       reporterId,
@@ -683,6 +727,8 @@ export class RedisDataStorageService implements IDataStorageService {
         "Prompt not available (generated before prompt storage was implemented)",
       messageIds,
       messageTexts,
+      messageDids,
+      messageRkeys,
       modelName: modelName || "gpt-5-nano", // Default for backward compatibility
       inputTokenCount: inputTokenCountStr
         ? parseInt(inputTokenCountStr)

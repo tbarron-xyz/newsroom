@@ -69,6 +69,8 @@ export interface Article {
   prompt: string; // The full prompt used to generate this article
   messageIds: number[]; // Indices of social media messages used
   messageTexts: string[]; // Text content of the messages that were used
+  messageDids: string[]; // Bluesky user DIDs for source messages
+  messageRkeys: string[]; // Bluesky record keys for source messages
   modelName: string; // The AI model used to generate this article
   inputTokenCount?: number; // Number of input tokens used in the API call
   outputTokenCount?: number; // Number of output tokens used in the API call
@@ -201,6 +203,10 @@ export const REDIS_KEYS = {
     `article:${articleId}:message_ids`,
   ARTICLE_MESSAGE_TEXTS: (articleId: string) =>
     `article:${articleId}:message_texts`,
+  ARTICLE_MESSAGE_DIDS: (articleId: string) =>
+    `article:${articleId}:message_dids`,
+  ARTICLE_MESSAGE_RKEYS: (articleId: string) =>
+    `article:${articleId}:message_rkeys`,
   ARTICLE_MODEL_NAME: (articleId: string) => `article:${articleId}:model_name`,
   ARTICLE_INPUT_TOKEN_COUNT: (articleId: string) =>
     `article:${articleId}:input_token_count`,

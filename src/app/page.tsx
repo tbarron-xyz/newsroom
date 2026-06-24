@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import SourceArticleCard from "../components/SourceArticleCard";
 import { apiService } from "@/app/services/api.service";
+import type { Article } from "./schemas/types";
 
 interface DailyEditionComment {
   author: string;
@@ -28,6 +31,28 @@ interface DailyEdition {
   newspaperName?: string;
   topics: Topic[];
   prompt: string;
+}
+
+interface EnrichedEdition {
+  id: string;
+  stories: Article[];
+  generationTime: number;
+  prompt: string;
+  modelName: string;
+}
+
+interface EnrichedDailyEdition {
+  id: string;
+  editions: EnrichedEdition[];
+  generationTime: number;
+  frontPageHeadline: string;
+  frontPageArticle: string;
+  newspaperName?: string;
+  topics: Topic[];
+  prompt: string;
+  modelName: string;
+  inputTokenCount?: number;
+  outputTokenCount?: number;
 }
 
 interface PrismDailyEditionPair {
@@ -172,6 +197,7 @@ export default function Home() {
   const [dailyEditions, setDailyEditions] = useState<DailyEdition[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEdition, setSelectedEdition] = useState<DailyEdition | null>(null);
+  const [enrichedData, setEnrichedData] = useState<EnrichedDailyEdition | null>(null);
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -204,6 +230,22 @@ export default function Home() {
     };
     loadConfig();
   }, []);
+
+  useEffect(() => {
+    if (!selectedEdition) return;
+    const fetchEnriched = async () => {
+      try {
+        const data = await apiService.get<EnrichedDailyEdition>(
+          `/api/daily-editions/${selectedEdition.id}`
+        );
+        setEnrichedData(data);
+      } catch (error) {
+        console.error("Failed to fetch enriched edition data:", error);
+        setEnrichedData(null);
+      }
+    };
+    fetchEnriched();
+  }, [selectedEdition]);
 
   const checkAuthStatus = async () => {
     try {
@@ -411,6 +453,17 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
+
+                  {enrichedData && (
+                    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
+                      <h2 className="text-xl font-bold text-white/90 mb-6">Source Articles</h2>
+                      <div className="space-y-4">
+                        {enrichedData.editions.flatMap(e => e.stories).map((article) => (
+                          <SourceArticleCard key={article.id} article={article} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
                     <div className="flex items-center gap-2 mb-6 relative group">

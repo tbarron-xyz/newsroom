@@ -73,6 +73,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
         prompt TEXT,
         messageIds TEXT,  -- JSON arr nums
         messageTexts TEXT,  -- JSON arr strs
+        messageDids TEXT,  -- JSON arr strs
+        messageRkeys TEXT,  -- JSON arr strs
         modelName TEXT,
         inputTokenCount INTEGER,
         outputTokenCount INTEGER
@@ -335,8 +337,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       `
       INSERT OR REPLACE INTO articles (
         id, reporterId, headline, body, generationTime, prompt, messageIds, messageTexts,
-        modelName, inputTokenCount, outputTokenCount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        messageDids, messageRkeys, modelName, inputTokenCount, outputTokenCount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
     ).run(
       article.id,
@@ -347,6 +349,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       article.prompt,
       JSON.stringify(article.messageIds),
       JSON.stringify(article.messageTexts),
+      JSON.stringify(article.messageDids),
+      JSON.stringify(article.messageRkeys),
       article.modelName,
       article.inputTokenCount,
       article.outputTokenCount
@@ -426,6 +430,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       ...row,
       messageIds: JSON.parse(row.messageIds || "[]"),
       messageTexts: JSON.parse(row.messageTexts || "[]"),
+      messageDids: JSON.parse(row.messageDids || "[]"),
+      messageRkeys: JSON.parse(row.messageRkeys || "[]"),
       inputTokenCount: row.inputTokenCount || undefined,
       outputTokenCount: row.outputTokenCount || undefined
     };

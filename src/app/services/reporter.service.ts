@@ -45,8 +45,10 @@ export class ReporterService {
           continue;
         }
 
-        // Extract message texts for the used message IDs
+        // Extract message texts and source IDs for the used message IDs
         const messageTexts: string[] = [];
+        const messageDids: string[] = [];
+        const messageRkeys: string[] = [];
         if (
           structuredArticle.response.messageIds &&
           structuredArticle.response.messageIds.length > 0
@@ -59,9 +61,12 @@ export class ReporterService {
               new Set(structuredArticle.response.potentialMessageIds)
             )
           ];
-          ids.forEach((x) =>
-            messageTexts.push(structuredArticle.messages[x - 1])
-          ); // -1 because ai service does a +1
+          ids.forEach((x) => {
+            const msg = structuredArticle.messages[x - 1];
+            messageTexts.push(msg.text);
+            messageDids.push(msg.did);
+            messageRkeys.push(msg.rkey);
+          });
         }
 
         // Convert structured article to simple Article format for storage
@@ -74,6 +79,8 @@ export class ReporterService {
           prompt: structuredArticle.prompt,
           messageIds: structuredArticle.response.messageIds || [],
           messageTexts: messageTexts,
+          messageDids: messageDids,
+          messageRkeys: messageRkeys,
           modelName: structuredArticle.response.modelName
         };
         articles.push(article);
@@ -311,7 +318,8 @@ export class ReporterService {
           ids.forEach((x) => {
             const index = x - 1;
             if (index >= 0 && index < eventGenerationResult.messages.length) {
-              messageTexts.push(eventGenerationResult.messages[index]);
+              const msg = eventGenerationResult.messages[index];
+              messageTexts.push(typeof msg === "string" ? msg : msg.text);
             } else {
               console.warn(
                 `Invalid message index ${x} (1-based) - out of bounds for ${eventGenerationResult.messages.length} messages`
@@ -494,8 +502,10 @@ export class ReporterService {
           continue;
         }
 
-        // Extract message texts for the used message IDs
+        // Extract message texts and source IDs for the used message IDs
         const messageTexts: string[] = [];
+        const messageDids: string[] = [];
+        const messageRkeys: string[] = [];
         if (
           structuredArticle.response.messageIds &&
           structuredArticle.response.messageIds.length > 0
@@ -508,9 +518,12 @@ export class ReporterService {
               new Set(structuredArticle.response.potentialMessageIds)
             )
           ];
-          ids.forEach((x) =>
-            messageTexts.push(structuredArticle.messages[x - 1])
-          ); // -1 because ai service does a +1
+          ids.forEach((x) => {
+            const msg = structuredArticle.messages[x - 1];
+            messageTexts.push(msg.text);
+            messageDids.push(msg.did);
+            messageRkeys.push(msg.rkey);
+          });
         }
 
         // Convert structured article to simple Article format for storage
@@ -523,6 +536,8 @@ export class ReporterService {
           prompt: structuredArticle.prompt,
           messageIds: structuredArticle.response.messageIds || [],
           messageTexts: messageTexts,
+          messageDids: messageDids,
+          messageRkeys: messageRkeys,
           modelName: structuredArticle.response.modelName
         };
 

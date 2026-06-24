@@ -48,6 +48,8 @@ interface MongoArticle {
   prompt: string;
   messageIds: number[];
   messageTexts: string[];
+  messageDids: string[];
+  messageRkeys: string[];
   modelName: string;
 }
 
@@ -288,6 +290,8 @@ export class MongoDBDataStorageService implements IDataStorageService {
       prompt: article.prompt,
       messageIds: article.messageIds,
       messageTexts: article.messageTexts,
+      messageDids: article.messageDids,
+      messageRkeys: article.messageRkeys,
       modelName: article.modelName
     };
 
@@ -317,6 +321,8 @@ export class MongoDBDataStorageService implements IDataStorageService {
       prompt: mongo.prompt,
       messageIds: mongo.messageIds,
       messageTexts: mongo.messageTexts,
+      messageDids: mongo.messageDids || [],
+      messageRkeys: mongo.messageRkeys || [],
       modelName: mongo.modelName
     }));
   }
@@ -339,6 +345,8 @@ export class MongoDBDataStorageService implements IDataStorageService {
       prompt: mongo.prompt,
       messageIds: mongo.messageIds,
       messageTexts: mongo.messageTexts,
+      messageDids: mongo.messageDids || [],
+      messageRkeys: mongo.messageRkeys || [],
       modelName: mongo.modelName
     }));
   }
@@ -360,6 +368,8 @@ export class MongoDBDataStorageService implements IDataStorageService {
       prompt: mongo.prompt,
       messageIds: mongo.messageIds,
       messageTexts: mongo.messageTexts,
+      messageDids: mongo.messageDids || [],
+      messageRkeys: mongo.messageRkeys || [],
       modelName: mongo.modelName
     }));
   }
@@ -379,6 +389,8 @@ export class MongoDBDataStorageService implements IDataStorageService {
       prompt: mongoArticle.prompt,
       messageIds: mongoArticle.messageIds,
       messageTexts: mongoArticle.messageTexts,
+      messageDids: mongoArticle.messageDids || [],
+      messageRkeys: mongoArticle.messageRkeys || [],
       modelName: mongoArticle.modelName
     };
   }

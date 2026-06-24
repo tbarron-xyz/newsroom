@@ -25,7 +25,7 @@ import {
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
-import { fetchLatestMessages } from "./bluesky.service";
+import { fetchLatestMessages, BlueskyMessage } from "./bluesky.service";
 import {
   AIPrompts,
   PERSONA_DISPLAY_NAMES,
@@ -136,7 +136,7 @@ export class AIService {
       outputTokenCount?: number;
     };
     prompt: string;
-    messages: string[];
+    messages: BlueskyMessage[];
   }> {
     const generationTime = Date.now();
     const articleId = `article_${generationTime}_${Math.random().toString(36).substring(2, 8)}`;
@@ -147,11 +147,7 @@ export class AIService {
       const messageSliceCount = await this.aiClient.getMessageSliceCount();
 
       // Fetch recent social media messages to inform article generation
-      let socialMediaMessages: Array<{
-        did: string;
-        text: string;
-        time: number;
-      }> = [];
+      let socialMediaMessages: BlueskyMessage[] = [];
       try {
         socialMediaMessages = await fetchLatestMessages(messageSliceCount);
       } catch (error) {
@@ -236,7 +232,7 @@ export class AIService {
       return {
         response: { ...parsedResponse, ...metadata },
         prompt: fullPrompt,
-        messages: socialMediaMessages.map((x) => x.text)
+        messages: socialMediaMessages
       };
     } catch (error) {
       console.error("Error generating structured article:", error);
@@ -695,7 +691,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       outputTokenCount?: number;
     }>;
     fullPrompt: string;
-    messages: string[];
+    messages: BlueskyMessage[];
   }> {
     try {
       // Format last events for context
@@ -705,11 +701,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const messageSliceCount = await this.aiClient.getMessageSliceCount();
 
       // Fetch recent social media messages
-      let socialMediaMessages: Array<{
-        did: string;
-        text: string;
-        time: number;
-      }> = [];
+      let socialMediaMessages: BlueskyMessage[] = [];
       try {
         socialMediaMessages = await fetchLatestMessages(messageSliceCount);
       } catch (error) {
@@ -792,7 +784,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       return {
         events: eventsWithMetadata,
         fullPrompt,
-        messages: socialMediaMessages.map((x) => x.text)
+        messages: socialMediaMessages
       };
     } catch (error) {
       await this.logOpenAIError(
@@ -835,7 +827,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       modelName: string;
     };
     prompt: string;
-    messages: string[];
+    messages: BlueskyMessage[];
   } | null> {
     const generationTime = Date.now();
     const articleId = `article_${generationTime}_${Math.random().toString(36).substring(2, 8)}`;
@@ -863,11 +855,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const messageSliceCount = await this.aiClient.getMessageSliceCount();
 
       // Fetch recent social media messages to inform article generation
-      let socialMediaMessages: Array<{
-        did: string;
-        text: string;
-        time: number;
-      }> = [];
+      let socialMediaMessages: BlueskyMessage[] = [];
       try {
         socialMediaMessages = await fetchLatestMessages(messageSliceCount);
       } catch (error) {
@@ -949,7 +937,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       return {
         response: { ...parsedResponse, ...metadata },
         prompt: fullPrompt,
-        messages: socialMediaMessages.map((x) => x.text)
+        messages: socialMediaMessages
       };
     } catch (error) {
       await this.logOpenAIError(

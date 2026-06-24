@@ -2,6 +2,7 @@ import { TinyJetstream } from "mbjc/tinyjetstream";
 
 export interface BlueskyMessage {
   did: string;
+  rkey: string;
   text: string;
   time: number;
 }
@@ -22,6 +23,7 @@ export async function fetchLatestMessages(
       try {
         messages.push({
           did: e.did,
+          rkey: e.commit.rkey,
           text: e.commit.record.text,
           time: Date.now()
         });

@@ -1,22 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import PageContainer from "../../components/PageContainer";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PageHeader from "../../components/PageHeader";
 import EmptyState from "../../components/EmptyState";
+import SourceArticleCard from "../../components/SourceArticleCard";
 import { apiService } from "../services/api.service";
 import { useList } from "@/hooks/useList";
-
-interface Article {
-  id: string;
-  reporterId: string;
-  headline: string;
-  body: string;
-  generationTime: number;
-  prompt: string;
-}
+import type { Article } from "../schemas/types";
 
 interface NewspaperEdition {
   id: string;
@@ -186,28 +178,7 @@ export default function EditionsPage() {
                     </h4>
                     <div className="space-y-4">
                       {articles.map((article: Article) => (
-                        <div
-                          key={article.id}
-                          className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg p-4"
-                        >
-                          <Link
-                            href={`/articles/${article.id}`}
-                            className="block"
-                          >
-                            <h5 className="font-semibold text-white/90 mb-2 hover:text-white transition-colors cursor-pointer">
-                              {article.headline}
-                            </h5>
-                          </Link>
-                          <p className="text-white/80 text-sm leading-relaxed">
-                            {article.body}
-                          </p>
-                          <div className="mt-2 text-xs text-white/60">
-                            Reporter: {article.reporterId} | Generated:{" "}
-                            {new Date(
-                              article.generationTime
-                            ).toLocaleDateString()}
-                          </div>
-                        </div>
+                        <SourceArticleCard key={article.id} article={article} />
                       ))}
                     </div>
                   </div>

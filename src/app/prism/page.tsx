@@ -5,7 +5,9 @@ import PageContainer from "../../components/PageContainer";
 import PageHeader from "../../components/PageHeader";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import EmptyState from "../../components/EmptyState";
+import SourceArticleCard from "../../components/SourceArticleCard";
 import { apiService } from "../services/api.service";
+import type { Article } from "../schemas/types";
 
 interface Topic {
   name: string;
@@ -23,10 +25,6 @@ interface DailyEdition {
   frontPageArticle: string;
   newspaperName?: string;
   topics: Topic[];
-  // modelFeedbackAboutThePrompt?: {
-  //   positive: string;
-  //   negative: string;
-  // };
   prompt: string;
   modelName: string;
   inputTokenCount?: number;
@@ -67,10 +65,12 @@ const PAIR_METADATA = [
 
 function DailyEditionCard({
   edition,
-  perspectiveLabel
+  perspectiveLabel,
+  articles
 }: {
   edition: DailyEdition;
   perspectiveLabel: string;
+  articles?: Article[];
 }) {
   const formatDate = (timestamp: number) =>
     new Date(timestamp).toLocaleDateString("en-US", {
@@ -145,6 +145,13 @@ function DailyEditionCard({
           </div>
         ))}
       </div>
+
+      {articles && articles.length > 0 && (
+        <div className="mt-8 pt-8 border-t border-white/20">
+          <h3 className="text-lg font-bold text-white/90 mb-4">Source Articles</h3>
+          {articles.map(article => <SourceArticleCard key={article.id} article={article} />)}
+        </div>
+      )}
     </div>
   );
 }
@@ -154,6 +161,8 @@ export default function PrismPage() {
   const [selectedPairId, setSelectedPairId] = useState(PAIR_METADATA[0].id);
   const [leftResult, setLeftResult] = useState<ColumnResult | null>(null);
   const [rightResult, setRightResult] = useState<ColumnResult | null>(null);
+  const [leftArticles, setLeftArticles] = useState<Article[] | undefined>(undefined);
+  const [rightArticles, setRightArticles] = useState<Article[] | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [remapping, setRemapping] = useState(false);
   const [error, setError] = useState("");
@@ -190,6 +199,18 @@ export default function PrismPage() {
       });
       setLeftResult(result.left);
       setRightResult(result.right);
+
+      // Fetch enriched source articles for both perspectives
+      const [leftEnriched, rightEnriched] = await Promise.all([
+        apiService.get<any>(`/api/daily-editions/${result.left.content.id}`).catch(() => null),
+        apiService.get<any>(`/api/daily-editions/${result.right.content.id}`).catch(() => null),
+      ]);
+      if (leftEnriched) {
+        setLeftArticles(leftEnriched.editions.flatMap((e: any) => e.stories));
+      }
+      if (rightEnriched) {
+        setRightArticles(rightEnriched.editions.flatMap((e: any) => e.stories));
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -308,6 +329,7 @@ export default function PrismPage() {
               <DailyEditionCard
                 edition={leftResult.content}
                 perspectiveLabel={leftResult.label}
+                articles={leftArticles}
               />
             </div>
             <div>
@@ -318,6 +340,7 @@ export default function PrismPage() {
               <DailyEditionCard
                 edition={rightResult.content}
                 perspectiveLabel={rightResult.label}
+                articles={rightArticles}
               />
             </div>
           </div>

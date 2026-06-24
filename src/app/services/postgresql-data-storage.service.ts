@@ -102,6 +102,8 @@ export class PostgreSQLDataStorageService {
           prompt TEXT NOT NULL,
           message_ids JSONB NOT NULL DEFAULT '[]',
           message_texts JSONB NOT NULL DEFAULT '[]',
+          message_dids JSONB NOT NULL DEFAULT '[]',
+          message_rkeys JSONB NOT NULL DEFAULT '[]',
           model_name TEXT DEFAULT 'gpt-5-nano',
           input_token_count INTEGER,
           output_token_count INTEGER
@@ -391,8 +393,8 @@ export class PostgreSQLDataStorageService {
 
     try {
       const query = `
-        INSERT INTO articles (id, reporter_id, headline, body, generation_time, prompt, message_ids, message_texts, model_name, input_token_count, output_token_count)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO articles (id, reporter_id, headline, body, generation_time, prompt, message_ids, message_texts, message_dids, message_rkeys, model_name, input_token_count, output_token_count)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         ON CONFLICT (id) DO UPDATE SET
           reporter_id = EXCLUDED.reporter_id,
           headline = EXCLUDED.headline,
@@ -401,6 +403,8 @@ export class PostgreSQLDataStorageService {
           prompt = EXCLUDED.prompt,
           message_ids = EXCLUDED.message_ids,
           message_texts = EXCLUDED.message_texts,
+          message_dids = EXCLUDED.message_dids,
+          message_rkeys = EXCLUDED.message_rkeys,
           model_name = EXCLUDED.model_name,
           input_token_count = EXCLUDED.input_token_count,
           output_token_count = EXCLUDED.output_token_count
@@ -415,6 +419,8 @@ export class PostgreSQLDataStorageService {
         article.prompt,
         JSON.stringify(article.messageIds),
         JSON.stringify(article.messageTexts),
+        JSON.stringify(article.messageDids),
+        JSON.stringify(article.messageRkeys),
         article.modelName,
         article.inputTokenCount,
         article.outputTokenCount
@@ -460,6 +466,8 @@ export class PostgreSQLDataStorageService {
         prompt: row.prompt,
         messageIds: row.message_ids,
         messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count
@@ -495,6 +503,8 @@ export class PostgreSQLDataStorageService {
         prompt: row.prompt,
         messageIds: row.message_ids,
         messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count
@@ -529,6 +539,8 @@ export class PostgreSQLDataStorageService {
         prompt: row.prompt,
         messageIds: row.message_ids,
         messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count
@@ -558,6 +570,8 @@ export class PostgreSQLDataStorageService {
         prompt: row.prompt,
         messageIds: row.message_ids,
         messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count

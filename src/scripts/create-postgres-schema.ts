@@ -72,6 +72,8 @@ async function createSchema() {
         prompt TEXT NOT NULL,
         message_ids JSONB NOT NULL DEFAULT '[]',
         message_texts JSONB NOT NULL DEFAULT '[]',
+        message_dids JSONB NOT NULL DEFAULT '[]',
+        message_rkeys JSONB NOT NULL DEFAULT '[]',
         model_name TEXT NOT NULL DEFAULT 'gpt-5-nano'
       )
     `);
