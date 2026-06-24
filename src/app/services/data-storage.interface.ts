@@ -12,7 +12,8 @@ import {
   ForumPost,
   DynamicPersona,
   Artifact,
-  ArtifactJob
+  ArtifactJob,
+  PrismDailyEditionPair
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 
@@ -144,6 +145,10 @@ export interface IDataStorageService {
     ttlHours?: number
   ): Promise<void>;
   getClassicPersonas(): Promise<typeof CLASSIC_PERSONAS>;
+
+  // Prism Daily Edition Pair operations
+  savePrismDailyEditionPair(pair: PrismDailyEditionPair): Promise<void>;
+  getPrismDailyEditionPairs(limit?: number): Promise<PrismDailyEditionPair[]>;
 
   // Artifact operations
   saveArtifact(artifact: Artifact): Promise<void>;

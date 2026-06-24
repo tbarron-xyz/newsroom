@@ -1764,6 +1764,50 @@ export default function EditorPage() {
                   </span>
                 </button>
               </div>
+
+              {/* Prism Daily Edition Job */}
+              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white/90">
+                      Generate Prism Daily
+                    </h3>
+                    <p className="text-sm text-white/70">Once daily at 8:30am</p>
+                  </div>
+                </div>
+                <p className="text-sm text-white/70">
+                  Generates a pair of opposing daily editions using AI-determined editorial perspectives.
+                </p>
+                <button
+                  onClick={() => triggerJob("prism-daily")}
+                  disabled={jobTriggering === "prism-daily" || !isAdmin}
+                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 ${
+                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  <span className="relative z-10 flex items-center justify-center space-x-2">
+                    {jobTriggering === "prism-daily" ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span>Trigger Manually</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Job Status Information */}

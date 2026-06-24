@@ -7,7 +7,8 @@ import {
   generatedCommentSchema,
   DynamicPersonasSchema,
   dailyEditionSchema,
-  threadRepliesSchema
+  threadRepliesSchema,
+  prismPerspectivesSchema
 } from "../schemas/response-schemas";
 
 interface PromptConfig {
@@ -570,6 +571,26 @@ Return valid JSON matching the schema: frontPageHeadline, frontPageArticle, topi
       systemPrompt,
       userPrompt,
       responseFormat: zodResponseFormat(dailyEditionSchema, "daily_edition")
+    };
+  }
+
+  static generatePrismDailyEditorialPrompts(editionsText: string): PromptConfig {
+    const systemPrompt = "You are a media analyst who identifies contrasting editorial perspectives. Given a set of newspaper stories, you determine two opposing but intellectually coherent political/ideological lenses that would frame the same facts differently.";
+    const userPrompt = `Analyze the following newspaper editions and determine two opposing editorial perspectives that would frame these stories differently.
+
+${editionsText}
+
+Return a JSON object with:
+- leftLabel: short label (1-4 words), e.g. "Progressive / Human Rights"
+- leftPrompt: 2-3 paragraph editorial prompt describing the perspective's framing, language, emphasis. Instruct the AI on what to emphasize/de-emphasize, what language and terminology to use, what values and priorities to reflect, and what sources/authorities to lend weight to.
+- rightLabel: short opposing label, e.g. "National Security / Conservative"
+- rightPrompt: 2-3 paragraph editorial prompt for the opposing lens, with the same structure.
+- rationale: brief explanation of why these two perspectives are opposing (optional)`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(prismPerspectivesSchema, "perspectives")
     };
   }
 

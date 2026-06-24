@@ -409,3 +409,15 @@ export interface ArtifactJob {
   error?: string;
   createdAt?: number;
 }
+
+export interface PrismDailyEditionPair {
+  id: string;
+  generationTime: number;
+  leftLabel: string;
+  rightLabel: string;
+  left: DailyEdition;
+  right: DailyEdition;
+  sourcePrompt: string;
+  leftPrompt: string;
+  rightPrompt: string;
+}

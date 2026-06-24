@@ -20,7 +20,8 @@ import {
   eventGenerationResponseSchema,
   generatedCommentSchema,
   DynamicPersonasSchema,
-  threadRepliesSchema
+  threadRepliesSchema,
+  prismPerspectivesSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -486,6 +487,78 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       await this.logOpenAIError(
         "Error generating daily edition",
         "Daily edition generation",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async generatePrismPerspectives(
+    editions: Array<{
+      id: string;
+      articles: Array<{ headline: string; body: string }>;
+    }>
+  ): Promise<{
+    leftLabel: string;
+    leftPrompt: string;
+    rightLabel: string;
+    rightPrompt: string;
+    fullPrompt: string;
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    if (editions.length === 0) {
+      throw new Error("No editions available for prism perspective generation");
+    }
+
+    try {
+      const editionsText = AIResponseUtils.formatEditionsText(editions);
+      const config = AIPrompts.generatePrismDailyEditorialPrompts(editionsText);
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
+
+      console.log(
+        `Calling openai prism perspectives generation with ${AIModelOption.EDITION_SELECTION}`
+      );
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.EDITION_SELECTION,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        }
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      await this.logAIResponse("Prism perspectives generation", result.response);
+
+      const content = result.response.choices[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error("No response content from AI service");
+      }
+
+      const parsed = prismPerspectivesSchema.parse(JSON.parse(content));
+
+      return {
+        leftLabel: parsed.leftLabel,
+        leftPrompt: parsed.leftPrompt,
+        rightLabel: parsed.rightLabel,
+        rightPrompt: parsed.rightPrompt,
+        fullPrompt,
+        modelName: result.modelUsed,
+        inputTokenCount: result.response.usage?.prompt_tokens,
+        outputTokenCount: result.response.usage?.completion_tokens
+      };
+    } catch (error) {
+      await this.logOpenAIError(
+        "Error generating prism perspectives",
+        "Prism perspectives generation",
         error
       );
       throw error;

@@ -2,7 +2,8 @@ import {
   NewspaperEdition,
   DailyEdition,
   Article,
-  Editor
+  Editor,
+  PrismDailyEditionPair
 } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
 import { AIService } from "./ai.service";
@@ -16,7 +17,8 @@ export type JobType =
   | "newspaper"
   | "daily"
   | "comments"
-  | "events";
+  | "events"
+  | "prism-daily";
 
 export interface JobResult {
   message: string;
@@ -182,6 +184,114 @@ export class EditorService {
       `Daily edition ${dailyEditionId} generated with comprehensive content${dailyEdition.newspaperName ? ` for ${dailyEdition.newspaperName}` : ""}`
     );
     return dailyEdition;
+  }
+
+  async generatePrismDailyEdition(): Promise<PrismDailyEditionPair> {
+    console.log("Editor: Starting prism daily edition pair generation...");
+
+    const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+    const recentEditions = await this.dataStorageService.getNewspaperEditions();
+    const last24HoursEditions = recentEditions.filter(
+      (edition) => edition.generationTime >= twentyFourHoursAgo
+    );
+
+    if (last24HoursEditions.length === 0) {
+      throw new Error("No newspaper editions found in the last 24 hours");
+    }
+
+    console.log(
+      `Found ${last24HoursEditions.length} newspaper editions from the last 24 hours`
+    );
+
+    const editor = await this.dataStorageService.getEditor();
+    if (!editor) {
+      throw new Error("No editor configuration found");
+    }
+
+    const detailedEditions = await Promise.all(
+      last24HoursEditions.map(async (edition) => {
+        const articles: Array<{ headline: string; body: string }> = [];
+        for (const articleId of edition.stories) {
+          const article = await this.dataStorageService.getArticle(articleId);
+          if (article) {
+            articles.push({
+              headline: article.headline,
+              body: article.body
+            });
+          }
+        }
+        return { id: edition.id, articles };
+      })
+    );
+
+    const perspectives = await this.aiService.generatePrismPerspectives(
+      detailedEditions
+    );
+
+    console.log(
+      `Generated perspectives: "${perspectives.leftLabel}" vs "${perspectives.rightLabel}"`
+    );
+
+    const [leftResult, rightResult] = await Promise.all([
+      this.aiService.selectNotableEditions(
+        detailedEditions,
+        perspectives.leftPrompt,
+        editor.editionSelectionModelName
+      ),
+      this.aiService.selectNotableEditions(
+        detailedEditions,
+        perspectives.rightPrompt,
+        editor.editionSelectionModelName
+      )
+    ]);
+
+    const editionIds = last24HoursEditions.map((e) => e.id);
+    const now = Date.now();
+
+    const leftEdition: DailyEdition = {
+      id: `prism_left_${now}_${Math.random().toString(36).substring(2, 8)}`,
+      editions: editionIds,
+      generationTime: now,
+      frontPageHeadline: leftResult.content.frontPageHeadline,
+      frontPageArticle: leftResult.content.frontPageArticle,
+      topics: leftResult.content.topics,
+      prompt: leftResult.fullPrompt,
+      modelName: leftResult.modelName,
+      inputTokenCount: leftResult.inputTokenCount,
+      outputTokenCount: leftResult.outputTokenCount
+    };
+
+    const rightEdition: DailyEdition = {
+      id: `prism_right_${now}_${Math.random().toString(36).substring(2, 8)}`,
+      editions: editionIds,
+      generationTime: now,
+      frontPageHeadline: rightResult.content.frontPageHeadline,
+      frontPageArticle: rightResult.content.frontPageArticle,
+      topics: rightResult.content.topics,
+      prompt: rightResult.fullPrompt,
+      modelName: rightResult.modelName,
+      inputTokenCount: rightResult.inputTokenCount,
+      outputTokenCount: rightResult.outputTokenCount
+    };
+
+    const pair: PrismDailyEditionPair = {
+      id: `prism_${now}_${Math.random().toString(36).substring(2, 8)}`,
+      generationTime: now,
+      leftLabel: perspectives.leftLabel,
+      rightLabel: perspectives.rightLabel,
+      left: leftEdition,
+      right: rightEdition,
+      sourcePrompt: perspectives.fullPrompt,
+      leftPrompt: leftResult.fullPrompt,
+      rightPrompt: rightResult.fullPrompt
+    };
+
+    await this.dataStorageService.savePrismDailyEditionPair(pair);
+
+    console.log(
+      `Prism daily edition pair ${pair.id} generated with ${pair.left.topics.length} topics each`
+    );
+    return pair;
   }
 
   async getLatestNewspaperEdition(): Promise<NewspaperEdition | null> {
@@ -423,6 +533,7 @@ export class EditorService {
         }
         return null;
       case "daily":
+      case "prism-daily":
         return null;
     }
 
@@ -570,6 +681,17 @@ export class EditorService {
         );
         return {
           message: `Comment generation job completed successfully. Added ${count} comments.`,
+          jobType
+        };
+      }
+
+      case "prism-daily": {
+        const pair = await this.generatePrismDailyEdition();
+        console.log(
+          `[${new Date().toISOString()}] Successfully generated prism daily edition pair ${pair.id}`
+        );
+        return {
+          message: `Prism daily edition pair ${pair.id} generated with ${pair.left.topics.length} topics each`,
           jobType
         };
       }

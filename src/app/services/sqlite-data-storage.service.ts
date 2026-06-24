@@ -12,7 +12,8 @@ import {
   ForumThread,
   ForumPost,
   DynamicPersona,
-  Artifact
+  Artifact,
+  PrismDailyEditionPair
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -1275,5 +1276,13 @@ export class SQLiteDataStorageService implements IDataStorageService {
         status: row.status as "pending" | "generated" | "failed"
       }
     };
+  }
+
+  async savePrismDailyEditionPair(_pair: PrismDailyEditionPair): Promise<void> {
+    throw new Error("Not implemented in SQLite");
+  }
+
+  async getPrismDailyEditionPairs(_limit?: number): Promise<PrismDailyEditionPair[]> {
+    return [];
   }
 }

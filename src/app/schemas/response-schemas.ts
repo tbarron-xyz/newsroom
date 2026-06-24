@@ -29,12 +29,6 @@ export const reporterArticleSchema = z.object({
   body: z.string(),
   keyQuotes: z.array(z.string()),
   sources: z.array(z.string()),
-  reporterNotes: z.object({
-    researchQuality: z.string(),
-    sourceDiversity: z.string(),
-    factualAccuracy: z.string()
-  }),
-  socialMediaSummary: z.string(),
   potentialMessageIds: z
     .array(z.number())
     .describe("The indexes of potentially related social media messages")
@@ -94,3 +88,11 @@ export const DynamicPersonaSchema = z.object({
 export const DynamicPersonasSchema = z.array(DynamicPersonaSchema);
 
 export const threadRepliesSchema = z.array(z.string()).length(3);
+
+export const prismPerspectivesSchema = z.object({
+  leftLabel: z.string(),
+  leftPrompt: z.string(),
+  rightLabel: z.string(),
+  rightPrompt: z.string(),
+  rationale: z.string().nullable()
+});

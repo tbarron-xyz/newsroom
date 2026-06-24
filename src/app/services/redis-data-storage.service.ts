@@ -13,7 +13,8 @@ import {
   ForumThread,
   ForumPost,
   DynamicPersona,
-  Artifact
+  Artifact,
+  PrismDailyEditionPair
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -2355,5 +2356,40 @@ export class RedisDataStorageService implements IDataStorageService {
     if (!current) throw new Error("Artifact not found");
     const updated = { ...current, ...updates };
     await this.saveArtifact(updated);
+  }
+
+  async savePrismDailyEditionPair(pair: PrismDailyEditionPair): Promise<void> {
+    console.log(
+      "Redis Write: ZADD prism_daily_editions",
+      pair.id,
+      pair.generationTime
+    );
+    const multi = this.client.multi();
+    multi.zAdd("prism_daily_editions", {
+      score: pair.generationTime,
+      value: pair.id
+    });
+    multi.set(`prism_daily_edition:${pair.id}:data`, JSON.stringify(pair));
+    multi.zRemRangeByRank("prism_daily_editions", 0, -11);
+    await multi.exec();
+  }
+
+  async getPrismDailyEditionPairs(limit?: number): Promise<PrismDailyEditionPair[]> {
+    const count = limit || 3;
+    const ids = await this.client.zRange(
+      "prism_daily_editions", 0, count - 1, { REV: true }
+    );
+    const pairs: PrismDailyEditionPair[] = [];
+    for (const id of ids) {
+      const json = await this.client.get(`prism_daily_edition:${id}:data`);
+      if (json) {
+        try {
+          pairs.push(JSON.parse(json));
+        } catch (error) {
+          console.error(`Error parsing prism pair ${id}:`, error);
+        }
+      }
+    }
+    return pairs;
   }
 }
