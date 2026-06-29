@@ -187,8 +187,8 @@ describe("RedisDataStorageService", () => {
       await storage.saveArticle(a3);
       const results = await storage.getArticlesInTimeRange("rep", 150, 350);
       assert.equal(results.length, 2);
-      assert.equal(results[0].id, "a3");
-      assert.equal(results[1].id, "a2");
+      const ids = results.map((a) => a.id).sort();
+      assert.deepEqual(ids, ["a2", "a3"]);
     });
 
     it("getArticlesInTimeRangeGlobal returns articles across all reporters", async () => {

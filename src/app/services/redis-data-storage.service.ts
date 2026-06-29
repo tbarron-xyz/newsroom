@@ -46,7 +46,7 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   async disconnect(): Promise<void> {
-    // await this.client..disconnect();
+    await this.client.quit();
     console.log("Disconnected from Redis");
   }
 
