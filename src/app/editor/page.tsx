@@ -340,48 +340,35 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-        <div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-          style={{ animationDelay: "1s" }}
-        ></div>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/30 relative z-10"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-[#33ff33] font-mono text-sm">
+          <span className="animate-pulse">$</span> Loading editor configuration...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 py-8 px-4 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-        style={{ animationDelay: "1s" }}
-      ></div>
-      <div className="max-w-4xl mx-auto relative z-10">
+    <div className="min-h-screen bg-black py-8 px-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 mb-8 shadow-2xl">
+        <div className="border border-[#1a3a1a] p-6 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white/90 mb-2">
-                Newsroom Editor Configuration
+              <h1 className="text-[#33ff33] text-xl font-mono mb-1">
+                # Newsroom Editor Configuration
               </h1>
-              <p className="text-white/70 text-lg">
-                Configure your AI editor's biography and editorial guidelines
+              <p className="text-[#557755] text-sm font-mono">
+                Configure your AI editor&apos;s biography and editorial guidelines
               </p>
             </div>
             <div className="flex items-center space-x-4">
               {isAdmin && (
                 <button
                   onClick={handleLogout}
-                  className="relative px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300"
+                  className="tui-btn-danger px-4 py-2"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10">Logout</span>
+                  Logout
                 </button>
               )}
             </div>
@@ -389,13 +376,13 @@ export default function EditorPage() {
         </div>
 
         {/* Main Content */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 space-y-8 shadow-2xl">
+        <div className="border border-[#1a3a1a] p-6 space-y-8">
           {/* Bio Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -408,27 +395,21 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Editor Biography
-              </h2>
+              <h2 className="tui-section-title">Editor Biography</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="border border-[#1a3a1a] p-4">
               <textarea
                 value={editorData.bio}
                 onChange={(e) =>
                   setEditorData({ ...editorData, bio: e.target.value })
                 }
                 placeholder="Enter the editor's biography..."
-                className={`w-full h-32 p-4 bg-white border border-gray-300 rounded-lg resize-none text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-600 ${
-                  isAdmin
-                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                }`}
+                className={`tui-input h-32 resize-none ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 rows={4}
                 readOnly={!isAdmin}
               />
-              <p className="text-sm text-white/70 mt-2">
-                This biography will be used to inform the AI's editorial
+              <p className="tui-muted mt-2">
+                This biography will be used to inform the AI&apos;s editorial
                 decisions and writing style.
               </p>
             </div>
@@ -437,9 +418,9 @@ export default function EditorPage() {
           {/* Prompt Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -452,28 +433,22 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Editorial Prompt
-              </h2>
+              <h2 className="tui-section-title">Editorial Prompt</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="border border-[#1a3a1a] p-4">
               <textarea
                 value={editorData.prompt}
                 onChange={(e) =>
                   setEditorData({ ...editorData, prompt: e.target.value })
                 }
                 placeholder="Enter the editorial guidelines and prompt..."
-                className={`w-full h-48 p-4 bg-white border border-gray-300 rounded-lg resize-none text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:border-gray-600 ${
-                  isAdmin
-                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                }`}
+                className={`tui-input h-48 resize-none ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 rows={6}
                 readOnly={!isAdmin}
               />
-              <p className="text-sm text-white/70 mt-2">
+              <p className="tui-muted mt-2">
                 Define the editorial standards, tone, and guidelines that will
-                guide the AI's newsroom decisions.
+                guide the AI&apos;s newsroom decisions.
               </p>
             </div>
           </div>
@@ -481,9 +456,9 @@ export default function EditorPage() {
           {/* Model Name Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -496,14 +471,12 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                AI Model Configuration
-              </h2>
+              <h2 className="tui-section-title">AI Model Configuration</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-6">
+            <div className="border border-[#1a3a1a] p-4 space-y-6">
               {/* Legacy / Default Model Name */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Default Model Name
                 </label>
                 <input
@@ -516,14 +489,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Default AI model used for thread replies and daily edition
                   comments when specific model fields are empty.
                 </p>
@@ -531,7 +500,7 @@ export default function EditorPage() {
 
               {/* Article Generation Model */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Article Generation Model
                 </label>
                 <input
@@ -544,14 +513,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   AI model used for generating news articles from social media
                   data.
                 </p>
@@ -559,7 +524,7 @@ export default function EditorPage() {
 
               {/* Event Generation Model */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Event Generation Model
                 </label>
                 <input
@@ -572,14 +537,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   AI model used for identifying and tracking news events from
                   social media.
                 </p>
@@ -587,7 +548,7 @@ export default function EditorPage() {
 
               {/* Story Selection Model */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Story Selection Model
                 </label>
                 <input
@@ -600,14 +561,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   AI model used for selecting the most newsworthy stories for
                   newspaper editions.
                 </p>
@@ -615,7 +572,7 @@ export default function EditorPage() {
 
               {/* Edition Selection Model */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Edition Selection Model
                 </label>
                 <input
@@ -628,14 +585,10 @@ export default function EditorPage() {
                     })
                   }
                   placeholder="Enter AI model name (e.g., gpt-5-nano)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   AI model used for selecting and compiling newspaper editions
                   into daily editions.
                 </p>
@@ -643,7 +596,7 @@ export default function EditorPage() {
 
               {/* Base URL */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   OpenAI API Base URL
                 </label>
                 <input
@@ -653,14 +606,10 @@ export default function EditorPage() {
                     setEditorData({ ...editorData, baseUrl: e.target.value })
                   }
                   placeholder="https://api.openai.com/v1 (leave empty for default)"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Custom base URL for OpenAI API requests. Leave empty to use
                   the default OpenAI API. Useful for custom endpoints or
                   proxies.
@@ -669,7 +618,7 @@ export default function EditorPage() {
 
               {/* Input Token Cost */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Input Token Cost ($ per 1M tokens)
                 </label>
                 <input
@@ -684,14 +633,10 @@ export default function EditorPage() {
                   placeholder="0.050"
                   min="0"
                   step="0.001"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Cost per million input tokens for AI API calls. Used to
                   calculate and track API spending.
                 </p>
@@ -699,7 +644,7 @@ export default function EditorPage() {
 
               {/* Output Token Cost */}
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Output Token Cost ($ per 1M tokens)
                 </label>
                 <input
@@ -714,14 +659,10 @@ export default function EditorPage() {
                   placeholder="0.400"
                   min="0"
                   step="0.001"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Cost per million output tokens for AI API calls. Used to
                   calculate and track API spending.
                 </p>
@@ -732,9 +673,9 @@ export default function EditorPage() {
           {/* Message Slice Count Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -747,11 +688,9 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Message Slice Count
-              </h2>
+              <h2 className="tui-section-title">Message Slice Count</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="border border-[#1a3a1a] p-4">
               <input
                 type="number"
                 value={editorData.messageSliceCount}
@@ -764,14 +703,10 @@ export default function EditorPage() {
                 placeholder="Enter message slice count (e.g., 200)"
                 min="1"
                 max="1000"
-                className={`w-full p-4 high-contrast-input ${
-                  isAdmin
-                    ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                    : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                }`}
+                className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 readOnly={!isAdmin}
               />
-              <p className="text-sm text-white/70 mt-2">
+              <p className="tui-muted mt-2">
                 Number of recent messages to fetch from Bluesky for article
                 generation (1-1000). Higher values provide more context but may
                 slow down processing.
@@ -782,9 +717,9 @@ export default function EditorPage() {
           {/* Article Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -797,13 +732,11 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Article Generation Period
-              </h2>
+              <h2 className="tui-section-title">Article Generation Period</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            <div className="border border-[#1a3a1a] p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Generation Interval (minutes)
                 </label>
                 <input
@@ -819,22 +752,18 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 15)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Minimum time interval between article generation runs (1-1440
                   minutes). The cron job will skip generation if this duration
-                  hasn't elapsed since the last run.
+                  hasn&apos;t elapsed since the last run.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Last Generation Time
                 </label>
                 <input
@@ -847,10 +776,10 @@ export default function EditorPage() {
                       : "Never"
                   }
                   placeholder="No generation has occurred yet"
-                  className="w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 bg-white/5 cursor-not-allowed"
+                  className="tui-input opacity-50 cursor-not-allowed"
                   readOnly
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Timestamp of the last successful article generation run. This
                   field is automatically updated by the system.
                 </p>
@@ -861,9 +790,9 @@ export default function EditorPage() {
           {/* Event Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -876,13 +805,11 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Event Generation Period
-              </h2>
+              <h2 className="tui-section-title">Event Generation Period</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            <div className="border border-[#1a3a1a] p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Generation Interval (minutes)
                 </label>
                 <input
@@ -898,22 +825,18 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 30)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Minimum time interval between event generation runs (1-1440
                   minutes). The cron job will skip generation if this duration
-                  hasn't elapsed since the last run.
+                  hasn&apos;t elapsed since the last run.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Last Generation Time
                 </label>
                 <input
@@ -926,10 +849,10 @@ export default function EditorPage() {
                       : "Never"
                   }
                   placeholder="No generation has occurred yet"
-                  className="w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 bg-white/5 cursor-not-allowed"
+                  className="tui-input opacity-50 cursor-not-allowed"
                   readOnly
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Timestamp of the last successful event generation run. This
                   field is automatically updated by the system.
                 </p>
@@ -940,9 +863,9 @@ export default function EditorPage() {
           {/* Edition Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -955,13 +878,11 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Edition Generation Period
-              </h2>
+              <h2 className="tui-section-title">Edition Generation Period</h2>
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            <div className="border border-[#1a3a1a] p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Generation Interval (minutes)
                 </label>
                 <input
@@ -977,22 +898,18 @@ export default function EditorPage() {
                   placeholder="Enter generation period in minutes (e.g., 180)"
                   min="1"
                   max="1440"
-                  className={`w-full p-4 high-contrast-input ${
-                    isAdmin
-                      ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      : "bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-60"
-                  }`}
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                   readOnly={!isAdmin}
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Minimum time interval between edition generation runs (1-1440
                   minutes). The cron job will skip generation if this duration
-                  hasn't elapsed since the last run.
+                  hasn&apos;t elapsed since the last run.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="tui-label block mb-2">
                   Last Generation Time
                 </label>
                 <input
@@ -1005,10 +922,10 @@ export default function EditorPage() {
                       : "Never"
                   }
                   placeholder="No generation has occurred yet"
-                  className="w-full p-4 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg text-white/90 bg-white/5 cursor-not-allowed"
+                  className="tui-input opacity-50 cursor-not-allowed"
                   readOnly
                 />
-                <p className="text-sm text-white/70 mt-2">
+                <p className="tui-muted mt-2">
                   Timestamp of the last successful edition generation run. This
                   field is automatically updated by the system.
                 </p>
@@ -1017,25 +934,23 @@ export default function EditorPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-6 border-t border-white/20">
+          <div className="flex items-center justify-between pt-6 border-t border-[#1a3a1a]">
             <button
               onClick={fetchEditorData}
               disabled={!isAdmin}
-              className={`relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300 ${
-                !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-              }`}
+              className={`tui-btn ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              Refresh Data
+              $ Refresh Data
             </button>
 
             <div className="flex items-center space-x-4">
               {message && (
                 <div
-                  className={`px-4 py-2 backdrop-blur-sm rounded-xl text-sm font-medium border ${
+                  className={
                     message.includes("successfully")
-                      ? "bg-green-500/20 border-green-500/30 text-green-200"
-                      : "bg-red-500/20 border-red-500/30 text-red-200"
-                  }`}
+                      ? "tui-msg-success"
+                      : "tui-msg-error"
+                  }
                 >
                   {message}
                 </div>
@@ -1044,48 +959,21 @@ export default function EditorPage() {
               <button
                 onClick={saveEditorData}
                 disabled={saving || !isAdmin}
-                className={`relative px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 ${
-                  !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                }`}
+                className={`tui-btn-primary ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                <span className="relative z-10 flex items-center space-x-2">
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <span>Save Changes</span>
-                    </>
-                  )}
-                </span>
+                {saving ? "Saving..." : "[ Save Changes ]"}
               </button>
             </div>
           </div>
         </div>
 
         {/* KPI Display Section */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
+        <div className="border border-[#1a3a1a] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1098,23 +986,21 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                AI Usage Metrics
-              </h2>
+              <h2 className="tui-section-title">AI Usage Metrics</h2>
             </div>
 
-            <p className="text-white/70">
+            <p className="tui-muted">
               Track your AI API usage and costs across all newsroom operations.
             </p>
 
             {kpiData ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Total AI API Spend */}
-                <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="border border-[#1a3a1a] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-green-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-green-200"
+                        className="w-5 h-5 text-[#33ff33]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1128,21 +1014,21 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white/90">API Spend</h3>
-                      <p className="text-sm text-white/70">Total cost</p>
+                      <h3 className="text-[#33ff33] font-mono text-sm">API Spend</h3>
+                      <p className="tui-muted">Total cost</p>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-green-200">
+                  <div className="tui-value">
                     ${kpiData[KpiName.TOTAL_AI_API_SPEND].toFixed(4)}
                   </div>
                 </div>
 
                 {/* Total Input Tokens */}
-                <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="border border-[#1a3a1a] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-blue-200"
+                        className="w-5 h-5 text-[#33ff33]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1156,23 +1042,21 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white/90">
-                        Input Tokens
-                      </h3>
-                      <p className="text-sm text-white/70">Total sent</p>
+                      <h3 className="text-[#33ff33] font-mono text-sm">Input Tokens</h3>
+                      <p className="tui-muted">Total sent</p>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-blue-200">
+                  <div className="tui-value">
                     {kpiData[KpiName.TOTAL_TEXT_INPUT_TOKENS].toLocaleString()}
                   </div>
                 </div>
 
                 {/* Total Output Tokens */}
-                <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="border border-[#1a3a1a] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-purple-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-purple-200"
+                        className="w-5 h-5 text-[#33ff33]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1186,42 +1070,39 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white/90">
-                        Output Tokens
-                      </h3>
-                      <p className="text-sm text-white/70">Total received</p>
+                      <h3 className="text-[#33ff33] font-mono text-sm">Output Tokens</h3>
+                      <p className="tui-muted">Total received</p>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-purple-200">
+                  <div className="tui-value">
                     {kpiData[KpiName.TOTAL_TEXT_OUTPUT_TOKENS].toLocaleString()}
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/30 mx-auto mb-4"></div>
-                <p className="text-white/70">Loading KPI data...</p>
+                <div className="text-[#33ff33] font-mono text-sm animate-pulse mb-4">$ Loading KPI data...</div>
               </div>
             )}
 
             <div className="flex items-center justify-center pt-4">
               <button
                 onClick={fetchKpiData}
-                className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
+                className="tui-btn"
               >
-                Refresh Metrics
+                $ Refresh Metrics
               </button>
             </div>
           </div>
         </div>
 
         {/* Memory Usage Section */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 mt-8 shadow-2xl">
+        <div className="border border-[#1a3a1a] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1234,23 +1115,21 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Memory Usage
-              </h2>
+              <h2 className="tui-section-title">Memory Usage</h2>
             </div>
 
-            <p className="text-white/70">
+            <p className="tui-muted">
               Current memory usage for Redis and system resources.
             </p>
 
             {memoryInfo ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Redis Memory */}
-                <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="border border-[#1a3a1a] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-red-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-red-200"
+                        className="w-5 h-5 text-[#33ff33]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1264,40 +1143,36 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white/90">Redis</h3>
-                      <p className="text-sm text-white/70">
-                        In-memory database
-                      </p>
+                      <h3 className="text-[#33ff33] font-mono text-sm">Redis</h3>
+                      <p className="tui-muted">In-memory database</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white/70">Used</span>
-                      <span className="text-lg font-semibold text-red-200">
-                        {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)}{" "}
-                        MB
+                      <span className="tui-muted">Used</span>
+                      <span className="text-[#33ff33] font-mono text-lg">
+                        {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white/70">Peak</span>
-                      <span className="text-lg font-semibold text-red-200">
+                      <span className="tui-muted">Peak</span>
+                      <span className="text-[#33ff33] font-mono text-lg">
                         {(
                           memoryInfo.redis.usedMemoryPeak /
                           1024 /
                           1024
-                        ).toFixed(2)}{" "}
-                        MB
+                        ).toFixed(2)} MB
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* System Memory */}
-                <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="border border-[#1a3a1a] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 bg-blue-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-blue-200"
+                        className="w-5 h-5 text-[#33ff33]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1311,45 +1186,42 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white/90">System</h3>
-                      <p className="text-sm text-white/70">Host machine</p>
+                      <h3 className="text-[#33ff33] font-mono text-sm">System</h3>
+                      <p className="tui-muted">Host machine</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white/70">Total</span>
-                      <span className="text-lg font-semibold text-blue-200">
+                      <span className="tui-muted">Total</span>
+                      <span className="text-[#33ff33] font-mono text-lg">
                         {(
                           memoryInfo.system.totalMemory /
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)}{" "}
-                        GB
+                        ).toFixed(2)} GB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white/70">Used</span>
-                      <span className="text-lg font-semibold text-blue-200">
+                      <span className="tui-muted">Used</span>
+                      <span className="text-[#33ff33] font-mono text-lg">
                         {(
                           memoryInfo.system.usedMemory /
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)}{" "}
-                        GB
+                        ).toFixed(2)} GB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white/70">Free</span>
-                      <span className="text-lg font-semibold text-green-200">
+                      <span className="tui-muted">Free</span>
+                      <span className="text-[#33ff33] font-mono text-lg">
                         {(
                           memoryInfo.system.freeMemory /
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)}{" "}
-                        GB
+                        ).toFixed(2)} GB
                       </span>
                     </div>
                   </div>
@@ -1357,29 +1229,28 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/30 mx-auto mb-4"></div>
-                <p className="text-white/70">Loading memory info...</p>
+                <div className="text-[#33ff33] font-mono text-sm animate-pulse mb-4">$ Loading memory info...</div>
               </div>
             )}
 
             <div className="flex items-center justify-center pt-4">
               <button
                 onClick={fetchMemoryInfo}
-                className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
+                className="tui-btn"
               >
-                Refresh Memory
+                $ Refresh Memory
               </button>
             </div>
           </div>
         </div>
 
         {/* Manual Job Triggers */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 mt-8 shadow-2xl">
+        <div className="border border-[#1a3a1a] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-4 h-4 text-[#33ff33]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1392,12 +1263,10 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white/90">
-                Manual Job Triggers
-              </h2>
+              <h2 className="tui-section-title">Manual Job Triggers</h2>
             </div>
 
-            <p className="text-white/70">
+            <p className="tui-muted">
               Manually trigger scheduled jobs for testing and immediate
               execution. These jobs run the same logic as the automated cron
               jobs.
@@ -1405,11 +1274,11 @@ export default function EditorPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Reporter Articles Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-white/80"
+                      className="w-5 h-5 text-[#33ff33]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1423,13 +1292,11 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Generate Articles
-                    </h3>
-                    <p className="text-sm text-white/70">Every 15 minutes</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Articles</h3>
+                    <p className="tui-muted">Every 15 minutes</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Triggers article generation for all reporters in the system.
                 </p>
                 <button
@@ -1439,53 +1306,30 @@ export default function EditorPage() {
                     reporterJobId !== null ||
                     !isAdmin
                   }
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "reporter" || reporterJobStatus ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>
-                          {reporterJobStatus?.status === "completed"
-                            ? "Completing..."
-                            : reporterJobStatus?.status === "failed"
-                              ? "Failed"
-                              : jobTriggering === "reporter"
-                                ? "Generating..."
-                                : "Running..."}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <span>Trigger Articles</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "reporter" || reporterJobStatus ? (
+                    <>
+                      {reporterJobStatus?.status === "completed"
+                        ? "Completing..."
+                        : reporterJobStatus?.status === "failed"
+                          ? "Failed"
+                          : jobTriggering === "reporter"
+                            ? "Generating..."
+                            : "Running..."}
+                    </>
+                  ) : (
+                    "Trigger Articles"
+                  )}
                 </button>
               </div>
 
               {/* Newspaper Edition Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-white/80"
+                      className="w-5 h-5 text-[#33ff33]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1499,57 +1343,28 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Newspaper Edition
-                    </h3>
-                    <p className="text-sm text-white/70">Every 3 hours</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Newspaper Edition</h3>
+                    <p className="tui-muted">Every 3 hours</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Creates a newspaper edition from available articles.
                 </p>
                 <button
                   onClick={() => triggerJob("newspaper")}
                   disabled={jobTriggering === "newspaper" || !isAdmin}
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "newspaper" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Creating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          />
-                        </svg>
-                        <span>Create Edition</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "newspaper" ? "Creating..." : "Create Edition"}
                 </button>
               </div>
 
               {/* Daily Edition Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-white/80"
+                      className="w-5 h-5 text-[#33ff33]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1563,13 +1378,11 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Daily Edition
-                    </h3>
-                    <p className="text-sm text-white/70">Every 24 hours</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Daily Edition</h3>
+                    <p className="tui-muted">Every 24 hours</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Compiles all newspaper editions into a daily edition.
                 </p>
                 <button
@@ -1577,51 +1390,26 @@ export default function EditorPage() {
                   disabled={
                     jobTriggering === "daily" || dailyJobId !== null || !isAdmin
                   }
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "daily" || dailyJobStatus ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>
-                          {dailyJobStatus?.status === "completed"
-                            ? "Completing..."
-                            : dailyJobStatus?.status === "failed"
-                              ? "Failed"
-                              : "Compiling..."}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                          />
-                        </svg>
-                        <span>Trigger Manually</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "daily" || dailyJobStatus ? (
+                    dailyJobStatus?.status === "completed"
+                      ? "Completing..."
+                      : dailyJobStatus?.status === "failed"
+                        ? "Failed"
+                        : "Compiling..."
+                  ) : (
+                    "Trigger Manually"
+                  )}
                 </button>
               </div>
 
               {/* Comment Generation Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-white/80"
+                      className="w-5 h-5 text-[#33ff33]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1635,17 +1423,15 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Generate Comments
-                    </h3>
-                    <p className="text-sm text-white/70">Once daily</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Comments</h3>
+                    <p className="tui-muted">Once daily</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Generates AI comments on the latest daily edition articles.
                 </p>
                 <div>
-                  <label className="block text-xs text-white/70 mb-1">
+                  <label className="tui-label block mb-1">
                     Number of Comments to Generate
                   </label>
                   <input
@@ -1656,51 +1442,24 @@ export default function EditorPage() {
                     onChange={(e) =>
                       setNumComments(parseInt(e.target.value) || 1)
                     }
-                    className="w-full p-3 high-contrast-input focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                    className="tui-input"
                   />
                 </div>
                 <button
                   onClick={() => triggerJob("comments", numComments)}
                   disabled={jobTriggering === "comments" || !isAdmin}
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "comments" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Generating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                          />
-                        </svg>
-                        <span>Generate Comments</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "comments" ? "Generating..." : "Generate Comments"}
                 </button>
               </div>
 
               {/* Event Generation Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-white/80"
+                      className="w-5 h-5 text-[#33ff33]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1720,92 +1479,44 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Generate Events
-                    </h3>
-                    <p className="text-sm text-white/70">Every 30 minutes</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Events</h3>
+                    <p className="tui-muted">Every 30 minutes</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Identifies and tracks news events from social media.
                 </p>
                 <button
                   onClick={() => triggerJob("events")}
                   disabled={jobTriggering === "events" || !isAdmin}
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "events" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Generating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13 10V3L4 14h7v7l9-11h-7z"
-                          />
-                        </svg>
-                        <span>Generate Events</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "events" ? "Generating..." : "Generate Events"}
                 </button>
               </div>
 
               {/* Prism Daily Edition Job */}
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="border border-[#1a3a1a] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[#33ff33]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white/90">
-                      Generate Prism Daily
-                    </h3>
-                    <p className="text-sm text-white/70">Once daily at 8:30am</p>
+                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Prism Daily</h3>
+                    <p className="tui-muted">Once daily at 8:30am</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/70">
+                <p className="tui-muted">
                   Generates a pair of opposing daily editions using AI-determined editorial perspectives.
                 </p>
                 <button
                   onClick={() => triggerJob("prism-daily")}
                   disabled={jobTriggering === "prism-daily" || !isAdmin}
-                  className={`w-full relative px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-medium overflow-hidden group hover:shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 ${
-                    !isAdmin ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  <span className="relative z-10 flex items-center justify-center space-x-2">
-                    {jobTriggering === "prism-daily" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Generating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        <span>Trigger Manually</span>
-                      </>
-                    )}
-                  </span>
+                  {jobTriggering === "prism-daily" ? "Generating..." : "Trigger Manually"}
                 </button>
               </div>
             </div>
@@ -1813,34 +1524,24 @@ export default function EditorPage() {
             {/* Job Status Information */}
             {jobStatus && (
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white/90">
-                  Job Status
-                </h3>
+                <h3 className="tui-section-title">Job Status</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Reporter Job Status */}
-                  <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="border border-[#1a3a1a] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-white/90">
+                      <span className="text-[#33ff33] font-mono text-sm">
                         Article Generation
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.reporterJob ? (
-                          <div className="flex items-center space-x-1">
-                            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-400 border-t-transparent"></div>
-                            <span className="text-xs text-yellow-200">
-                              Running
-                            </span>
-                          </div>
+                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <div className="flex items-center space-x-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-xs text-green-200">Idle</span>
-                          </div>
+                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
-                    <div className="space-y-1 text-xs text-white/70">
+                    <div className="space-y-1 tui-muted">
                       <div>
                         Last run:{" "}
                         {jobStatus.lastRuns.reporterJob
@@ -1857,28 +1558,20 @@ export default function EditorPage() {
                   </div>
 
                   {/* Newspaper Job Status */}
-                  <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="border border-[#1a3a1a] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-white/90">
+                      <span className="text-[#33ff33] font-mono text-sm">
                         Newspaper Edition
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.newspaperJob ? (
-                          <div className="flex items-center space-x-1">
-                            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-400 border-t-transparent"></div>
-                            <span className="text-xs text-yellow-200">
-                              Running
-                            </span>
-                          </div>
+                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <div className="flex items-center space-x-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-xs text-green-200">Idle</span>
-                          </div>
+                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
-                    <div className="space-y-1 text-xs text-white/70">
+                    <div className="space-y-1 tui-muted">
                       <div>
                         Last run:{" "}
                         {jobStatus.lastRuns.newspaperJob
@@ -1895,28 +1588,20 @@ export default function EditorPage() {
                   </div>
 
                   {/* Daily Job Status */}
-                  <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="border border-[#1a3a1a] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-white/90">
+                      <span className="text-[#33ff33] font-mono text-sm">
                         Daily Edition
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.dailyJob ? (
-                          <div className="flex items-center space-x-1">
-                            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-400 border-t-transparent"></div>
-                            <span className="text-xs text-yellow-200">
-                              Running
-                            </span>
-                          </div>
+                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <div className="flex items-center space-x-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-xs text-green-200">Idle</span>
-                          </div>
+                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
-                    <div className="space-y-1 text-xs text-white/70">
+                    <div className="space-y-1 tui-muted">
                       <div>
                         Last run:{" "}
                         {jobStatus.lastRuns.dailyJob
@@ -1934,10 +1619,10 @@ export default function EditorPage() {
                 </div>
 
                 {jobStatus.note && (
-                  <div className="backdrop-blur-sm bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
+                  <div className="border border-[#1a3a1a] p-4">
                     <div className="flex items-start space-x-3">
                       <svg
-                        className="w-5 h-5 text-blue-200 mt-0.5"
+                        className="w-5 h-5 text-[#33ff33] mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1950,8 +1635,8 @@ export default function EditorPage() {
                         />
                       </svg>
                       <div>
-                        <h4 className="font-medium text-blue-200">Note</h4>
-                        <p className="text-sm text-blue-100 mt-1">
+                        <h4 className="text-[#33ff33] font-mono text-sm">Note</h4>
+                        <p className="tui-muted mt-1">
                           {jobStatus.note}
                         </p>
                       </div>
@@ -1964,7 +1649,7 @@ export default function EditorPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-white/50">
+        <div className="text-center mt-8 text-[#335533] font-mono text-sm">
           <p>{appName} Editor Configuration Panel</p>
         </div>
       </div>
