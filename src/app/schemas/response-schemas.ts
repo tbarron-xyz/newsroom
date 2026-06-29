@@ -18,6 +18,7 @@ export const dailyEditionSchema = z.object({
 export const reporterArticleSchema = z.object({
   messageIds: z
     .array(z.number())
+    .min(1, "At least one source message is required to write an article")
     .describe(
       "The indexes of the social media messages used to write this article"
     ),

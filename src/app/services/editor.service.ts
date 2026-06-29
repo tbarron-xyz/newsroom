@@ -49,8 +49,26 @@ export class EditorService {
       throw new Error("No articles found in the last 3 hours");
     }
 
+    // Only include articles that have source messages
+    const articlesWithSources = allRecentArticles.filter(
+      (a) => a.messageTexts && a.messageTexts.length > 0
+    );
+
+    const filteredCount = allRecentArticles.length - articlesWithSources.length;
+    if (filteredCount > 0) {
+      console.log(
+        `Filtered out ${filteredCount} articles without source messages`
+      );
+    }
+
+    if (articlesWithSources.length === 0) {
+      throw new Error(
+        "No articles with source messages found in the last 3 hours"
+      );
+    }
+
     console.log(
-      `Found ${allRecentArticles.length} articles from the last 3 hours`
+      `Found ${articlesWithSources.length} articles from the last 3 hours`
     );
 
     // Get editor information
@@ -67,7 +85,7 @@ export class EditorService {
       inputTokenCount,
       outputTokenCount
     } = await this.aiService.selectNewsworthyStories(
-      allRecentArticles,
+      articlesWithSources,
       editor.prompt,
       editor.storySelectionModelName
     );

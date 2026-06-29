@@ -15,6 +15,8 @@ interface Article {
   prompt: string;
   messageIds: string[];
   messageTexts: string[];
+  messageDids: string[];
+  messageRkeys: string[];
 }
 
 export default function ArticlePage() {
@@ -76,19 +78,25 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
+        <div
+          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div className="text-center relative z-10">
+          <div className="w-16 h-16 backdrop-blur-xl bg-red-500/20 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-8 h-8 text-red-600"
+              className="w-8 h-8 text-red-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -101,13 +109,13 @@ export default function ArticlePage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
+          <h2 className="text-xl font-semibold text-white/90 mb-2">
             Error Loading Article
           </h2>
-          <p className="text-slate-600">{error}</p>
+          <p className="text-white/70">{error}</p>
           <Link
             href="/articles"
-            className="mt-4 inline-block px-6 py-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
+            className="mt-4 inline-block px-6 py-3 bg-white/10 text-white/70 rounded-lg hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-colors font-medium"
           >
             ← Back to Articles
           </Link>
@@ -121,22 +129,22 @@ export default function ArticlePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-slate-800 mb-2">
+            <h1 className="text-4xl font-bold text-white/90 mb-2">
               Article Details
             </h1>
-            <p className="text-slate-600 text-lg">
+            <p className="text-white/70 text-lg">
               Reporter {article.reporterId.split("_")[2] || article.reporterId}
             </p>
           </div>
           <div className="flex items-center space-x-4">
             <Link
               href={`/articles?reporterId=${article.reporterId}`}
-              className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
+              className="px-6 py-3 bg-white/10 text-white/70 rounded-lg hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-colors font-medium"
             >
               ← Back to Articles
             </Link>
@@ -144,12 +152,12 @@ export default function ArticlePage() {
         </div>
 
         {/* Article Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4 leading-tight">
+            <h2 className="text-3xl font-bold text-white/90 mb-4 leading-tight">
               {article.headline}
             </h2>
-            <div className="flex items-center text-sm text-slate-500">
+            <div className="flex items-center text-sm text-white/60">
               <svg
                 className="w-4 h-4 mr-1"
                 fill="none"
@@ -167,64 +175,80 @@ export default function ArticlePage() {
             </div>
           </div>
 
-          <div className="prose prose-slate max-w-none mb-8">
-            <div className="text-slate-700 leading-relaxed whitespace-pre-wrap text-lg">
+          <div className="mb-8">
+            <div className="text-white/80 leading-relaxed whitespace-pre-wrap text-lg">
               {article.body}
             </div>
           </div>
 
           {/* Message Texts Section */}
           {article.messageTexts && article.messageTexts.length > 0 && (
-            <div className="mt-8 pt-8 border-t border-slate-200">
+            <div className="mt-8 pt-8 border-t border-white/20">
               <ExpandableSection
                 title="Source Messages"
                 expanded={showMessages}
                 onToggle={() => setShowMessages(!showMessages)}
               >
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold text-white/80">
                     Social Media Messages Used:
                   </h4>
-                  {article.messageTexts.map((message, index) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-slate-50 rounded-lg border border-slate-200"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-slate-500">
-                          Message {index + 1}
-                        </span>
-                        {article.messageIds && article.messageIds[index] && (
-                          <span className="text-xs text-slate-400">
-                            ID: {article.messageIds[index]}
+                  {article.messageTexts.map((message, index) => {
+                    const did = article.messageDids?.[index];
+                    const rkey = article.messageRkeys?.[index];
+                    const bskyUrl = did && rkey
+                      ? `https://bsky.app/profile/${did}/post/${rkey}`
+                      : null;
+                    return (
+                      <div
+                        key={index}
+                        className="p-4 bg-white/5 border border-white/10 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium text-white/50">
+                            Message {index + 1}
                           </span>
-                        )}
+                          {bskyUrl ? (
+                            <a
+                              href={bskyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-300 hover:text-blue-200 underline"
+                            >
+                              View on Bluesky
+                            </a>
+                          ) : article.messageIds?.[index] ? (
+                            <span className="text-xs text-white/40">
+                              ID: {article.messageIds[index]}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="text-sm text-white/80 whitespace-pre-wrap">
+                          {message}
+                        </div>
                       </div>
-                      <div className="text-sm text-slate-700 whitespace-pre-wrap">
-                        {message}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </ExpandableSection>
             </div>
           )}
 
           {/* Prompt Section */}
-          <div className="mt-8 pt-8 border-t border-slate-200">
+          <div className="mt-8 pt-8 border-t border-white/20">
             <ExpandableSection
               title="Prompt"
               expanded={showPrompt}
               onToggle={() => setShowPrompt(!showPrompt)}
             >
-              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
                 <div className="flex items-center gap-2 mb-2 relative group">
-                  <h4 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold text-white/80">
                     AI Generation Prompt:
                   </h4>
                   <div className="relative group">
                     <svg
-                      className="w-4 h-4 text-slate-500 hover:text-slate-700 cursor-help"
+                      className="w-4 h-4 text-white/60 hover:text-white/80 cursor-help"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -242,15 +266,15 @@ export default function ArticlePage() {
                     </div>
                   </div>
                 </div>
-                <pre className="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed">
+                <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono leading-relaxed">
                   {article.prompt}
                 </pre>
               </div>
             </ExpandableSection>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-slate-200">
-            <div className="flex items-center justify-between text-sm text-slate-500">
+          <div className="mt-8 pt-8 border-t border-white/20">
+            <div className="flex items-center justify-between text-sm text-white/50">
               <span>Article ID: {article.id}</span>
               <span>Reporter: {article.reporterId}</span>
             </div>
@@ -258,7 +282,7 @@ export default function ArticlePage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-slate-500">
+        <div className="text-center mt-12 text-white/50">
           <p>{appName} Article</p>
         </div>
       </div>
