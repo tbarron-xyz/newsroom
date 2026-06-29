@@ -54,6 +54,12 @@ export class AIService {
     this.aiClient = new AIClient(dataStorageService);
   }
 
+  protected async fetchSocialMediaMessages(
+    messageSliceCount: number
+  ): Promise<BlueskyMessage[]> {
+    return fetchLatestMessages(messageSliceCount);
+  }
+
   private async logAIResponse(
     eventDescription: string,
     response?: OpenAIResponse,
@@ -149,7 +155,9 @@ export class AIService {
       // Fetch recent social media messages to inform article generation
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await fetchLatestMessages(messageSliceCount);
+        socialMediaMessages = await this.fetchSocialMediaMessages(
+          messageSliceCount
+        );
       } catch (error) {
         console.warn("Failed to fetch social media messages:", error);
         // Continue with article generation even if social media fetch fails
@@ -703,7 +711,9 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       // Fetch recent social media messages
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await fetchLatestMessages(messageSliceCount);
+        socialMediaMessages = await this.fetchSocialMediaMessages(
+          messageSliceCount
+        );
       } catch (error) {
         console.warn(
           "Failed to fetch social media messages for events:",
@@ -857,7 +867,9 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       // Fetch recent social media messages to inform article generation
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await fetchLatestMessages(messageSliceCount);
+        socialMediaMessages = await this.fetchSocialMediaMessages(
+          messageSliceCount
+        );
       } catch (error) {
         console.warn("Failed to fetch social media messages:", error);
         // Continue with article generation even if social media fetch fails

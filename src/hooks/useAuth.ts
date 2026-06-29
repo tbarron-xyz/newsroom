@@ -25,6 +25,19 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "true") {
+      setUser({
+        id: "auth-disabled-user",
+        email: "dev@localhost",
+        role: "admin",
+        hasReader: true,
+        hasReporter: true,
+        hasEditor: true,
+      });
+      setLoading(false);
+      return;
+    }
+
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem("accessToken");

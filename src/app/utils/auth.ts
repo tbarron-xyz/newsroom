@@ -24,6 +24,21 @@ export function withAuth(
   return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     const container = ServiceContainer.getInstance();
     const dataStorage = await container.getDataStorageService();
+
+    if (process.env.AUTH_DISABLED === "true") {
+      const syntheticUser: User = {
+        id: "auth-disabled-user",
+        email: "dev@localhost",
+        passwordHash: "",
+        role: "admin",
+        createdAt: Date.now(),
+        hasReader: true,
+        hasReporter: true,
+        hasEditor: true,
+      };
+      return handler(request, syntheticUser, dataStorage, context);
+    }
+
     const authService = await container.getAuthService();
     const abilitiesService = await container.getAbilitiesService();
 
