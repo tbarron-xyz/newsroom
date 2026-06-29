@@ -1,0 +1,21 @@
+services:
+  test:
+    build: .
+    environment:
+      - DATA_STORAGE_BACKEND=sqlite
+      - NODE_ENV=test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: node --import tsx --test
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATA_STORAGE_BACKEND=sqlite
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev

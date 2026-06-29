@@ -9,6 +9,7 @@ Four cron pipelines drive content generation: events → articles → editions �
 
 After making any code changes to typescript files (.ts/.tsx), run `npm run build` to check the typescript build
 <!-- Then run the Prettier formatter: `npm run format` -->
+- Run `docker compose run --rm test` or `npm test` to run the test suite (uses `node:test` framework)
 
 # Code Style Guidelines
 - When patterns repeat, extract to a shared location.

@@ -43,6 +43,7 @@ All users can freely access recent content without registration. Visit the follo
 - Node.js 18+
 - Redis server running on `redis://localhost:6379` (default database)
 - PostgreSQL server (optional, for PostgreSQL backend)
+- Docker (optional, for Docker Compose testing)
 
 ## Getting Started
 
@@ -64,6 +65,20 @@ All users can freely access recent content without registration. Visit the follo
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) to access the application.
+
+### Docker Compose (alternative)
+
+For isolated testing without local dependencies:
+
+```bash
+docker compose run --rm test
+```
+
+Or start the dev server:
+
+```bash
+docker compose up app
+```
 
 ## Project Structure
 
@@ -158,3 +173,52 @@ Bluesky/Jetstream → Events → Articles → Newspaper Editions → Daily Editi
 - **Articles Page**: Browse generated articles
 - **Editions Page**: View compiled newspaper editions
 - **Daily Edition Page**: Access the latest daily newspaper
+
+## Testing
+
+Tests use Node's built-in [node:test](https://nodejs.org/api/test.html) framework with `tsx` for TypeScript support. Test files are named `*.test.ts` and are auto-discovered.
+
+### Running Tests
+
+**Locally** (requires a local Node.js install):
+
+```bash
+DATA_STORAGE_BACKEND=sqlite npm test
+```
+
+**With Docker Compose** (isolated, no local dependencies needed):
+
+```bash
+docker compose run --rm test
+```
+
+Run a single test file:
+
+```bash
+docker compose run --rm test node --import tsx --test src/app/services/sqlite-data-storage.test.ts
+```
+
+### Writing Tests
+
+Tests use `node:test` and `node:assert/strict`:
+
+```typescript
+import { describe, it, before, after } from "node:test";
+import assert from "node:assert/strict";
+```
+
+### Existing Test Suite
+
+The primary test file at `src/app/services/sqlite-data-storage.test.ts` contains 47 tests covering:
+
+| Group | Tests | Areas |
+|---|---|---|
+| Editor | 3 | save/get, null when missing |
+| Reporter | 5 | CRUD, empty beats, disabled state |
+| Article | 7 | CRUD, 4 query patterns (latest, by reporter, time range, global) |
+| Event | 4 | CRUD, by reporter, latest updated |
+| NewspaperEdition / DailyEdition | 6 | CRUD, ordering, empty topics |
+| User | 8 | create, lookup by ID/email, login tracking, delete, unique constraint |
+| Ad | 5 | full CRUD lifecycle |
+| Job status, KPI, Log | 8 | running/lastRun/lastSuccess, set/get/increment, add/get |
+| clearAllData | 1 | wipes all tables for isolation |

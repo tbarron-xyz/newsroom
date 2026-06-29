@@ -48,3 +48,4 @@ config.yaml
 native
 planning
 .ignore
+db.sqlite

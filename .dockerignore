@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+dist
+dump.rdb
+*.db
+*.sqlite
+.env*.local
+coverage

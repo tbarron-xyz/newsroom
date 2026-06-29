@@ -585,8 +585,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       dailyEdition.frontPageHeadline,
       dailyEdition.frontPageArticle,
       dailyEdition.newspaperName,
-      // dailyEdition.modelFeedbackAboutThePrompt?.positive,
-      // dailyEdition.modelFeedbackAboutThePrompt?.negative,
+      null, // modelFeedbackPositive (legacy, unused)
+      null, // modelFeedbackNegative (legacy, unused)
       JSON.stringify(dailyEdition.topics || []),
       dailyEdition.prompt,
       dailyEdition.modelName,
