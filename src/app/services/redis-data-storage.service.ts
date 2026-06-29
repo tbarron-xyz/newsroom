@@ -25,7 +25,7 @@ export class RedisDataStorageService implements IDataStorageService {
 
   constructor() {
     this.client = createClient({
-      url: "redis://localhost:6379"
+      url: process.env.REDIS_URL || "redis://localhost:6379"
       // Add username/password if needed
       // username: 'default',
       // password: 'yourpassword'

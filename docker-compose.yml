@@ -3,11 +3,19 @@ services:
     build: .
     environment:
       - DATA_STORAGE_BACKEND=sqlite
+      - REDIS_URL=redis://redis:6379
       - NODE_ENV=test
     volumes:
       - .:/app
       - /app/node_modules
+    depends_on:
+      - redis
     command: node --import tsx --test
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
   app:
     build: .

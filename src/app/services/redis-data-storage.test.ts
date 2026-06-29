@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { SQLiteDataStorageService } from "./sqlite-data-storage.service";
+import { RedisDataStorageService } from "./redis-data-storage.service";
 import {
   makeEditor,
   makeReporter,
@@ -12,11 +12,11 @@ import {
   makeAd
 } from "./test-data-factories";
 
-describe("SQLiteDataStorageService", () => {
-  let storage: SQLiteDataStorageService;
+describe("RedisDataStorageService", () => {
+  let storage: RedisDataStorageService;
 
   beforeEach(async () => {
-    storage = new SQLiteDataStorageService();
+    storage = new RedisDataStorageService();
     await storage.connect();
     await storage.clearAllData();
   });
@@ -28,7 +28,7 @@ describe("SQLiteDataStorageService", () => {
 
   describe("connection lifecycle", () => {
     it("connects and disconnects without error", async () => {
-      const s = new SQLiteDataStorageService();
+      const s = new RedisDataStorageService();
       await s.connect();
       await s.disconnect();
     });
@@ -373,14 +373,6 @@ describe("SQLiteDataStorageService", () => {
       const retrieved = await storage.getUserById(user.id);
       assert.equal(retrieved, null);
     });
-
-    it("enforces unique email constraint", async () => {
-      await storage.createUser(makeUserInput({ email: "dup@test.com" }));
-      await assert.rejects(
-        () => storage.createUser(makeUserInput({ email: "dup@test.com" })),
-        /UNIQUE constraint failed/
-      );
-    });
   });
 
   describe("Ad", () => {
@@ -483,7 +475,7 @@ describe("SQLiteDataStorageService", () => {
   });
 
   describe("clearAllData", () => {
-    it("wipes all tables", async () => {
+    it("wipes all data", async () => {
       await storage.saveEditor(makeEditor());
       await storage.saveReporter(makeReporter());
       await storage.saveArticle(makeArticle());

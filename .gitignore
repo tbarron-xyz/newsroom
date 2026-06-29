@@ -49,3 +49,4 @@ native
 planning
 .ignore
 db.sqlite
+db.sqlite-*
