@@ -1,3 +1,4 @@
+import { statSync } from "fs";
 import Database from "better-sqlite3";
 import {
   Editor,
@@ -1115,25 +1116,16 @@ export class SQLiteDataStorageService implements IDataStorageService {
     redis: { usedMemory: number; usedMemoryPeak: number };
     system: { totalMemory: number; usedMemory: number; freeMemory: number };
   }> {
-    const db = this.getDb();
-    // Get SQLite memory stats (approximation)
-    const dbStats = db.prepare("PRAGMA compile_time_limit").get() as any;
-    const pageCount = db.prepare("PRAGMA page_count").get() as any;
-    const pageSize = db.prepare("PRAGMA page_size").get() as any;
+    const dbFileSize = statSync(this.dbPath).size;
 
-    // Estimate database memory usage
-    const estimatedDbMemory = pageCount.page_count * pageSize.page_size;
-
-    // For system memory, provide basic estimates since SQLite doesn't provide this directly
-    // This could be enhanced with system-specific calls if needed
     const totalMemory = process.memoryUsage().heapTotal;
     const usedMemory = process.memoryUsage().heapUsed;
     const freeMemory = totalMemory - usedMemory;
 
     return {
       redis: {
-        usedMemory: estimatedDbMemory,
-        usedMemoryPeak: estimatedDbMemory // SQLite doesn't track peaks
+        usedMemory: dbFileSize,
+        usedMemoryPeak: dbFileSize
       },
       system: {
         totalMemory,

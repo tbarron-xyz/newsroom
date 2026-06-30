@@ -18,7 +18,7 @@ export default function PageContainer({
 }: PageContainerProps) {
   const bgClass =
     variant === "tui"
-      ? "min-h-screen bg-black"
+      ? "tui-theme min-h-screen bg-black"
       : "min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600";
 
   return (

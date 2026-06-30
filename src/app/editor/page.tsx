@@ -1096,7 +1096,7 @@ export default function EditorPage() {
           </div>
         </div>
 
-        {/* Memory Usage Section */}
+          {/* Memory & Storage Section */}
         <div className="border border-[var(--tui-border)] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
@@ -1115,16 +1115,16 @@ export default function EditorPage() {
                   />
                 </svg>
               </div>
-              <h2 className="tui-section-title">Memory Usage</h2>
+              <h2 className="tui-section-title">Memory &amp; Storage</h2>
             </div>
 
             <p className="tui-muted">
-              Current memory usage for Redis and system resources.
+              Current database storage (disk) and system memory usage.
             </p>
 
             {memoryInfo ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Redis Memory */}
+                {/* Database Storage */}
                 <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
                     <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
@@ -1143,19 +1143,19 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Redis</h3>
-                      <p className="tui-muted">In-memory database</p>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Database</h3>
+                      <p className="tui-muted">On-disk storage</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="tui-muted">Used</span>
+                      <span className="tui-muted">File Size</span>
                       <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="tui-muted">Peak</span>
+                      <span className="tui-muted">On Disk</span>
                       <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.redis.usedMemoryPeak /
