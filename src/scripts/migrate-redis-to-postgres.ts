@@ -113,15 +113,7 @@ async function migrateData() {
     }
     console.log(`✅ ${users.length} users migrated`);
 
-    // 8. Migrate Ads
-    console.log("Migrating ads...");
-    const ads = await redisService.getAllAds();
-    for (const ad of ads) {
-      await postgresService.saveAd(ad);
-    }
-    console.log(`✅ ${ads.length} ads migrated`);
-
-    // 9. Migrate KPIs
+    // 8. Migrate KPIs
     console.log("Migrating KPIs...");
     // Note: We need to get KPI names from somewhere. For now, we'll migrate common ones
     const kpiNames = [

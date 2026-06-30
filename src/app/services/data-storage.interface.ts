@@ -5,7 +5,6 @@ import {
   NewspaperEdition,
   DailyEdition,
   Event,
-  AdEntry,
   User,
   ForumSection,
   ForumThread,
@@ -62,14 +61,6 @@ export interface IDataStorageService {
   saveDailyEdition(dailyEdition: DailyEdition): Promise<void>;
   getDailyEditions(limit?: number): Promise<DailyEdition[]>;
   getDailyEdition(dailyEditionId: string): Promise<DailyEdition | null>;
-
-  // Ad operations
-  saveAd(ad: AdEntry): Promise<void>;
-  getAllAds(): Promise<AdEntry[]>;
-  getMostRecentAd(): Promise<AdEntry | null>;
-  getAd(adId: string): Promise<AdEntry | null>;
-  updateAd(adId: string, updates: Partial<Omit<AdEntry, "id">>): Promise<void>;
-  deleteAd(adId: string): Promise<void>;
 
   // User operations
   createUser(

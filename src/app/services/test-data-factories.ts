@@ -5,8 +5,7 @@ import type {
   Reporter,
   User,
   NewspaperEdition,
-  DailyEdition,
-  AdEntry
+  DailyEdition
 } from "../schemas/types";
 
 export function makeEditor(overrides: Partial<Editor> = {}): Editor {
@@ -129,13 +128,4 @@ export function makeDailyEdition(
   };
 }
 
-export function makeAd(overrides: Partial<AdEntry> = {}): AdEntry {
-  return {
-    id: "ad_test_1",
-    userId: "user_test_1",
-    name: "Test Ad",
-    bidPrice: 1.5,
-    promptContent: "Buy our product!",
-    ...overrides
-  };
-}
+

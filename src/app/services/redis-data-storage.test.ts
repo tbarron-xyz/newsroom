@@ -8,8 +8,7 @@ import {
   makeEvent,
   makeUserInput,
   makeNewspaperEdition,
-  makeDailyEdition,
-  makeAd
+  makeDailyEdition
 } from "./test-data-factories";
 
 describe("RedisDataStorageService", () => {
@@ -375,54 +374,6 @@ describe("RedisDataStorageService", () => {
     });
   });
 
-  describe("Ad", () => {
-    it("saves and retrieves an ad", async () => {
-      const ad = makeAd();
-      await storage.saveAd(ad);
-      const retrieved = await storage.getAd(ad.id);
-      assert.notEqual(retrieved, null);
-      assert.equal(retrieved!.name, ad.name);
-      assert.equal(retrieved!.bidPrice, ad.bidPrice);
-      assert.equal(retrieved!.promptContent, ad.promptContent);
-    });
-
-    it("getAllAds returns all ads", async () => {
-      const a1 = makeAd({ id: "ad1" });
-      const a2 = makeAd({ id: "ad2" });
-      await storage.saveAd(a1);
-      await storage.saveAd(a2);
-      const all = await storage.getAllAds();
-      assert.equal(all.length, 2);
-    });
-
-    it("getMostRecentAd returns the ad with the most recent timestamp in its ID", async () => {
-      const a1 = makeAd({ id: "ad_1000_abc" });
-      const a2 = makeAd({ id: "ad_2000_def" });
-      await storage.saveAd(a1);
-      await storage.saveAd(a2);
-      const recent = await storage.getMostRecentAd();
-      assert.notEqual(recent, null);
-      assert.equal(recent!.id, "ad_2000_def");
-    });
-
-    it("updateAd partial update", async () => {
-      const ad = makeAd();
-      await storage.saveAd(ad);
-      await storage.updateAd(ad.id, { name: "Updated Ad", bidPrice: 5.0 });
-      const retrieved = await storage.getAd(ad.id);
-      assert.equal(retrieved!.name, "Updated Ad");
-      assert.equal(retrieved!.bidPrice, 5.0);
-    });
-
-    it("deleteAd removes ad", async () => {
-      const ad = makeAd();
-      await storage.saveAd(ad);
-      await storage.deleteAd(ad.id);
-      const retrieved = await storage.getAd(ad.id);
-      assert.equal(retrieved, null);
-    });
-  });
-
   describe("Job status", () => {
     it("setJobRunning and getJobRunning round-trip", async () => {
       await storage.setJobRunning("reporter", true);
@@ -483,7 +434,6 @@ describe("RedisDataStorageService", () => {
       await storage.saveNewspaperEdition(makeNewspaperEdition());
       await storage.saveDailyEdition(makeDailyEdition());
       await storage.createUser(makeUserInput());
-      await storage.saveAd(makeAd());
 
       await storage.clearAllData();
 
@@ -494,7 +444,6 @@ describe("RedisDataStorageService", () => {
       assert.deepEqual(await storage.getNewspaperEditions(), []);
       assert.deepEqual(await storage.getDailyEditions(), []);
       assert.deepEqual(await storage.getAllUsers(), []);
-      assert.deepEqual(await storage.getAllAds(), []);
     });
   });
 });

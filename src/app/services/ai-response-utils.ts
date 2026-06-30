@@ -55,9 +55,7 @@ export class AIResponseUtils {
   }
 
   static formatSocialMediaContext(
-    messages: Array<{ did: string; text: string; time: number }>,
-    includeAds?: boolean,
-    mostRecentAd?: any
+    messages: Array<{ did: string; text: string; time: number }>
   ): string {
     if (messages.length === 0) {
       return "";
@@ -67,11 +65,6 @@ export class AIResponseUtils {
 
     for (let i = 0; i < messages.length; i++) {
       formattedMessages.push(`${i + 1}. "${messages[i].text}"`);
-
-      // Insert ad prompt after every 20 message entries if ads are enabled
-      if (includeAds && (i + 1) % 20 === 0 && mostRecentAd) {
-        formattedMessages.push(`\n\n${mostRecentAd.promptContent}\n\n`);
-      }
     }
 
     return `\n\nRecent social media discussions:\n${formattedMessages.join("\n")}`;

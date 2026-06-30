@@ -37,7 +37,6 @@ export default function Navigation({ appFullName }: NavigationProps) {
     { href: "/articles", text: "Articles", condition: true },
     { href: "/editions", text: "Editions", condition: true },
     { href: "/prism", text: "Prism", condition: true },
-    { href: "/ads", text: "Ads", condition: !!user },
     { href: "/account", text: "Account", condition: !!user },
     { href: "/events", text: "Events", condition: true }
   ];

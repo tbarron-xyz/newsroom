@@ -126,7 +126,7 @@ async function createSchema() {
       )
     `);
 
-    // Create users table (must be created before ads due to foreign key)
+    // Create users table
     console.log("Creating users table...");
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -139,18 +139,6 @@ async function createSchema() {
         has_reader BOOLEAN NOT NULL DEFAULT false,
         has_reporter BOOLEAN NOT NULL DEFAULT false,
         has_editor BOOLEAN NOT NULL DEFAULT false
-      )
-    `);
-
-    // Create ads table
-    console.log("Creating ads table...");
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS ads (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL REFERENCES users(id),
-        name TEXT NOT NULL,
-        bid_price DECIMAL(10,2) NOT NULL,
-        prompt_content TEXT NOT NULL
       )
     `);
 
@@ -201,11 +189,6 @@ async function createSchema() {
     console.log("Creating users indexes...");
     await client.query(
       `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`
-    );
-
-    console.log("Creating ads indexes...");
-    await client.query(
-      `CREATE INDEX IF NOT EXISTS idx_ads_user ON ads(user_id)`
     );
 
     await client.query("COMMIT");

@@ -6,7 +6,6 @@ import {
   NewspaperEdition,
   DailyEdition,
   Event,
-  AdEntry,
   User,
   ForumSection,
   ForumThread,
@@ -161,17 +160,6 @@ export class PostgreSQLDataStorageService {
         )
       `);
 
-      // Create ads table
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS ads (
-          id TEXT PRIMARY KEY,
-          user_id TEXT NOT NULL REFERENCES users(id),
-          name TEXT NOT NULL,
-          bid_price DECIMAL(10,2) NOT NULL,
-          prompt_content TEXT NOT NULL
-        )
-      `);
-
       // Create users table
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -222,10 +210,6 @@ export class PostgreSQLDataStorageService {
       await client.query(
         `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`
       );
-      await client.query(
-        `CREATE INDEX IF NOT EXISTS idx_ads_user ON ads(user_id)`
-      );
-
       await client.query("COMMIT");
     } catch (error) {
       await client.query("ROLLBACK");
@@ -926,143 +910,6 @@ export class PostgreSQLDataStorageService {
     }
   }
 
-  // Ad operations
-  async saveAd(ad: AdEntry): Promise<void> {
-    const client = await this.pool.connect();
-
-    try {
-      const query = `
-        INSERT INTO ads (id, user_id, name, bid_price, prompt_content)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (id) DO UPDATE SET
-          user_id = EXCLUDED.user_id,
-          name = EXCLUDED.name,
-          bid_price = EXCLUDED.bid_price,
-          prompt_content = EXCLUDED.prompt_content
-      `;
-
-      await client.query(query, [
-        ad.id,
-        ad.userId,
-        ad.name,
-        ad.bidPrice,
-        ad.promptContent
-      ]);
-    } finally {
-      client.release();
-    }
-  }
-
-  async getAllAds(): Promise<AdEntry[]> {
-    const client = await this.pool.connect();
-
-    try {
-      const result = await client.query("SELECT * FROM ads");
-      return result.rows.map((row: any) => ({
-        id: row.id,
-        userId: row.user_id,
-        name: row.name,
-        bidPrice: row.bid_price,
-        promptContent: row.prompt_content
-      }));
-    } finally {
-      client.release();
-    }
-  }
-
-  async getMostRecentAd(): Promise<AdEntry | null> {
-    const client = await this.pool.connect();
-
-    try {
-      const result = await client.query(
-        "SELECT * FROM ads ORDER BY id DESC LIMIT 1"
-      );
-      if (result.rows.length === 0) return null;
-
-      const row = result.rows[0];
-      return {
-        id: row.id,
-        userId: row.user_id,
-        name: row.name,
-        bidPrice: row.bid_price,
-        promptContent: row.prompt_content
-      };
-    } finally {
-      client.release();
-    }
-  }
-
-  async getAd(adId: string): Promise<AdEntry | null> {
-    const client = await this.pool.connect();
-
-    try {
-      const result = await client.query("SELECT * FROM ads WHERE id = $1", [
-        adId
-      ]);
-      if (result.rows.length === 0) return null;
-
-      const row = result.rows[0];
-      return {
-        id: row.id,
-        userId: row.user_id,
-        name: row.name,
-        bidPrice: row.bid_price,
-        promptContent: row.prompt_content
-      };
-    } finally {
-      client.release();
-    }
-  }
-
-  async updateAd(
-    adId: string,
-    updates: Partial<Omit<AdEntry, "id">>
-  ): Promise<void> {
-    const client = await this.pool.connect();
-
-    try {
-      const setParts: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
-
-      if (updates.userId !== undefined) {
-        setParts.push(`user_id = $${paramIndex++}`);
-        values.push(updates.userId);
-      }
-      if (updates.name !== undefined) {
-        setParts.push(`name = $${paramIndex++}`);
-        values.push(updates.name);
-      }
-      if (updates.bidPrice !== undefined) {
-        setParts.push(`bid_price = $${paramIndex++}`);
-        values.push(updates.bidPrice);
-      }
-      if (updates.promptContent !== undefined) {
-        setParts.push(`prompt_content = $${paramIndex++}`);
-        values.push(updates.promptContent);
-      }
-
-      if (setParts.length === 0) return;
-
-      const query = `UPDATE ads SET ${setParts.join(", ")} WHERE id = $${paramIndex}`;
-      values.push(adId);
-
-      await client.query(query, values);
-    } finally {
-      client.release();
-    }
-  }
-
-  async deleteAd(adId: string): Promise<void> {
-    const client = await this.pool.connect();
-
-    try {
-      await client.query("DELETE FROM ads WHERE id = $1", [adId]);
-    } finally {
-      client.release();
-    }
-  }
-
   // User operations
   async createUser(
     user: Omit<User, "id" | "createdAt" | "lastLoginAt">
@@ -1360,7 +1207,6 @@ export class PostgreSQLDataStorageService {
       // Delete in order to respect foreign key constraints
       await client.query("DELETE FROM job_status");
       await client.query("DELETE FROM kpis");
-      await client.query("DELETE FROM ads");
       await client.query("DELETE FROM users");
       await client.query("DELETE FROM daily_editions");
       await client.query("DELETE FROM newspaper_editions");

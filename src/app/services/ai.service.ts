@@ -163,20 +163,9 @@ export class AIService {
         // Continue with article generation even if social media fetch fails
       }
 
-      // Fetch the most recent ad from data storage
-      let mostRecentAd = null;
-      try {
-        mostRecentAd = await this.dataStorageService.getMostRecentAd();
-      } catch (error) {
-        console.warn("Failed to fetch most recent ad:", error);
-        // Continue with article generation even if ad fetch fails
-      }
-
-      // Format social media messages for the prompt with ad insertion
+      // Format social media messages for the prompt
       const socialMediaContext = AIResponseUtils.formatSocialMediaContext(
-        socialMediaMessages,
-        true,
-        mostRecentAd
+        socialMediaMessages
       );
 
       const config = AIPrompts.generateStructuredArticlePrompts(
@@ -877,8 +866,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
 
       // Format social media messages for the prompt
       const socialMediaContext = AIResponseUtils.formatSocialMediaContext(
-        socialMediaMessages,
-        false
+        socialMediaMessages
       );
 
       const config = AIPrompts.generateArticlesFromEventsPrompts(

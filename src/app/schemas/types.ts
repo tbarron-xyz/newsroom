@@ -135,14 +135,6 @@ export interface Event {
   outputTokenCount?: number; // Number of output tokens used in the API call
 }
 
-export interface AdEntry {
-  id: string;
-  userId: string;
-  name: string;
-  bidPrice: number;
-  promptContent: string;
-}
-
 export interface User {
   id: string;
   email: string;
@@ -259,13 +251,6 @@ export const REDIS_KEYS = {
   EVENT_OUTPUT_TOKEN_COUNT: (eventId: string) =>
     `event:${eventId}:output_token_count`,
   EVENT_REPORTER: (eventId: string) => `event:${eventId}:reporter_id`,
-
-  // Ads
-  ADS: "ads",
-  AD_NAME: (adId: string) => `ad:${adId}:name`,
-  AD_BID_PRICE: (adId: string) => `ad:${adId}:bid_price`,
-  AD_PROMPT_CONTENT: (adId: string) => `ad:${adId}:prompt_content`,
-  AD_USER_ID: (adId: string) => `ad:${adId}:user_id`,
 
   // Users
   USERS: "users",

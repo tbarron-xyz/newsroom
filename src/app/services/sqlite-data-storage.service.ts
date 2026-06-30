@@ -7,7 +7,6 @@ import {
   NewspaperEdition,
   DailyEdition,
   Event,
-  AdEntry,
   User,
   ForumSection,
   ForumThread,
@@ -131,15 +130,6 @@ export class SQLiteDataStorageService implements IDataStorageService {
         outputTokenCount INTEGER
       );
       CREATE INDEX IF NOT EXISTS idx_daily_editions_time ON daily_editions(generationTime DESC);
-
-      -- Ads
-      CREATE TABLE IF NOT EXISTS ads (
-        id TEXT PRIMARY KEY,
-        userId TEXT,
-        name TEXT,
-        bidPrice REAL,
-        promptContent TEXT
-      );
 
       -- Users
       CREATE TABLE IF NOT EXISTS users (
@@ -641,77 +631,6 @@ export class SQLiteDataStorageService implements IDataStorageService {
     };
   }
 
-  // Ad operations
-  async saveAd(ad: AdEntry): Promise<void> {
-    const db = this.getDb();
-    db.prepare(
-      `
-      INSERT OR REPLACE INTO ads (id, userId, name, bidPrice, promptContent)
-      VALUES (?, ?, ?, ?, ?)
-    `
-    ).run(ad.id, ad.userId, ad.name, ad.bidPrice, ad.promptContent);
-  }
-
-  async getAllAds(): Promise<AdEntry[]> {
-    const db = this.getDb();
-    const rows = db.prepare("SELECT * FROM ads").all() as any[];
-    return rows;
-  }
-
-  async getMostRecentAd(): Promise<AdEntry | null> {
-    const db = this.getDb();
-    const rows = db.prepare("SELECT id FROM ads").all() as { id: string }[];
-    const adIds = rows.map((row) => row.id);
-    const sortedAdIds = adIds.sort((a, b) => {
-      const timestampA = parseInt(a.split("_")[1]);
-      const timestampB = parseInt(b.split("_")[1]);
-      return timestampB - timestampA; // Most recent first
-    });
-    if (sortedAdIds.length === 0) return null;
-    return await this.getAd(sortedAdIds[0]);
-  }
-
-  async getAd(adId: string): Promise<AdEntry | null> {
-    const db = this.getDb();
-    const row = db.prepare("SELECT * FROM ads WHERE id = ?").get(adId) as any;
-    return row || null;
-  }
-
-  async updateAd(
-    adId: string,
-    updates: Partial<Omit<AdEntry, "id">>
-  ): Promise<void> {
-    const db = this.getDb();
-    const fields: string[] = [];
-    const values: any[] = [];
-    if (updates.userId !== undefined) {
-      fields.push("userId = ?");
-      values.push(updates.userId);
-    }
-    if (updates.name !== undefined) {
-      fields.push("name = ?");
-      values.push(updates.name);
-    }
-    if (updates.bidPrice !== undefined) {
-      fields.push("bidPrice = ?");
-      values.push(updates.bidPrice);
-    }
-    if (updates.promptContent !== undefined) {
-      fields.push("promptContent = ?");
-      values.push(updates.promptContent);
-    }
-    if (fields.length === 0) return;
-    values.push(adId);
-    db.prepare(`UPDATE ads SET ${fields.join(", ")} WHERE id = ?`).run(
-      ...values
-    );
-  }
-
-  async deleteAd(adId: string): Promise<void> {
-    const db = this.getDb();
-    db.prepare("DELETE FROM ads WHERE id = ?").run(adId);
-  }
-
   // User operations
   async createUser(
     user: Omit<User, "id" | "createdAt" | "lastLoginAt">
@@ -1092,7 +1011,6 @@ export class SQLiteDataStorageService implements IDataStorageService {
       "events",
       "newspaper_editions",
       "daily_editions",
-      "ads",
       "users",
       "job_status",
       "kpis",
