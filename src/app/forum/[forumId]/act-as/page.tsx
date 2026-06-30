@@ -141,43 +141,44 @@ export default function ActAsPage() {
 
   if (loading && personas.length === 0) {
     return (
-      <PageContainer>
+      <PageContainer variant="tui">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner"></div>
         </div>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer>
-      <ContentCard className="p-8 mb-8">
+    <PageContainer variant="tui">
+      <ContentCard variant="tui" className="p-8 mb-8">
         <PageHeader
+          variant="tui"
           title="Act as Forum User"
           description="Generate authentic replies as different forum personas"
         >
           <Link
             href={`/forum/${forumId}`}
-            className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
+            className="tui-btn"
           >
             ← Back to Forum
           </Link>
         </PageHeader>
       </ContentCard>
 
-      <ContentCard className="p-6 mb-8">
+      <ContentCard variant="tui" className="p-6 mb-8">
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <label className="text-white/80 font-medium">Select Persona:</label>
+            <label className="tui-label">Select Persona:</label>
             <button
               onClick={() => fetchReplyOptions(selectedPersonaKey)}
               disabled={loading || !selectedPersonaKey}
-              className="px-6 py-2 bg-purple-500/30 border border-purple-400/40 hover:bg-purple-500/50 text-white rounded-xl transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="tui-btn"
             >
               ↻ Refresh
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-white/5 border border-white/20 rounded-2xl max-h-72 overflow-y-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-[var(--tui-border)] max-h-72 overflow-y-auto">
             {personas.map((persona) => (
               <button
                 key={persona.key}
@@ -185,17 +186,17 @@ export default function ActAsPage() {
                   setSelectedPersonaKey(persona.key);
                   fetchReplyOptions(persona.key);
                 }}
-                className={`p-3 rounded-xl border border-white/10 text-left transition-all duration-200 hover:border-purple-400/50 hover:shadow-lg hover:scale-[1.02]
+                className={`p-3 border border-[var(--tui-border)] text-left transition-all duration-200 hover:bg-[var(--tui-hover-bg)]
                   ${
                     selectedPersonaKey === persona.key
-                      ? `bg-gradient-to-br ${persona.color || "from-purple-500 to-indigo-600"} ring-2 ring-white/50 shadow-xl`
-                      : "bg-white/10 hover:bg-white/20"
+                      ? `border-[var(--tui-primary)] bg-[var(--tui-hover-bg)]`
+                      : "bg-[var(--tui-bg)]"
                   }`}
               >
-                <div className="font-bold text-lg leading-tight mb-1">
+                <div className="font-bold text-lg leading-tight mb-1 tui-text-primary">
                   {persona.display}
                 </div>
-                <div className="text-xs text-white/70 leading-tight line-clamp-2">
+                <div className="tui-text-muted leading-tight line-clamp-2">
                   {persona.description}
                 </div>
               </button>
@@ -205,35 +206,35 @@ export default function ActAsPage() {
       </ContentCard>
 
       {error && (
-        <ContentCard className="mt-6 p-4 bg-red-500/20 border border-red-500/30">
-          <p className="text-red-200">{error}</p>
+        <ContentCard variant="tui" className="mt-6 p-4 border border-[#ff3333]">
+          <p className="tui-text-muted">{error}</p>
         </ContentCard>
       )}
 
       {success && (
-        <ContentCard className="mt-6 p-4 bg-green-500/20 border border-green-500/30">
-          <p className="text-green-200">{success}</p>
+        <ContentCard variant="tui" className="mt-6 p-4 border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)]">
+          <p className="tui-text-primary">{success}</p>
         </ContentCard>
       )}
 
       {replyOptions.length === 0 && !loading && !error ? (
-        <ContentCard className="p-8">
-          <p className="text-center text-white/70">
+        <ContentCard variant="tui" className="p-8">
+          <p className="text-center tui-muted">
             No threads available in this forum to generate replies for.
           </p>
         </ContentCard>
       ) : (
         <div className="space-y-8">
           {replyOptions.map((option, idx) => (
-            <ContentCard key={idx} className="p-6">
+            <ContentCard variant="tui" key={idx} className="p-6">
               <div className="mb-4 flex items-center justify-between">
                 <Link
                   href={`/thread/${option.threadId}`}
-                  className="text-xl font-semibold text-white hover:text-white/90 transition-colors"
+                  className="text-xl font-semibold tui-link"
                 >
                   {option.threadTitle}
                 </Link>
-                <span className="text-purple-300 text-sm font-medium">
+                <span className="tui-text-muted text-sm font-medium">
                   {option.personaDisplay}
                 </span>
               </div>
@@ -242,15 +243,15 @@ export default function ActAsPage() {
                 {option.replies.map((reply, rIdx) => (
                   <div
                     key={rIdx}
-                    className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:border-purple-400/40 transition-all"
+                    className="border border-[var(--tui-border)] p-5"
                   >
-                    <div className="text-white/90 text-[15px] leading-relaxed mb-4">
+                    <div className="text-[var(--tui-primary)] font-mono text-[15px] leading-relaxed mb-4">
                       {reply}
                     </div>
                     <button
                       onClick={() => handlePostReply(option.threadId, reply)}
                       disabled={submitting}
-                      className="text-xs px-6 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800/50 text-white font-medium rounded-xl transition-all flex items-center gap-2"
+                      className="tui-btn text-xs"
                     >
                       {submitting
                         ? "Posting..."

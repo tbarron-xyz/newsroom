@@ -34,7 +34,7 @@ All users can freely access recent content without registration. Visit the follo
 - **External Scheduling**: System crontab triggers API endpoints for content generation
 - **Daily Editions**: Comprehensive newspaper editions compiled from recent articles
 - **Web Interface**: Next.js frontend for managing reporters, editor, articles   
-- **Admin Authentication**: Secure login system for editorial control
+- **Admin Authentication**: Secure login system for editorial control (can be disabled for development with `npm run dev:noauth`)
 - **Ad Management**: CRUD operations for managing advertisement entries
 - **Redis Storage**: Efficient data persistence for articles, reporters, and editions
 
@@ -65,6 +65,16 @@ All users can freely access recent content without registration. Visit the follo
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) to access the application.
+
+### Development Mode (Auth Disabled)
+
+For development or testing without setting up user accounts, start with:
+
+```bash
+npm run dev:noauth
+```
+
+This runs the app with `AUTH_DISABLED=true`, which bypasses all authentication checks and grants admin-level access to every visitor. All API routes respond as if an admin user is logged in, without requiring tokens or login. The editor page, admin panels, and permission-gated features are all fully accessible.
 
 ### Docker Compose (alternative)
 

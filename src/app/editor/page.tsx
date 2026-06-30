@@ -340,8 +340,8 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-[#33ff33] font-mono text-sm">
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-[var(--tui-primary)] font-mono text-sm">
           <span className="animate-pulse">$</span> Loading editor configuration...
         </div>
       </div>
@@ -349,13 +349,13 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black py-8 px-4">
+    <div className="tui-theme min-h-screen bg-black py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="border border-[#1a3a1a] p-6 mb-8">
+        <div className="border border-[var(--tui-border)] p-6 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-[#33ff33] text-xl font-mono mb-1">
+              <h1 className="text-[var(--tui-primary)] text-xl font-mono mb-1">
                 # Newsroom Editor Configuration
               </h1>
               <p className="text-[#557755] text-sm font-mono">
@@ -376,13 +376,13 @@ export default function EditorPage() {
         </div>
 
         {/* Main Content */}
-        <div className="border border-[#1a3a1a] p-6 space-y-8">
+        <div className="border border-[var(--tui-border)] p-6 space-y-8">
           {/* Bio Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -397,7 +397,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Editor Biography</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4">
+            <div className="border border-[var(--tui-border)] p-4">
               <textarea
                 value={editorData.bio}
                 onChange={(e) =>
@@ -418,9 +418,9 @@ export default function EditorPage() {
           {/* Prompt Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -435,7 +435,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Editorial Prompt</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4">
+            <div className="border border-[var(--tui-border)] p-4">
               <textarea
                 value={editorData.prompt}
                 onChange={(e) =>
@@ -456,9 +456,9 @@ export default function EditorPage() {
           {/* Model Name Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -473,7 +473,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">AI Model Configuration</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4 space-y-6">
+            <div className="border border-[var(--tui-border)] p-4 space-y-6">
               {/* Legacy / Default Model Name */}
               <div>
                 <label className="tui-label block mb-2">
@@ -673,9 +673,9 @@ export default function EditorPage() {
           {/* Message Slice Count Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -690,7 +690,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Message Slice Count</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4">
+            <div className="border border-[var(--tui-border)] p-4">
               <input
                 type="number"
                 value={editorData.messageSliceCount}
@@ -717,9 +717,9 @@ export default function EditorPage() {
           {/* Article Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -734,7 +734,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Article Generation Period</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4 space-y-4">
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
               <div>
                 <label className="tui-label block mb-2">
                   Generation Interval (minutes)
@@ -790,9 +790,9 @@ export default function EditorPage() {
           {/* Event Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -807,7 +807,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Event Generation Period</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4 space-y-4">
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
               <div>
                 <label className="tui-label block mb-2">
                   Generation Interval (minutes)
@@ -863,9 +863,9 @@ export default function EditorPage() {
           {/* Edition Generation Period Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -880,7 +880,7 @@ export default function EditorPage() {
               </div>
               <h2 className="tui-section-title">Edition Generation Period</h2>
             </div>
-            <div className="border border-[#1a3a1a] p-4 space-y-4">
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
               <div>
                 <label className="tui-label block mb-2">
                   Generation Interval (minutes)
@@ -934,7 +934,7 @@ export default function EditorPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-6 border-t border-[#1a3a1a]">
+          <div className="flex items-center justify-between pt-6 border-t border-[var(--tui-border)]">
             <button
               onClick={fetchEditorData}
               disabled={!isAdmin}
@@ -968,12 +968,12 @@ export default function EditorPage() {
         </div>
 
         {/* KPI Display Section */}
-        <div className="border border-[#1a3a1a] p-6 mt-8">
+        <div className="border border-[var(--tui-border)] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -996,11 +996,11 @@ export default function EditorPage() {
             {kpiData ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Total AI API Spend */}
-                <div className="border border-[#1a3a1a] p-4">
+                <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#33ff33]"
+                        className="w-5 h-5 text-[var(--tui-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1014,7 +1014,7 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[#33ff33] font-mono text-sm">API Spend</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">API Spend</h3>
                       <p className="tui-muted">Total cost</p>
                     </div>
                   </div>
@@ -1024,11 +1024,11 @@ export default function EditorPage() {
                 </div>
 
                 {/* Total Input Tokens */}
-                <div className="border border-[#1a3a1a] p-4">
+                <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#33ff33]"
+                        className="w-5 h-5 text-[var(--tui-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1042,7 +1042,7 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[#33ff33] font-mono text-sm">Input Tokens</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Input Tokens</h3>
                       <p className="tui-muted">Total sent</p>
                     </div>
                   </div>
@@ -1052,11 +1052,11 @@ export default function EditorPage() {
                 </div>
 
                 {/* Total Output Tokens */}
-                <div className="border border-[#1a3a1a] p-4">
+                <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#33ff33]"
+                        className="w-5 h-5 text-[var(--tui-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1070,7 +1070,7 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[#33ff33] font-mono text-sm">Output Tokens</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Output Tokens</h3>
                       <p className="tui-muted">Total received</p>
                     </div>
                   </div>
@@ -1081,7 +1081,7 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="text-[#33ff33] font-mono text-sm animate-pulse mb-4">$ Loading KPI data...</div>
+                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">$ Loading KPI data...</div>
               </div>
             )}
 
@@ -1097,12 +1097,12 @@ export default function EditorPage() {
         </div>
 
         {/* Memory Usage Section */}
-        <div className="border border-[#1a3a1a] p-6 mt-8">
+        <div className="border border-[var(--tui-border)] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1125,11 +1125,11 @@ export default function EditorPage() {
             {memoryInfo ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Redis Memory */}
-                <div className="border border-[#1a3a1a] p-4">
+                <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#33ff33]"
+                        className="w-5 h-5 text-[var(--tui-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1143,20 +1143,20 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[#33ff33] font-mono text-sm">Redis</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Redis</h3>
                       <p className="tui-muted">In-memory database</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="tui-muted">Used</span>
-                      <span className="text-[#33ff33] font-mono text-lg">
+                      <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="tui-muted">Peak</span>
-                      <span className="text-[#33ff33] font-mono text-lg">
+                      <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.redis.usedMemoryPeak /
                           1024 /
@@ -1168,11 +1168,11 @@ export default function EditorPage() {
                 </div>
 
                 {/* System Memory */}
-                <div className="border border-[#1a3a1a] p-4">
+                <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#33ff33]"
+                        className="w-5 h-5 text-[var(--tui-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1186,14 +1186,14 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[#33ff33] font-mono text-sm">System</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">System</h3>
                       <p className="tui-muted">Host machine</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="tui-muted">Total</span>
-                      <span className="text-[#33ff33] font-mono text-lg">
+                      <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.system.totalMemory /
                           1024 /
@@ -1204,7 +1204,7 @@ export default function EditorPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="tui-muted">Used</span>
-                      <span className="text-[#33ff33] font-mono text-lg">
+                      <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.system.usedMemory /
                           1024 /
@@ -1215,7 +1215,7 @@ export default function EditorPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="tui-muted">Free</span>
-                      <span className="text-[#33ff33] font-mono text-lg">
+                      <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.system.freeMemory /
                           1024 /
@@ -1229,7 +1229,7 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="text-[#33ff33] font-mono text-sm animate-pulse mb-4">$ Loading memory info...</div>
+                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">$ Loading memory info...</div>
               </div>
             )}
 
@@ -1245,12 +1245,12 @@ export default function EditorPage() {
         </div>
 
         {/* Manual Job Triggers */}
-        <div className="border border-[#1a3a1a] p-6 mt-8">
+        <div className="border border-[var(--tui-border)] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 border border-[#1a3a1a] flex items-center justify-center">
+              <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-[#33ff33]"
+                  className="w-4 h-4 text-[var(--tui-primary)]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1274,11 +1274,11 @@ export default function EditorPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Reporter Articles Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-[#33ff33]"
+                      className="w-5 h-5 text-[var(--tui-primary)]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1292,7 +1292,7 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Articles</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Articles</h3>
                     <p className="tui-muted">Every 15 minutes</p>
                   </div>
                 </div>
@@ -1325,11 +1325,11 @@ export default function EditorPage() {
               </div>
 
               {/* Newspaper Edition Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-[#33ff33]"
+                      className="w-5 h-5 text-[var(--tui-primary)]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1343,7 +1343,7 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Newspaper Edition</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Newspaper Edition</h3>
                     <p className="tui-muted">Every 3 hours</p>
                   </div>
                 </div>
@@ -1360,11 +1360,11 @@ export default function EditorPage() {
               </div>
 
               {/* Daily Edition Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-[#33ff33]"
+                      className="w-5 h-5 text-[var(--tui-primary)]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1378,7 +1378,7 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Daily Edition</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Daily Edition</h3>
                     <p className="tui-muted">Every 24 hours</p>
                   </div>
                 </div>
@@ -1405,11 +1405,11 @@ export default function EditorPage() {
               </div>
 
               {/* Comment Generation Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-[#33ff33]"
+                      className="w-5 h-5 text-[var(--tui-primary)]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1423,7 +1423,7 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Comments</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Comments</h3>
                     <p className="tui-muted">Once daily</p>
                   </div>
                 </div>
@@ -1455,11 +1455,11 @@ export default function EditorPage() {
               </div>
 
               {/* Event Generation Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-[#33ff33]"
+                      className="w-5 h-5 text-[var(--tui-primary)]"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -1479,7 +1479,7 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Events</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Events</h3>
                     <p className="tui-muted">Every 30 minutes</p>
                   </div>
                 </div>
@@ -1496,15 +1496,15 @@ export default function EditorPage() {
               </div>
 
               {/* Prism Daily Edition Job */}
-              <div className="border border-[#1a3a1a] p-4 space-y-4">
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[#1a3a1a] flex items-center justify-center">
-                    <svg className="w-5 h-5 text-[#33ff33]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[#33ff33] font-mono text-sm">Generate Prism Daily</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Prism Daily</h3>
                     <p className="tui-muted">Once daily at 8:30am</p>
                   </div>
                 </div>
@@ -1528,16 +1528,16 @@ export default function EditorPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Reporter Job Status */}
-                  <div className="border border-[#1a3a1a] p-4">
+                  <div className="border border-[var(--tui-border)] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#33ff33] font-mono text-sm">
+                      <span className="text-[var(--tui-primary)] font-mono text-sm">
                         Article Generation
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.reporterJob ? (
                           <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
@@ -1558,16 +1558,16 @@ export default function EditorPage() {
                   </div>
 
                   {/* Newspaper Job Status */}
-                  <div className="border border-[#1a3a1a] p-4">
+                  <div className="border border-[var(--tui-border)] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#33ff33] font-mono text-sm">
+                      <span className="text-[var(--tui-primary)] font-mono text-sm">
                         Newspaper Edition
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.newspaperJob ? (
                           <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
@@ -1588,16 +1588,16 @@ export default function EditorPage() {
                   </div>
 
                   {/* Daily Job Status */}
-                  <div className="border border-[#1a3a1a] p-4">
+                  <div className="border border-[var(--tui-border)] p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[#33ff33] font-mono text-sm">
+                      <span className="text-[var(--tui-primary)] font-mono text-sm">
                         Daily Edition
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.dailyJob ? (
                           <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
                         ) : (
-                          <span className="text-[#33ff33] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
                         )}
                       </div>
                     </div>
@@ -1619,10 +1619,10 @@ export default function EditorPage() {
                 </div>
 
                 {jobStatus.note && (
-                  <div className="border border-[#1a3a1a] p-4">
+                  <div className="border border-[var(--tui-border)] p-4">
                     <div className="flex items-start space-x-3">
                       <svg
-                        className="w-5 h-5 text-[#33ff33] mt-0.5"
+                        className="w-5 h-5 text-[var(--tui-primary)] mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1635,7 +1635,7 @@ export default function EditorPage() {
                         />
                       </svg>
                       <div>
-                        <h4 className="text-[#33ff33] font-mono text-sm">Note</h4>
+                        <h4 className="text-[var(--tui-primary)] font-mono text-sm">Note</h4>
                         <p className="tui-muted mt-1">
                           {jobStatus.note}
                         </p>

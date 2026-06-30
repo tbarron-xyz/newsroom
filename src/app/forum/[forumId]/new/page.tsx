@@ -60,17 +60,17 @@ export default function NewThreadPage() {
 
   if (!hasReader) {
     return (
-      <PageContainer>
-        <ContentCard className="p-8">
-          <h2 className="text-xl font-semibold text-white/90 mb-2">
+      <PageContainer variant="tui">
+        <ContentCard variant="tui" className="p-8">
+          <h2 className="text-xl font-semibold text-[var(--tui-primary)] font-mono mb-2">
             Permission Required
           </h2>
-          <p className="text-white/70 mb-4">
+          <p className="tui-muted mb-4">
             You need reader permission to create a new thread.
           </p>
           <Link
             href={`/forum/${forumId}`}
-            className="text-blue-400 hover:text-blue-300"
+            className="tui-link"
           >
             ← Back to Forum
           </Link>
@@ -99,12 +99,12 @@ export default function NewThreadPage() {
   const forumTitle = forumTitles[forumId] || forumId;
 
   return (
-    <PageContainer>
-      <ContentCard className="p-8 mb-8">
-        <PageHeader title="New Thread" description={forumTitle}>
+    <PageContainer variant="tui">
+      <ContentCard variant="tui" className="p-8 mb-8">
+        <PageHeader variant="tui" title="New Thread" description={forumTitle}>
           <Link
             href={`/forum/${forumId}`}
-            className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
+            className="tui-btn"
           >
             ← Back to Forum
           </Link>
@@ -112,9 +112,10 @@ export default function NewThreadPage() {
       </ContentCard>
 
       <form onSubmit={handleSubmit}>
-        <ContentCard className="p-6">
+        <ContentCard variant="tui" className="p-6">
           <div className="space-y-6">
             <FormInput
+              variant="tui"
               label="Subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
@@ -122,12 +123,12 @@ export default function NewThreadPage() {
               maxLength={200}
               required
             />
-            <span className="text-xs text-white/50">
+            <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
               {subject.length}/200 characters
             </span>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-white/90">
+              <label className="tui-label block mb-2">
                 Body
               </label>
               <textarea
@@ -137,16 +138,16 @@ export default function NewThreadPage() {
                 maxLength={4096}
                 rows={8}
                 required
-                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/50 focus:outline-none focus:border-white/40 resize-none"
+                className="tui-textarea"
               />
-              <span className="text-xs text-white/50">
+              <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
                 {body.length}/4096 characters
               </span>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-200">
-                {error}
+              <div className="border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)] p-4">
+                <p className="tui-text-muted">{error}</p>
               </div>
             )}
 
@@ -154,7 +155,7 @@ export default function NewThreadPage() {
               <button
                 type="submit"
                 disabled={submitting || !subject.trim() || !body.trim()}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed hover:from-blue-600 hover:to-purple-700 transition-all"
+                className="tui-btn-primary"
               >
                 {submitting ? "Creating..." : "Create Thread"}
               </button>

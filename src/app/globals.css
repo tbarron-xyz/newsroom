@@ -92,10 +92,20 @@ body {
 }
 
 /* TUI Theme */
+.tui-theme {
+  --tui-primary: #ffb000;
+  --tui-primary-dim: #ffc233;
+  --tui-muted: rgb(255 255 255 / 0.6);
+  --tui-border: #4a3500;
+  --tui-bg: #000;
+  --tui-hover-bg: #1a0f00;
+  --tui-placeholder: #4a3500;
+}
+
 .tui-input {
-  background-color: #000;
-  border: 1px solid #1a3a1a;
-  color: #33ff33;
+  background-color: var(--tui-bg);
+  border: 1px solid var(--tui-border);
+  color: var(--tui-primary);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   padding: 0.75rem 1rem;
@@ -103,10 +113,10 @@ body {
   width: 100%;
 }
 .tui-input::placeholder {
-  color: #335533;
+  color: var(--tui-placeholder);
 }
 .tui-input:focus {
-  border-color: #33ff33;
+  border-color: var(--tui-primary);
 }
 .tui-input:disabled {
   opacity: 0.5;
@@ -114,9 +124,9 @@ body {
 }
 
 .tui-btn {
-  background-color: #000;
-  border: 1px solid #33ff33;
-  color: #33ff33;
+  background-color: var(--tui-bg);
+  border: 1px solid var(--tui-primary);
+  color: var(--tui-primary);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   padding: 0.5rem 1.5rem;
@@ -124,7 +134,7 @@ body {
   transition: background-color 0.15s;
 }
 .tui-btn:hover:not(:disabled) {
-  background-color: #0a2a0a;
+  background-color: var(--tui-hover-bg);
 }
 .tui-btn:disabled {
   opacity: 0.5;
@@ -132,9 +142,9 @@ body {
 }
 
 .tui-btn-primary {
-  background-color: #33ff33;
-  border: 1px solid #33ff33;
-  color: #000;
+  background-color: var(--tui-primary);
+  border: 1px solid var(--tui-primary);
+  color: var(--tui-bg);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   padding: 0.5rem 1.5rem;
@@ -142,7 +152,7 @@ body {
   transition: background-color 0.15s;
 }
 .tui-btn-primary:hover:not(:disabled) {
-  background-color: #44ff44;
+  background-color: var(--tui-primary-dim);
 }
 .tui-btn-primary:disabled {
   opacity: 0.5;
@@ -150,7 +160,7 @@ body {
 }
 
 .tui-btn-danger {
-  background-color: #000;
+  background-color: var(--tui-bg);
   border: 1px solid #ff3333;
   color: #ff3333;
   font-family: var(--font-mono);
@@ -164,7 +174,7 @@ body {
 }
 
 .tui-label {
-  color: #33ff33;
+  color: var(--tui-primary);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -172,26 +182,26 @@ body {
 }
 
 .tui-section-title {
-  color: #33ff33;
+  color: var(--tui-primary);
   font-size: 1.125rem;
   font-family: var(--font-mono);
 }
 
 .tui-value {
-  color: #33ff33;
+  color: var(--tui-primary);
   font-size: 1.5rem;
   font-family: var(--font-mono);
 }
 
 .tui-muted {
-  color: #557755;
+  color: var(--tui-muted);
   font-size: 0.875rem;
   font-family: var(--font-mono);
 }
 
 .tui-msg-success {
-  border: 1px solid rgba(51, 255, 51, 0.3);
-  color: #33ff33;
+  border: 1px solid color-mix(in srgb, var(--tui-primary) 30%, transparent);
+  color: var(--tui-primary);
   padding: 0.5rem 1rem;
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -203,4 +213,69 @@ body {
   padding: 0.5rem 1rem;
   font-family: var(--font-mono);
   font-size: 0.875rem;
+}
+
+.tui-link {
+  color: var(--tui-primary);
+  font-family: var(--font-mono);
+  transition: opacity 0.15s;
+}
+.tui-link:hover {
+  opacity: 0.8;
+}
+
+.tui-textarea {
+  background-color: var(--tui-bg);
+  border: 1px solid var(--tui-border);
+  color: var(--tui-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  width: 100%;
+  resize: none;
+}
+.tui-textarea::placeholder {
+  color: var(--tui-placeholder);
+}
+.tui-textarea:focus {
+  border-color: var(--tui-primary);
+}
+
+.tui-section-card {
+  border: 1px solid var(--tui-border);
+  overflow: hidden;
+}
+.tui-section-card-header {
+  border-bottom: 1px solid var(--tui-border);
+  padding: 1rem 1.5rem;
+}
+.tui-section-card-body {
+  padding: 1.5rem;
+}
+.tui-section-card-divider {
+  border-top: 1px solid var(--tui-border);
+}
+.tui-section-card-item {
+  padding: 1.5rem;
+  transition: background-color 0.15s;
+}
+.tui-section-card-item:hover {
+  background-color: var(--tui-hover-bg);
+}
+
+.tui-text-primary {
+  color: var(--tui-primary);
+  font-family: var(--font-mono);
+}
+
+.tui-text-muted {
+  color: var(--tui-muted);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.tui-spinner {
+  border-color: var(--tui-primary);
+  border-right-color: transparent;
 }

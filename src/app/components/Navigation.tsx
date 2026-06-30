@@ -1,61 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { apiService } from "../services/api.service";
-
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "editor" | "reporter" | "user";
-  hasReader: boolean;
-  hasReporter: boolean;
-  hasEditor: boolean;
-}
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavigationProps {
   appFullName: string;
 }
 
 export default function Navigation({ appFullName }: NavigationProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [_loading, setLoading] = useState(true);
+  const { user, isAdmin } = useAuth();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  // Re-check auth status when pathname changes
-  useEffect(() => {
-    checkAuthStatus();
-  }, [pathname]);
-
-  const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const data = await apiService.get<{ user: User }>("/api/auth/verify");
-      setUser(data.user);
-    } catch (error) {
-      console.error("Auth check failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    setUser(null);
-    window.location.href = "/";
+    router.push("/");
   };
 
   const toggleMobileMenu = () => {
@@ -151,7 +114,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
             {navigationItems.map((item) => renderNavigationLink(item, false))}
 
             {/* Admin-only links */}
-            {user?.role === "admin" && (
+            {isAdmin && (
               <>{adminItems.map((item) => renderAdminLink(item, false))}</>
             )}
 
@@ -222,7 +185,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
           {navigationItems.map((item) => renderNavigationLink(item, true))}
 
           {/* Admin-only links */}
-          {user?.role === "admin" && (
+          {isAdmin && (
             <>{adminItems.map((item) => renderAdminLink(item, true))}</>
           )}
 

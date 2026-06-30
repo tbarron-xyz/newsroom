@@ -67,15 +67,6 @@ interface PrismDailyEditionPair {
   rightPrompt: string;
 }
 
-interface User {
-  id: string;
-  email: string;
-  role: "admin" | "editor" | "reporter" | "user";
-  hasReader: boolean;
-  hasReporter: boolean;
-  hasEditor: boolean;
-}
-
 function EditionCard({ edition, label, dotColor }: { edition: DailyEdition; label: string; dotColor: string }) {
   return (
     <div className="space-y-8">
@@ -199,8 +190,6 @@ export default function Home() {
   const [selectedEdition, setSelectedEdition] = useState<DailyEdition | null>(null);
   const [enrichedData, setEnrichedData] = useState<EnrichedDailyEdition | null>(null);
   const [message, setMessage] = useState("");
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
 
   const [prismPairs, setPrismPairs] = useState<PrismDailyEditionPair[]>([]);
   const [selectedPairIndex, setSelectedPairIndex] = useState(0);
@@ -209,10 +198,6 @@ export default function Home() {
 
   const [appName, setAppName] = useState("");
   const [appFullName, setAppFullName] = useState("");
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
 
   useEffect(() => {
     fetchEditions();
@@ -246,22 +231,6 @@ export default function Home() {
     };
     fetchEnriched();
   }, [selectedEdition]);
-
-  const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setAuthLoading(false);
-        return;
-      }
-      const data = await apiService.get<{ user: User }>("/api/auth/verify");
-      setUser(data.user);
-    } catch (error) {
-      console.error("Auth check failed:", error);
-    } finally {
-      setAuthLoading(false);
-    }
-  };
 
   const fetchEditions = async () => {
     try {
@@ -302,7 +271,7 @@ export default function Home() {
     });
   };
 
-  if (loading || authLoading || prismLoading) {
+  if (loading || prismLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
