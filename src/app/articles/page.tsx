@@ -9,6 +9,7 @@ import ContentCard from "@/components/ContentCard";
 import PageHeader from "@/components/PageHeader";
 import GradientButton from "@/components/GradientButton";
 import ExpandableSection from "@/components/ExpandableSection";
+import SourceMessageCard from "@/components/SourceMessageCard";
 import { apiService } from "@/app/services/api.service";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -21,6 +22,8 @@ interface Article {
   prompt: string;
   messageIds: string[];
   messageTexts: string[];
+  messageDids: string[];
+  messageRkeys: string[];
 }
 
 function ArticlesContent() {
@@ -269,25 +272,12 @@ function ArticlesContent() {
                         Social Media Messages Used:
                       </h4>
                       {article.messageTexts.map((message, index) => (
-                        <div
+                        <SourceMessageCard
                           key={index}
-                          className="p-4 backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium text-white/70">
-                              Message {index + 1}
-                            </span>
-                            {article.messageIds &&
-                              article.messageIds[index] && (
-                                <span className="text-xs text-white/50">
-                                  ID: {article.messageIds[index]}
-                                </span>
-                              )}
-                          </div>
-                          <div className="text-sm text-white/80 whitespace-pre-wrap">
-                            {message}
-                          </div>
-                        </div>
+                          did={article.messageDids[index]}
+                          rkey={article.messageRkeys[index]}
+                          text={message}
+                        />
                       ))}
                     </div>
                   </ExpandableSection>

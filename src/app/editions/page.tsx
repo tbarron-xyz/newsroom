@@ -24,6 +24,7 @@ export default function EditionsPage() {
     refetch: refetchEditions
   } = useList<NewspaperEdition>("/api/editions/latest");
   const [editions, setEditions] = useState<NewspaperEdition[]>([]);
+  const [loadingEditions, setLoadingEditions] = useState(false);
   const [message, setMessage] = useState("");
   const [appName, setAppName] = useState("Newsroom");
   const [expandedEdition, setExpandedEdition] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export default function EditionsPage() {
     const loadEditions = async () => {
       if (!editionsData || editionsData.length === 0) return;
 
+      setLoadingEditions(true);
       try {
         const fullEditions = await Promise.all(
           editionsData.map(
@@ -62,6 +64,8 @@ export default function EditionsPage() {
       } catch (error) {
         setMessage("Error loading newspaper editions");
         console.error("Error fetching newspaper editions:", error);
+      } finally {
+        setLoadingEditions(false);
       }
     };
     loadEditions();
@@ -97,7 +101,7 @@ export default function EditionsPage() {
     });
   };
 
-  if (loading) {
+  if (loading || loadingEditions) {
     return <LoadingSpinner />;
   }
 

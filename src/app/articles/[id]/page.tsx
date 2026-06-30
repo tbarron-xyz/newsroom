@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ExpandableSection from "@/components/ExpandableSection";
+import SourceMessageCard from "@/components/SourceMessageCard";
 import { apiService } from "@/app/services/api.service";
 
 interface Article {
@@ -193,42 +194,14 @@ export default function ArticlePage() {
                   <h4 className="text-sm font-semibold text-white/80">
                     Social Media Messages Used:
                   </h4>
-                  {article.messageTexts.map((message, index) => {
-                    const did = article.messageDids?.[index];
-                    const rkey = article.messageRkeys?.[index];
-                    const bskyUrl = did && rkey
-                      ? `https://bsky.app/profile/${did}/post/${rkey}`
-                      : null;
-                    return (
-                      <div
-                        key={index}
-                        className="p-4 bg-white/5 border border-white/10 rounded-lg"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-medium text-white/50">
-                            Message {index + 1}
-                          </span>
-                          {bskyUrl ? (
-                            <a
-                              href={bskyUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-300 hover:text-blue-200 underline"
-                            >
-                              View on Bluesky
-                            </a>
-                          ) : article.messageIds?.[index] ? (
-                            <span className="text-xs text-white/40">
-                              ID: {article.messageIds[index]}
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="text-sm text-white/80 whitespace-pre-wrap">
-                          {message}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {article.messageTexts.map((message, index) => (
+                    <SourceMessageCard
+                      key={index}
+                      did={article.messageDids?.[index] ?? ""}
+                      rkey={article.messageRkeys?.[index] ?? ""}
+                      text={message}
+                    />
+                  ))}
                 </div>
               </ExpandableSection>
             </div>
