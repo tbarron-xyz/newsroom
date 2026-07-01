@@ -209,7 +209,7 @@ export const REDIS_KEYS = {
   // Newspaper Editions
   EDITIONS: "editions",
   EDITIONS_LATEST: "editions:latest",
-  EDITIONS_LATEST_MAX_LENGTH: 50,
+  EDITIONS_LATEST_MAX_LENGTH: 25,
   EDITION_STORIES: (editionId: string) => `edition:${editionId}:stories`,
   EDITION_TIME: (editionId: string) => `edition:${editionId}:time`,
   EDITION_PROMPT: (editionId: string) => `edition:${editionId}:prompt`,

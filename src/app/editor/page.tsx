@@ -34,6 +34,7 @@ interface KpiData {
 interface MemoryInfo {
   redis: { usedMemory: number; usedMemoryPeak: number };
   system: { totalMemory: number; usedMemory: number; freeMemory: number };
+  backend?: string;
 }
 
 interface JobStatus {
@@ -1143,19 +1144,27 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Database</h3>
-                      <p className="tui-muted">On-disk storage</p>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                        {memoryInfo.backend === "redis" ? "Redis" : "Database"}
+                      </h3>
+                      <p className="tui-muted">
+                        {memoryInfo.backend === "redis" ? "In-memory database" : "On-disk storage"}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="tui-muted">File Size</span>
+                      <span className="tui-muted">
+                        {memoryInfo.backend === "redis" ? "Used" : "File Size"}
+                      </span>
                       <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="tui-muted">On Disk</span>
+                      <span className="tui-muted">
+                        {memoryInfo.backend === "redis" ? "Peak" : "On Disk"}
+                      </span>
                       <span className="text-[var(--tui-primary)] font-mono text-lg">
                         {(
                           memoryInfo.redis.usedMemoryPeak /

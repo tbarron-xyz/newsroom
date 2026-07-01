@@ -4,10 +4,8 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import PageContainer from "@/components/PageContainer";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import ContentCard from "@/components/ContentCard";
 import PageHeader from "@/components/PageHeader";
-import GradientButton from "@/components/GradientButton";
 import ExpandableSection from "@/components/ExpandableSection";
 import SourceMessageCard from "@/components/SourceMessageCard";
 import { apiService } from "@/app/services/api.service";
@@ -120,48 +118,36 @@ function ArticlesContent() {
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading articles...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-        <div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-          style={{ animationDelay: "1s" }}
-        ></div>
-        <div className="text-center relative z-10">
-          <div className="w-16 h-16 backdrop-blur-xl bg-red-500/20 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-red-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)] p-6">
+            <h2 className="text-xl font-semibold text-[var(--tui-primary)] font-mono mb-2">
+              Error Loading Articles
+            </h2>
+            <p className="tui-muted">{error}</p>
           </div>
-          <h2 className="text-xl font-semibold text-white/90 mb-2">
-            Error Loading Articles
-          </h2>
-          <p className="text-white/70">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <PageContainer>
-      <ContentCard className="p-8 mb-8">
+    <PageContainer variant="tui">
+      <ContentCard variant="tui" className="p-8 mb-8">
         <PageHeader
+          variant="tui"
           title={
             reporterId
               ? "Articles by Reporter"
@@ -178,17 +164,11 @@ function ArticlesContent() {
           }
         >
           {reporterId ? (
-            <Link
-              href="/reporters"
-              className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
-            >
+            <Link href="/reporters" className="tui-btn">
               ← Back to Reporters
             </Link>
           ) : (
-            <Link
-              href="/"
-              className="relative px-6 py-3 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl font-medium text-white/90 hover:bg-white/20 transition-all duration-300"
-            >
+            <Link href="/" className="tui-btn">
               ← Back to Daily Edition
             </Link>
           )}
@@ -198,26 +178,11 @@ function ArticlesContent() {
       {/* Articles List */}
       <div className="space-y-6">
         {articles.length === 0 ? (
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-12 text-center shadow-2xl">
-            <div className="w-16 h-16 backdrop-blur-sm bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-white/70"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white/90 mb-2">
+          <div className="border border-[var(--tui-border)] p-12 text-center">
+            <h3 className="text-xl font-semibold tui-text-primary mb-2">
               No Articles Found
             </h3>
-            <p className="text-white/70">
+            <p className="tui-text-muted">
               {reporterId
                 ? "This reporter hasn't written any articles yet."
                 : "No articles have been published yet."}
@@ -225,17 +190,14 @@ function ArticlesContent() {
           </div>
         ) : (
           articles.map((article) => (
-            <div
-              key={article.id}
-              className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl hover:bg-white/15 transition-all duration-300"
-            >
+            <ContentCard variant="tui" key={article.id} className="p-8">
               <div className="mb-4">
                 <Link href={`/articles/${article.id}`} className="block group">
-                  <h2 className="text-2xl font-bold text-white/90 mb-2 group-hover:text-white transition-colors">
+                  <h2 className="text-2xl font-bold tui-link mb-2">
                     {article.headline}
                   </h2>
                 </Link>
-                <div className="flex items-center text-sm text-white/70">
+                <div className="flex items-center tui-text-muted">
                   <svg
                     className="w-4 h-4 mr-1"
                     fill="none"
@@ -254,21 +216,22 @@ function ArticlesContent() {
               </div>
 
               <div className="prose prose-slate max-w-none">
-                <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
+                <p className="tui-text-muted leading-relaxed whitespace-pre-wrap">
                   {article.body}
                 </p>
               </div>
 
               {/* Source Messages Section */}
               {article.messageTexts && article.messageTexts.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-white/20">
+                <div className="mt-6 pt-6 border-t border-[var(--tui-border)]">
                   <ExpandableSection
                     title="Source Messages"
                     expanded={expandedMessages.has(article.id)}
                     onToggle={() => toggleMessages(article.id)}
+                    variant="tui"
                   >
                     <div className="space-y-4">
-                      <h4 className="text-sm font-semibold text-white/90">
+                      <h4 className="text-sm font-semibold tui-text-primary">
                         Social Media Messages Used:
                       </h4>
                       {article.messageTexts.map((message, index) => (
@@ -277,6 +240,7 @@ function ArticlesContent() {
                           did={article.messageDids[index]}
                           rkey={article.messageRkeys[index]}
                           text={message}
+                          variant="tui"
                         />
                       ))}
                     </div>
@@ -285,20 +249,21 @@ function ArticlesContent() {
               )}
 
               {/* Prompt Section */}
-              <div className="mt-6 pt-6 border-t border-white/20">
+              <div className="mt-6 pt-6 border-t border-[var(--tui-border)]">
                 <ExpandableSection
                   title="Prompt"
                   expanded={expandedPrompts.has(article.id)}
                   onToggle={() => togglePrompt(article.id)}
+                  variant="tui"
                 >
-                  <div className="p-4 backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg">
+                  <div className="border border-[var(--tui-border)] bg-black p-4">
                     <div className="flex items-center gap-2 mb-2 relative group">
-                      <h4 className="text-sm font-semibold text-white/90">
+                      <h4 className="text-sm font-semibold tui-text-primary">
                         AI Generation Prompt:
                       </h4>
                       <div className="relative group">
                         <svg
-                          className="w-4 h-4 text-white/60 hover:text-white/80 cursor-help"
+                          className="w-4 h-4 text-[var(--tui-primary)] cursor-help"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -308,7 +273,7 @@ function ArticlesContent() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black border border-[var(--tui-border)] text-[var(--tui-primary)] text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 font-mono">
                           To ensure full journalistic transparency, this is the
                           exact prompt given to the AI model to generate this
                           article. This allows the user to verify that no funny
@@ -316,27 +281,27 @@ function ArticlesContent() {
                         </div>
                       </div>
                     </div>
-                    <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono leading-relaxed">
+                    <pre className="text-xs text-[var(--tui-muted)] whitespace-pre-wrap font-mono leading-relaxed">
                       {article.prompt}
                     </pre>
                   </div>
                 </ExpandableSection>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-white/20">
-                <div className="flex items-center justify-between text-sm text-white/70">
+              <div className="mt-6 pt-6 border-t border-[var(--tui-border)]">
+                <div className="flex items-center justify-between tui-text-muted">
                   <span>Article ID: {article.id}</span>
                   <span>Reporter: {article.reporterId}</span>
                 </div>
               </div>
-            </div>
+            </ContentCard>
           ))
         )}
       </div>
 
       {/* Footer */}
-      <div className="text-center mt-12 text-white/50">
-        <p>{appName} Articles</p>
+      <div className="text-center mt-12">
+        <p className="tui-text-muted">{appName} Articles</p>
       </div>
     </PageContainer>
   );
@@ -344,7 +309,14 @@ function ArticlesContent() {
 
 export default function ArticlesPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading articles...</p>
+        </div>
+      </div>
+    }>
       <ArticlesContent />
     </Suspense>
   );

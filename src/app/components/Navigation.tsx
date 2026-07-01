@@ -29,14 +29,12 @@ export default function Navigation({ appFullName }: NavigationProps) {
     setIsMobileMenuOpen(false);
   };
 
-  // Navigation configuration
   const navigationItems = [
     { href: "/about", text: "About", condition: true },
     { href: "/forum", text: "Forum", condition: !!user },
     { href: "/reporters", text: "Reporters", condition: !!user },
     { href: "/articles", text: "Articles", condition: true },
     { href: "/editions", text: "Editions", condition: true },
-    { href: "/prism", text: "Prism", condition: true },
     { href: "/account", text: "Account", condition: !!user },
     { href: "/events", text: "Events", condition: true }
   ];
@@ -45,64 +43,31 @@ export default function Navigation({ appFullName }: NavigationProps) {
     { href: "/users", text: "Users" },
     { href: "/admin/bluesky-messages", text: "Bluesky Messages" },
     { href: "/logs", text: "Logs" },
-    { href: "/artifacts", text: "Artifacts" },
-
-    { href: "/flow", text: "Flow" },
-
     { href: "/editor", text: "Editor Settings", isEditorButton: true }
   ];
 
-  const renderNavigationLink = (
-    item: (typeof navigationItems)[0],
-    isMobile: boolean
-  ) => {
-    if (!item.condition) return null;
+  const linkClasses = (isMobile: boolean) =>
+    isMobile
+      ? "text-white/60 hover:text-[var(--tui-primary)] block px-3 py-2 rounded-md text-base font-mono transition-colors"
+      : "text-white/60 hover:text-[var(--tui-primary)] px-3 py-2 rounded-md text-sm font-mono transition-colors";
 
-    const baseClasses = isMobile
-      ? "text-slate-600 hover:text-slate-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-      : "text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors";
-
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        onClick={isMobile ? closeMobileMenu : undefined}
-        className={baseClasses}
-      >
-        {item.text}
-      </Link>
-    );
-  };
-
-  const renderAdminLink = (item: (typeof adminItems)[0], isMobile: boolean) => {
-    const baseClasses = isMobile
-      ? item.isEditorButton
-        ? "bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-colors"
-        : "text-slate-600 hover:text-slate-900 block px-3 py-2 rounded-md text-sm font-medium transition-colors"
-      : item.isEditorButton
-        ? "bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
-        : "text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-xs font-medium transition-colors";
-
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        onClick={isMobile ? closeMobileMenu : undefined}
-        className={baseClasses}
-      >
-        {item.text}
-      </Link>
-    );
+  const adminLinkClasses = (isMobile: boolean, isEditorButton?: boolean) => {
+    if (isEditorButton) {
+      return isMobile
+        ? "bg-[var(--tui-primary)] text-black block px-3 py-2 rounded-md text-base font-mono font-medium hover:opacity-90 transition-colors"
+        : "bg-[var(--tui-primary)] text-black px-4 py-2 rounded-lg text-xs font-mono font-medium hover:opacity-90 transition-colors";
+    }
+    return linkClasses(isMobile);
   };
 
   return (
-    <nav className="bg-white border-b border-slate-200 shadow-sm">
+    <nav className="bg-black border-b border-[var(--tui-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-12">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image src="/icon.png" alt="App icon" width={32} height={32} />
-              <span className="text-base font-bold text-slate-800">
+              <span className="text-base font-bold text-[var(--tui-primary)] font-mono">
                 {appFullName}
               </span>
             </Link>
@@ -110,25 +75,44 @@ export default function Navigation({ appFullName }: NavigationProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {navigationItems.map((item) => renderNavigationLink(item, false))}
+            {navigationItems.map((item) => {
+              if (!item.condition) return null;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={linkClasses(false)}
+                >
+                  {item.text}
+                </Link>
+              );
+            })}
 
-            {/* Admin-only links */}
             {isAdmin && (
-              <>{adminItems.map((item) => renderAdminLink(item, false))}</>
+              <>
+                {adminItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={adminLinkClasses(false, item.isEditorButton)}
+                  >
+                    {item.text}
+                  </Link>
+                ))}
+              </>
             )}
 
-            {/* Show login/logout based on auth status */}
             {user ? (
               <button
                 onClick={handleLogout}
-                className="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-white/60 hover:text-[var(--tui-primary)] px-3 py-2 rounded-md text-sm font-mono transition-colors"
               >
                 Logout
               </button>
             ) : (
               <Link
                 href="/login"
-                className="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-white/60 hover:text-[var(--tui-primary)] px-3 py-2 rounded-md text-sm font-mono transition-colors"
               >
                 Login
               </Link>
@@ -139,7 +123,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
           <div className="flex items-center">
             <button
               onClick={toggleMobileMenu}
-              className="text-slate-600 hover:text-slate-900 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="text-white/60 hover:text-[var(--tui-primary)] p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--tui-primary)]"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
@@ -180,23 +164,44 @@ export default function Navigation({ appFullName }: NavigationProps) {
 
       {/* Mobile menu */}
       <div className={`${isMobileMenuOpen ? "block" : "hidden"}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-slate-200">
-          {navigationItems.map((item) => renderNavigationLink(item, true))}
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-black border-t border-[var(--tui-border)]">
+          {navigationItems.map((item) => {
+            if (!item.condition) return null;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={closeMobileMenu}
+                className={linkClasses(true)}
+              >
+                {item.text}
+              </Link>
+            );
+          })}
 
-          {/* Admin-only links */}
           {isAdmin && (
-            <>{adminItems.map((item) => renderAdminLink(item, true))}</>
+            <>
+              {adminItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMobileMenu}
+                  className={adminLinkClasses(true, item.isEditorButton)}
+                >
+                  {item.text}
+                </Link>
+              ))}
+            </>
           )}
 
-          {/* Mobile auth section */}
-          <div className="border-t border-slate-200 pt-4 mt-4">
+          <div className="border-t border-[var(--tui-border)] pt-4 mt-4">
             {user ? (
               <button
                 onClick={() => {
                   handleLogout();
                   closeMobileMenu();
                 }}
-                className="text-slate-600 hover:text-slate-900 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors"
+                className="text-white/60 hover:text-[var(--tui-primary)] block w-full text-left px-3 py-2 rounded-md text-base font-mono transition-colors"
               >
                 Logout
               </button>
@@ -204,7 +209,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
               <Link
                 href="/login"
                 onClick={closeMobileMenu}
-                className="text-slate-600 hover:text-slate-900 block px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-white/60 hover:text-[var(--tui-primary)] block px-3 py-2 rounded-md text-sm font-mono transition-colors"
               >
                 Login
               </Link>

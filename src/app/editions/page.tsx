@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import PageContainer from "../../components/PageContainer";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import ContentCard from "../../components/ContentCard";
 import PageHeader from "../../components/PageHeader";
-import EmptyState from "../../components/EmptyState";
 import SourceArticleCard from "../../components/SourceArticleCard";
 import { apiService } from "../services/api.service";
 import { useList } from "@/hooks/useList";
@@ -102,70 +101,60 @@ export default function EditionsPage() {
   };
 
   if (loading || loadingEditions) {
-    return <LoadingSpinner />;
+    return (
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading editions...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <PageContainer maxWidth="max-w-7xl">
-      <PageHeader
-        title="Newspaper Editions"
-        description="Browse the latest AI-generated newspaper editions"
-      />
+    <PageContainer variant="tui" maxWidth="max-w-7xl">
+      <ContentCard variant="tui" className="p-8 mb-8">
+        <PageHeader
+          variant="tui"
+          title="Newspaper Editions"
+          description="Browse the latest AI-generated newspaper editions"
+        />
+      </ContentCard>
 
       {message && (
-        <div className="mb-6 px-6 py-4 backdrop-blur-sm rounded-xl text-center font-medium bg-red-500/20 border border-red-500/30 text-red-200">
-          {message}
-        </div>
+        <div className="mb-6 tui-msg-error text-center">{message}</div>
       )}
 
       {editions.length === 0 ? (
-        <EmptyState
-          icon={
-            <svg
-              className="w-8 h-8 text-white/70"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM16 2v4M8 2v4M3 10h18"
-              />
-            </svg>
-          }
-          title="No Editions Available"
-          description="Newspaper editions are generated automatically. Check back later!"
-        />
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold tui-text-primary mb-2">No Editions Available</h3>
+          <p className="tui-text-muted">Newspaper editions are generated automatically. Check back later!</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="space-y-6">
           {editions.map((edition: NewspaperEdition) => {
             const isExpanded = expandedEdition === edition.id;
             const articles = edition.stories as Article[];
             const hasFullArticles = articles[0] && "headline" in articles[0];
 
             return (
-              <div
-                key={edition.id}
-                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shadow-2xl hover:bg-white/15 transition-all duration-300"
-              >
+              <ContentCard variant="tui" key={edition.id} className="p-6">
                 <div className="mb-4 flex justify-between items-start">
                   <div>
-                    <h2 className="text-xl font-bold text-white/90 mb-2">
+                    <h2 className="text-xl font-bold tui-text-primary mb-2">
                       Newspaper Edition
                     </h2>
-                    <p className="text-sm text-white/70 mb-2">
+                    <p className="tui-text-muted mb-2">
                       {formatDate(edition.generationTime)}
                     </p>
-                    <p className="text-white/80 text-sm">
+                    <p className="tui-text-muted">
                       {edition.stories.length} stories included
                     </p>
                   </div>
                   <button
                     onClick={() => setShowAllArticles(!showAllArticles)}
                     disabled={loadingArticles === edition.id}
-                    className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white/90 rounded-lg transition-colors disabled:opacity-50"
+                    className="tui-btn"
                   >
                     {loadingArticles === edition.id
                       ? "Loading..."
@@ -177,29 +166,29 @@ export default function EditionsPage() {
 
                 {showAllArticles && hasFullArticles && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-white/90 mb-2">
+                    <h4 className="text-sm font-semibold tui-text-primary mb-2">
                       Articles
                     </h4>
                     <div className="space-y-4">
                       {articles.map((article: Article) => (
-                        <SourceArticleCard key={article.id} article={article} />
+                        <SourceArticleCard key={article.id} article={article} variant="tui" />
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="text-center text-sm text-white/70">
+                <div className="text-center tui-text-muted">
                   Edition ID: {edition.id.slice(0, 12)}...
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-white/20">
+                <div className="mt-4 pt-4 border-t border-[var(--tui-border)]">
                   <div className="flex items-center gap-2 mb-2 relative group">
-                    <h4 className="text-sm font-semibold text-white/90">
+                    <h4 className="text-sm font-semibold tui-text-primary">
                       Generation Prompt
                     </h4>
                     <div className="relative group">
                       <svg
-                        className="w-4 h-4 text-white/60 hover:text-white/80 cursor-help"
+                        className="w-4 h-4 text-[var(--tui-primary)] cursor-help"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -209,7 +198,7 @@ export default function EditionsPage() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black border border-[var(--tui-border)] text-[var(--tui-primary)] text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 font-mono">
                         To ensure full journalistic transparency, this is the
                         exact prompt given to the AI model to generate this
                         edition. This allows the user to verify that no funny
@@ -217,18 +206,18 @@ export default function EditionsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-white/70 font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
+                  <div className="border border-[var(--tui-border)] bg-black p-3 text-xs text-[var(--tui-muted)] font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
                     {edition.prompt}
                   </div>
                 </div>
-              </div>
+              </ContentCard>
             );
           })}
         </div>
       )}
 
-      <div className="text-center mt-12 text-white/50">
-        <p>{appName} Edition Archive</p>
+      <div className="text-center mt-12">
+        <p className="tui-text-muted">{appName} Edition Archive</p>
       </div>
     </PageContainer>
   );

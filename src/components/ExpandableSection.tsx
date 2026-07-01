@@ -6,6 +6,7 @@ interface ExpandableSectionProps {
   expanded: boolean;
   onToggle: () => void;
   className?: string;
+  variant?: "glass" | "tui";
 }
 
 export default function ExpandableSection({
@@ -13,13 +14,14 @@ export default function ExpandableSection({
   children,
   expanded,
   onToggle,
-  className = ""
+  className = "",
+  variant = "glass"
 }: ExpandableSectionProps) {
   return (
     <div className={className}>
       <button
         onClick={onToggle}
-        className="flex items-center text-sm font-medium text-white/70 hover:text-white transition-colors"
+        className={`flex items-center text-sm font-medium transition-colors ${variant === "tui" ? "text-[var(--tui-muted)] hover:text-[var(--tui-primary)]" : "text-white/70 hover:text-white"}`}
       >
         <svg
           className={`w-4 h-4 mr-2 transition-transform ${expanded ? "rotate-90" : ""}`}
