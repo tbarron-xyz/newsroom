@@ -289,6 +289,9 @@ export const REDIS_KEYS = {
 
   // Artifacts
   ARTIFACTS_LATEST: "artifact:latest",
+  // Ticker
+  TICKER_LATEST: "ticker:latest",
+
   ARTIFACTS_BY_TYPE: (type: string) => `artifact:${type}`,
   ARTIFACT_TYPE: (artifactId: string) => `artifact:${artifactId}:type`,
   ARTIFACT_INPUTS: (artifactId: string) => `artifact:${artifactId}:inputs`,
@@ -399,6 +402,16 @@ export interface ArtifactJob {
   result?: any;
   error?: string;
   createdAt?: number;
+}
+
+export interface Ticker {
+  id: string;
+  text: string;
+  generationTime: number;
+  dailyEditionId: string;
+  modelName: string;
+  inputTokenCount?: number;
+  outputTokenCount?: number;
 }
 
 export interface PrismDailyEditionPair {

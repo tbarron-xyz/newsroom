@@ -9,7 +9,8 @@ import {
   User,
   ForumSection,
   ForumThread,
-  ForumPost
+  ForumPost,
+  Ticker
 } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
 
@@ -155,6 +156,19 @@ export class PostgreSQLDataStorageService {
           topics JSONB NOT NULL DEFAULT '[]',
           prompt TEXT NOT NULL,
           model_name TEXT DEFAULT 'gpt-5-nano',
+          input_token_count INTEGER,
+          output_token_count INTEGER
+        )
+      `      );
+
+      // Create ticker table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS ticker (
+          id TEXT PRIMARY KEY,
+          text TEXT NOT NULL,
+          generation_time BIGINT NOT NULL,
+          daily_edition_id TEXT NOT NULL,
+          model_name TEXT NOT NULL,
           input_token_count INTEGER,
           output_token_count INTEGER
         )
@@ -901,6 +915,57 @@ export class PostgreSQLDataStorageService {
         //     : undefined,
         topics: row.topics,
         prompt: row.prompt,
+        modelName: row.model_name,
+        inputTokenCount: row.input_token_count,
+        outputTokenCount: row.output_token_count
+      };
+    } finally {
+      client.release();
+    }
+  }
+
+  // Ticker operations
+  async saveTicker(ticker: Ticker): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      const query = `
+        INSERT INTO ticker (id, text, generation_time, daily_edition_id, model_name, input_token_count, output_token_count)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (id) DO UPDATE SET
+          text = EXCLUDED.text,
+          generation_time = EXCLUDED.generation_time,
+          daily_edition_id = EXCLUDED.daily_edition_id,
+          model_name = EXCLUDED.model_name,
+          input_token_count = EXCLUDED.input_token_count,
+          output_token_count = EXCLUDED.output_token_count
+      `;
+      await client.query(query, [
+        ticker.id,
+        ticker.text,
+        ticker.generationTime,
+        ticker.dailyEditionId,
+        ticker.modelName,
+        ticker.inputTokenCount,
+        ticker.outputTokenCount
+      ]);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLatestTicker(): Promise<Ticker | null> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        "SELECT * FROM ticker ORDER BY generation_time DESC LIMIT 1"
+      );
+      if (result.rows.length === 0) return null;
+      const row = result.rows[0];
+      return {
+        id: row.id,
+        text: row.text,
+        generationTime: row.generation_time,
+        dailyEditionId: row.daily_edition_id,
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count

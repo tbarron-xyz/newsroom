@@ -6,6 +6,7 @@ import PageContainer from "../components/PageContainer";
 import ContentCard from "../components/ContentCard";
 import PageHeader from "../components/PageHeader";
 import SourceArticleCard from "../components/SourceArticleCard";
+import Ticker from "../components/Ticker";
 import { apiService } from "@/app/services/api.service";
 import type { Article } from "./schemas/types";
 
@@ -283,7 +284,9 @@ export default function Home() {
   }
 
   return (
-    <PageContainer variant="tui" maxWidth="max-w-7xl">
+    <>
+      <Ticker />
+      <PageContainer variant="tui" maxWidth="max-w-7xl">
       {message && (
         <div className="mb-6 tui-msg-error text-center">{message}</div>
       )}
@@ -450,5 +453,6 @@ export default function Home() {
         <p className="tui-text-muted">{appFullName} Daily Edition Reader</p>
       </div>
     </PageContainer>
+    </>
   );
 }

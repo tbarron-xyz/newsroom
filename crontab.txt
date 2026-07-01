@@ -4,6 +4,8 @@
 
 0 8 * * * wget http://localhost:8080/api/cron/daily
 
+10 8 * * * wget http://localhost:8080/api/cron/ticker
+
 30 8 * * * wget http://localhost:8080/api/cron/prism-daily
 
 */30 * * * * wget http://localhost:8080/api/cron/comments

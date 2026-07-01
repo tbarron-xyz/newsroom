@@ -13,7 +13,8 @@ import {
   ForumPost,
   DynamicPersona,
   Artifact,
-  PrismDailyEditionPair
+  PrismDailyEditionPair,
+  Ticker
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -130,6 +131,17 @@ export class SQLiteDataStorageService implements IDataStorageService {
         outputTokenCount INTEGER
       );
       CREATE INDEX IF NOT EXISTS idx_daily_editions_time ON daily_editions(generationTime DESC);
+
+      -- Ticker
+      CREATE TABLE IF NOT EXISTS ticker (
+        id TEXT PRIMARY KEY,
+        text TEXT NOT NULL,
+        generationTime INTEGER,
+        dailyEditionId TEXT NOT NULL,
+        modelName TEXT NOT NULL,
+        inputTokenCount INTEGER,
+        outputTokenCount INTEGER
+      );
 
       -- Users
       CREATE TABLE IF NOT EXISTS users (
@@ -625,6 +637,42 @@ export class SQLiteDataStorageService implements IDataStorageService {
       topics: topics,
       // modelFeedbackAboutThePrompt,
       prompt: row.prompt,
+      modelName: row.modelName,
+      inputTokenCount: row.inputTokenCount || undefined,
+      outputTokenCount: row.outputTokenCount || undefined
+    };
+  }
+
+  // Ticker operations
+  async saveTicker(ticker: Ticker): Promise<void> {
+    const db = this.getDb();
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO ticker (id, text, generationTime, dailyEditionId, modelName, inputTokenCount, outputTokenCount)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `
+    ).run(
+      ticker.id,
+      ticker.text,
+      ticker.generationTime,
+      ticker.dailyEditionId,
+      ticker.modelName,
+      ticker.inputTokenCount,
+      ticker.outputTokenCount
+    );
+  }
+
+  async getLatestTicker(): Promise<Ticker | null> {
+    const db = this.getDb();
+    const row = db
+      .prepare("SELECT * FROM ticker ORDER BY generationTime DESC LIMIT 1")
+      .get() as any;
+    if (!row) return null;
+    return {
+      id: row.id,
+      text: row.text,
+      generationTime: row.generationTime,
+      dailyEditionId: row.dailyEditionId,
       modelName: row.modelName,
       inputTokenCount: row.inputTokenCount || undefined,
       outputTokenCount: row.outputTokenCount || undefined

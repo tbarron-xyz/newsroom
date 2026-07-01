@@ -8,7 +8,8 @@ import {
   DynamicPersonasSchema,
   dailyEditionSchema,
   threadRepliesSchema,
-  prismPerspectivesSchema
+  prismPerspectivesSchema,
+  tickerSchema
 } from "../schemas/response-schemas";
 
 interface PromptConfig {
@@ -604,6 +605,22 @@ Return a JSON object with:
       systemPrompt,
       userPrompt,
       responseFormat: zodResponseFormat(DynamicPersonasSchema, "personas")
+    };
+  }
+
+  static generateTickerPrompts(editionText: string): PromptConfig {
+    const systemPrompt = `You are a news ticker editor. Condense the daily edition into a very terse, scrolling ticker string using pipe-separated segments. Each segment must be extremely short (under 60 characters) — just the essential actors and action, like breaking-news chyrons. Use a news wire style: "Actor: Action | Actor: Action". No explanations, no complete sentences. Examples: "Trump: Gaza bombs must stop | Iran: Bomb plans derail deal | Economy: AI bigger than God"`;
+
+    const userPrompt = `Condense the following daily edition into a terse pipe-separated ticker string (max 300 characters total). Each segment must be "Subject: Brief action" format:
+
+${editionText}
+
+Return a JSON object with a single "text" field containing the ticker string.`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(tickerSchema, "ticker")
     };
   }
 }

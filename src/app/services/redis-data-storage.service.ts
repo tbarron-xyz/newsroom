@@ -13,7 +13,8 @@ import {
   ForumPost,
   DynamicPersona,
   Artifact,
-  PrismDailyEditionPair
+  PrismDailyEditionPair,
+  Ticker
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -1512,6 +1513,34 @@ export class RedisDataStorageService implements IDataStorageService {
       outputTokenCount: outputTokenCountStr
         ? parseInt(outputTokenCountStr)
         : undefined
+    };
+  }
+
+  // Ticker operations
+  async saveTicker(ticker: Ticker): Promise<void> {
+    const { id, text, generationTime, dailyEditionId, modelName, inputTokenCount, outputTokenCount } = ticker;
+    await this.client.hSet(REDIS_KEYS.TICKER_LATEST, {
+      id,
+      text,
+      generationTime: String(generationTime),
+      dailyEditionId,
+      modelName,
+      ...(inputTokenCount !== undefined && { inputTokenCount: String(inputTokenCount) }),
+      ...(outputTokenCount !== undefined && { outputTokenCount: String(outputTokenCount) })
+    });
+  }
+
+  async getLatestTicker(): Promise<Ticker | null> {
+    const data = await this.client.hGetAll(REDIS_KEYS.TICKER_LATEST);
+    if (!data || !data.text) return null;
+    return {
+      id: data.id,
+      text: data.text,
+      generationTime: parseInt(data.generationTime || "0"),
+      dailyEditionId: data.dailyEditionId || "",
+      modelName: data.modelName || "",
+      inputTokenCount: data.inputTokenCount ? parseInt(data.inputTokenCount) : undefined,
+      outputTokenCount: data.outputTokenCount ? parseInt(data.outputTokenCount) : undefined
     };
   }
 

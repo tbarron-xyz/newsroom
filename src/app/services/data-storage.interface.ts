@@ -12,7 +12,8 @@ import {
   DynamicPersona,
   Artifact,
   ArtifactJob,
-  PrismDailyEditionPair
+  PrismDailyEditionPair,
+  Ticker
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 
@@ -61,6 +62,10 @@ export interface IDataStorageService {
   saveDailyEdition(dailyEdition: DailyEdition): Promise<void>;
   getDailyEditions(limit?: number): Promise<DailyEdition[]>;
   getDailyEdition(dailyEditionId: string): Promise<DailyEdition | null>;
+
+  // Ticker operations
+  saveTicker(ticker: Ticker): Promise<void>;
+  getLatestTicker(): Promise<Ticker | null>;
 
   // User operations
   createUser(

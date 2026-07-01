@@ -97,3 +97,7 @@ export const prismPerspectivesSchema = z.object({
   rightPrompt: z.string(),
   rationale: z.string().nullable()
 });
+
+export const tickerSchema = z.object({
+  text: z.string()
+});

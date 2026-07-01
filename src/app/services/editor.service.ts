@@ -3,7 +3,8 @@ import {
   DailyEdition,
   Article,
   Editor,
-  PrismDailyEditionPair
+  PrismDailyEditionPair,
+  Ticker
 } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
 import { AIService } from "./ai.service";
@@ -18,7 +19,8 @@ export type JobType =
   | "daily"
   | "comments"
   | "events"
-  | "prism-daily";
+  | "prism-daily"
+  | "ticker";
 
 export interface JobResult {
   message: string;
@@ -457,6 +459,52 @@ export class EditorService {
     return results;
   }
 
+  async generateTicker(): Promise<JobResult> {
+    console.log("Editor: Starting ticker text generation...");
+
+    const dailyEdition = await this.getLatestDailyEdition();
+    if (!dailyEdition) {
+      throw new Error("No daily editions available for ticker generation");
+    }
+
+    const editor = await this.dataStorageService.getEditor();
+
+    const editionText = [
+      `Front Page Headline: ${dailyEdition.frontPageHeadline}`,
+      `Front Page Article: ${dailyEdition.frontPageArticle}`,
+      "",
+      "Stories:",
+      ...dailyEdition.topics.map(
+        (topic, index) =>
+          `Story ${index}: ${topic.name}\nHeadline: ${topic.headline}\nSummary: ${topic.oneLineSummary}`
+      )
+    ].join("\n\n");
+
+    const result = await this.aiService.generateTickerText(
+      editionText,
+      editor?.editionSelectionModelName
+    );
+
+    const now = Date.now();
+    const ticker: Ticker = {
+      id: `ticker_${now}`,
+      text: result.text,
+      generationTime: now,
+      dailyEditionId: dailyEdition.id,
+      modelName: result.modelName,
+      inputTokenCount: result.inputTokenCount,
+      outputTokenCount: result.outputTokenCount
+    };
+
+    await this.dataStorageService.saveTicker(ticker);
+
+    console.log(`[${new Date().toISOString()}] Successfully generated ticker text`);
+    return {
+      message: `Ticker text generated: "${result.text.substring(0, 60)}..."`,
+      jobType: "ticker"
+    };
+  }
+
   async runJob(
     jobType: JobType,
     options: { enforceTimeConstraint?: boolean; count?: number } = {}
@@ -712,6 +760,10 @@ export class EditorService {
           message: `Prism daily edition pair ${pair.id} generated with ${pair.left.topics.length} topics each`,
           jobType
         };
+      }
+
+      case "ticker": {
+        return await this.generateTicker();
       }
     }
   }

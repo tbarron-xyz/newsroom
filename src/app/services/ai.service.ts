@@ -21,7 +21,8 @@ import {
   generatedCommentSchema,
   DynamicPersonasSchema,
   threadRepliesSchema,
-  prismPerspectivesSchema
+  prismPerspectivesSchema,
+  tickerSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -1244,5 +1245,64 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       }
     }
     return [];
+  }
+
+  async generateTickerText(
+    editionText: string,
+    modelName?: string
+  ): Promise<{
+    text: string;
+    fullPrompt: string;
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    console.log("Generating ticker text from daily edition");
+
+    try {
+      const config = AIPrompts.generateTickerPrompts(editionText);
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
+
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.EDITION_SELECTION,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        },
+        modelName
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      await this.logAIResponse("Ticker text generation", result.response);
+
+      const content = result.response.choices[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error("No response content from AI service");
+      }
+
+      const parsed = tickerSchema.parse(JSON.parse(content));
+
+      return {
+        text: parsed.text,
+        fullPrompt,
+        modelName: result.modelUsed,
+        inputTokenCount: result.response.usage?.prompt_tokens,
+        outputTokenCount: result.response.usage?.completion_tokens
+      };
+    } catch (error) {
+      await this.logOpenAIError(
+        "Error generating ticker text",
+        "Ticker text generation",
+        error
+      );
+      throw error;
+    }
   }
 }

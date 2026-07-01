@@ -1528,6 +1528,31 @@ export default function EditorPage() {
                   {jobTriggering === "prism-daily" ? "Generating..." : "Trigger Manually"}
                 </button>
               </div>
+
+              {/* News Ticker Job */}
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">News Ticker</h3>
+                    <p className="tui-muted">Once daily at 8:10am</p>
+                  </div>
+                </div>
+                <p className="tui-muted">
+                  Generates a scrolling ticker text from the latest daily edition.
+                </p>
+                <button
+                  onClick={() => triggerJob("ticker")}
+                  disabled={jobTriggering === "ticker" || !isAdmin}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {jobTriggering === "ticker" ? "Generating..." : "Generate Ticker"}
+                </button>
+              </div>
             </div>
 
             {/* Job Status Information */}

@@ -109,6 +109,7 @@ The system operates through 4 interconnected pipelines triggered by system cront
 | Article Generation | Hourly (`:00`) | 15 min | `/api/cron/articles` | Generates articles for each enabled reporter using Bluesky data |
 | Newspaper Edition | Every 6 hours | 180 min | `/api/cron/edition` | Curates articles from last 3 hours into newspaper edition |
 | Daily Edition | Daily at 8am | — | `/api/cron/daily` | Aggregates 24h of editions into comprehensive daily newspaper |
+| News Ticker | Daily at 8:10am | — | `/api/cron/ticker` | Condenses daily edition into scrolling ticker text |
 
 ### Pipeline Details
 
