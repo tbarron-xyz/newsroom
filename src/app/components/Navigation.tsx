@@ -75,8 +75,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {navigationItems.map((item) => {
-              if (!item.condition) return null;
+            {navigationItems.filter((item) => item.condition).map((item) => {
               return (
                 <Link
                   key={item.href}
@@ -87,20 +86,6 @@ export default function Navigation({ appFullName }: NavigationProps) {
                 </Link>
               );
             })}
-
-            {isAdmin && (
-              <>
-                {adminItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={adminLinkClasses(false, item.isEditorButton)}
-                  >
-                    {item.text}
-                  </Link>
-                ))}
-              </>
-            )}
 
             {user ? (
               <button
