@@ -105,7 +105,7 @@ export class AIResponseUtils {
     return events
       .map(
         (event, index) =>
-          `Event ${index + 1}:\nTitle: ${event.title}\nFacts: ${event.facts.join(", ")}\nCreated: ${new Date(event.createdTime).toISOString()}`
+          `Title: ${event.title}\nFacts: ${event.facts.join(", ")}\nCreated: ${new Date(event.createdTime).toISOString()}`
       )
       .join("\n\n");
   }

@@ -85,10 +85,6 @@ export default function EditorPage() {
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
   const [memoryInfo, setMemoryInfo] = useState<MemoryInfo | null>(null);
   const [appName, setAppName] = useState("Newsroom");
-  const [dailyJobId, setDailyJobId] = useState<string | null>(null);
-  const [dailyJobStatus, setDailyJobStatus] = useState<any>(null);
-  const [reporterJobId, setReporterJobId] = useState<string | null>(null);
-  const [reporterJobStatus, setReporterJobStatus] = useState<any>(null);
   const [numComments, setNumComments] = useState(1);
   const router = useRouter();
 
@@ -101,15 +97,21 @@ export default function EditorPage() {
     fetchMemoryInfo();
   }, []);
 
-  // Auto-resume polling if jobs are running
+  // Continuous poll job status every 3s
   useEffect(() => {
-    if (isAdmin && jobStatus?.status?.dailyJob && !dailyJobId) {
-      fetchActiveDailyJobId();
+    const interval = setInterval(fetchJobStatus, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Clear jobTriggering once polling confirms the job is actually running
+  useEffect(() => {
+    if (jobTriggering === "reporter" && jobStatus?.status.reporterJob) {
+      setJobTriggering(null);
     }
-    if (isAdmin && jobStatus?.status?.reporterJob && !reporterJobId) {
-      fetchActiveReporterJobId();
+    if (jobTriggering === "daily" && jobStatus?.status.dailyJob) {
+      setJobTriggering(null);
     }
-  }, [jobStatus, isAdmin]);
+  }, [jobStatus, jobTriggering]);
 
   // Load app configuration
   useEffect(() => {
@@ -187,25 +189,17 @@ export default function EditorPage() {
       };
 
       if (jobType === "daily") {
-        const result = await apiService.post<{
-          jobId: string;
-          message: string;
-        }>("/api/editor/jobs", requestBody);
+        const result = await apiService.post<{ message: string }>(
+          "/api/editor/jobs", requestBody
+        );
         setMessage(result.message);
-        setDailyJobId(result.jobId);
-        setDailyJobStatus({ status: "waiting" });
-        // start polling
-        setTimeout(pollDailyJobStatus, 5000);
+        setTimeout(() => setMessage(""), 5000);
       } else if (jobType === "reporter") {
-        const result = await apiService.post<{
-          jobId: string;
-          message: string;
-        }>("/api/editor/jobs", requestBody);
+        const result = await apiService.post<{ message: string }>(
+          "/api/editor/jobs", requestBody
+        );
         setMessage(result.message);
-        setReporterJobId(result.jobId);
-        setReporterJobStatus({ status: "waiting" });
-        // start polling
-        setTimeout(pollReporterJobStatus, 5000);
+        setTimeout(() => setMessage(""), 5000);
       } else {
         const result = await apiService.post<{ message: string }>(
           "/api/editor/jobs",
@@ -216,9 +210,8 @@ export default function EditorPage() {
       }
     } catch (error: any) {
       setMessage(error.error || `Error triggering ${jobType} job`);
-      console.error(`Error triggering ${jobType} job:`, error);
-    } finally {
       setJobTriggering(null);
+      console.error(`Error triggering ${jobType} job:`, error);
     }
   };
 
@@ -248,91 +241,6 @@ export default function EditorPage() {
       console.error("Error fetching memory info:", error);
     }
   };
-
-  const pollDailyJobStatus = async () => {
-    if (!dailyJobId) return;
-    try {
-      const status = await apiService.get<any>(
-        `/api/editor/jobs/${dailyJobId}`
-      );
-      setDailyJobStatus(status);
-      if (status.status === "completed") {
-        setMessage("Daily edition generated successfully");
-        setTimeout(() => setMessage(""), 5000);
-        setDailyJobId(null);
-        setDailyJobStatus(null);
-        fetchJobStatus(); // update last runs
-      } else if (status.status === "failed") {
-        setMessage("Daily edition generation failed");
-        setTimeout(() => setMessage(""), 5000);
-        setDailyJobId(null);
-        setDailyJobStatus(null);
-      } else {
-        // still running or waiting, keep polling
-        setTimeout(pollDailyJobStatus, 5000);
-      }
-    } catch (error) {
-      console.error("Error polling job status:", error);
-    }
-  };
-
-  const pollReporterJobStatus = async () => {
-    if (!reporterJobId) return;
-    try {
-      const status = await apiService.get<any>(
-        `/api/editor/jobs/${reporterJobId}`
-      );
-      setReporterJobStatus(status);
-      if (status.status === "completed") {
-        setMessage("Reporter articles generated successfully");
-        setTimeout(() => setMessage(""), 5000);
-        setReporterJobId(null);
-        setReporterJobStatus(null);
-        fetchJobStatus(); // update last runs
-      } else if (status.status === "failed") {
-        setMessage("Reporter articles generation failed");
-        setTimeout(() => setMessage(""), 5000);
-        setReporterJobId(null);
-        setReporterJobStatus(null);
-      } else {
-        // still running or waiting, keep polling
-        setTimeout(pollReporterJobStatus, 5000);
-      }
-    } catch (error) {
-      console.error("Error polling reporter job status:", error);
-    }
-  };
-
-  const fetchActiveDailyJobId = async () => {
-    try {
-      const result = await apiService.get<{ jobId: string | null }>(
-        "/api/editor/jobs/daily"
-      );
-      if (result.jobId) {
-        setDailyJobId(result.jobId);
-        setDailyJobStatus({ status: "active" }); // assume active
-        pollDailyJobStatus(); // start polling immediately if reloads
-      }
-    } catch (error) {
-      console.error("Error fetching active daily job:", error);
-    }
-  };
-
-  const fetchActiveReporterJobId = async () => {
-    try {
-      const result = await apiService.get<{ jobId: string | null }>(
-        "/api/editor/jobs/reporter"
-      );
-      if (result.jobId) {
-        setReporterJobId(result.jobId);
-        setReporterJobStatus({ status: "active" }); // assume active
-        pollReporterJobStatus(); // start polling immediately if reloads
-      }
-    } catch (error) {
-      console.error("Error fetching active reporter job:", error);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -1312,21 +1220,13 @@ export default function EditorPage() {
                   onClick={() => triggerJob("reporter")}
                   disabled={
                     jobTriggering === "reporter" ||
-                    reporterJobId !== null ||
+                    jobStatus?.status.reporterJob ||
                     !isAdmin
                   }
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "reporter" || reporterJobStatus ? (
-                    <>
-                      {reporterJobStatus?.status === "completed"
-                        ? "Completing..."
-                        : reporterJobStatus?.status === "failed"
-                          ? "Failed"
-                          : jobTriggering === "reporter"
-                            ? "Generating..."
-                            : "Running..."}
-                    </>
+                  {jobTriggering === "reporter" || jobStatus?.status.reporterJob ? (
+                    jobTriggering === "reporter" ? "Generating..." : "Running..."
                   ) : (
                     "Trigger Articles"
                   )}
@@ -1397,16 +1297,12 @@ export default function EditorPage() {
                 <button
                   onClick={() => triggerJob("daily")}
                   disabled={
-                    jobTriggering === "daily" || dailyJobId !== null || !isAdmin
+                    jobTriggering === "daily" || jobStatus?.status.dailyJob || !isAdmin
                   }
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "daily" || dailyJobStatus ? (
-                    dailyJobStatus?.status === "completed"
-                      ? "Completing..."
-                      : dailyJobStatus?.status === "failed"
-                        ? "Failed"
-                        : "Compiling..."
+                  {jobTriggering === "daily" || jobStatus?.status.dailyJob ? (
+                    jobTriggering === "daily" ? "Compiling..." : "Running..."
                   ) : (
                     "Trigger Manually"
                   )}

@@ -61,30 +61,8 @@ export default function Home() {
 
   return (
     <PageContainer variant="tui" maxWidth="max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3 space-y-6">
-          <h2 className="text-xl font-bold text-[var(--tui-primary)]">Today's Stories</h2>
-          {edition.topics.map((topic, index) => (
-            <ContentCard key={index} variant="tui" className="p-8">
-              <div className="mb-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
-                    <span className="tui-muted">{index + 1}</span>
-                  </div>
-                  <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">{topic.name}</span>
-                </div>
-                <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">{topic.headline}</h3>
-                <p className="tui-muted italic">{topic.oneLineSummary}</p>
-              </div>
-              <div className="prose prose-lg max-w-none">
-                <p className="tui-text-muted leading-relaxed mb-4">{topic.newsStoryFirstParagraph}</p>
-                <p className="tui-text-muted leading-relaxed">{topic.newsStorySecondParagraph}</p>
-              </div>
-            </ContentCard>
-          ))}
-        </div>
-
-        <div className="lg:col-span-1">
+      <div className="relative">
+        <aside className="float-right w-72 ml-8 mb-4">
           <ContentCard variant="tui" className="p-6">
             <h2 className="text-lg font-bold text-[var(--tui-primary)] mb-4">Opinion</h2>
             {opinions.length === 0 ? (
@@ -103,6 +81,38 @@ export default function Home() {
               </div>
             )}
           </ContentCard>
+        </aside>
+
+        <div className="min-w-[30rem] space-y-6">
+          <h2 className="text-xl font-bold text-[var(--tui-primary)]">Today's Stories</h2>
+          {edition.topics.map((topic, index) => (
+            <ContentCard key={index} variant="tui" className="p-8">
+              <div className="mb-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
+                    <span className="tui-muted">{index + 1}</span>
+                  </div>
+                  <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">{topic.name}</span>
+                  <span className="tui-muted">
+                    {new Date(edition.generationTime).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">{topic.headline}</h3>
+                <p className="tui-muted italic">{topic.oneLineSummary}</p>
+              </div>
+              <div className="prose prose-lg max-w-none">
+                <p className="tui-text-muted leading-relaxed mb-4">{topic.newsStoryFirstParagraph}</p>
+                <p className="tui-text-muted leading-relaxed">{topic.newsStorySecondParagraph}</p>
+              </div>
+            </ContentCard>
+          ))}
         </div>
       </div>
     </PageContainer>

@@ -4,11 +4,11 @@
 
 An AI-powered newsroom application where AI agents act as reporters and an editor, automatically generating articles and newspaper editions. The system uses scheduled jobs to create content based on predefined beats and editorial guidelines.
 
-## Product Overview
+## Overview
 
 attonews is an AI-powered news platform that revolutionizes journalism through automated content creation. Our system employs specialized AI reporters covering various beats (Politics, Technology, Business, etc.) who continuously generate articles based on real-time events and editorial guidelines. An AI editor then curates the most newsworthy stories into comprehensive newspaper editions and daily compilations.
 
-Unlike traditional newsrooms, attonews operates 24/7, producing fresh content hourly with editions compiled every 6 hours and daily newspapers every 24 hours. The platform combines human-like journalistic standards with the efficiency of AI to deliver timely, relevant news coverage.
+attonews operates 24/7, producing fresh content hourly with editions compiled every 6 hours and daily newspapers every 24 hours. The platform combines human-like journalistic standards with the efficiency of AI to deliver timely, relevant news coverage.
 
 ## For Readers
 
@@ -22,7 +22,7 @@ Access attonews's AI-generated news content through our intuitive web interface:
 
 ### Public Access
 All users can freely access recent content without registration. Visit the following pages to start reading:
-- `/` - Home page featuring the latest daily edition
+- `/` - Main page with latest stories and opinion articles
 - `/about` - About the project
 - `/editions` - View recent newspaper editions
 - `/events` - Browse event-level news developments
@@ -35,7 +35,6 @@ All users can freely access recent content without registration. Visit the follo
 - **Daily Editions**: Comprehensive newspaper editions compiled from recent articles
 - **Web Interface**: Next.js frontend for managing reporters, editor, articles   
 - **Admin Authentication**: Secure login system for editorial control (can be disabled for development with `npm run dev:noauth`)
-- **Ad Management**: CRUD operations for managing advertisement entries
 - **Redis Storage**: Efficient data persistence for articles, reporters, and editions
 
 ## Prerequisites
@@ -122,7 +121,6 @@ The system operates through 4 interconnected pipelines triggered by system cront
 **2. Article Generation** (`/api/cron/articles`)
 - For each enabled reporter:
   - Fetches latest Bluesky messages
-  - Retrieves most recent ad (for context)
   - Calls AI to generate structured article
   - Saves article to storage
 - Location: `src/app/services/reporter.service.ts:11`
@@ -137,7 +135,6 @@ The system operates through 4 interconnected pipelines triggered by system cront
 - Aggregates all newspaper editions from the last 24 hours
 - AI creates comprehensive front page headline/article
 - AI generates topic-by-topic breakdown with summaries
-- Displayed on home page `/`
 - Location: `src/app/services/editor.service.ts:85`
 
 ### Generation Period Throttling
@@ -183,7 +180,7 @@ Bluesky/Jetstream → Events → Articles → Newspaper Editions → Daily Editi
 - **Editor Page**: Configure editor settings and manually trigger jobs
 - **Articles Page**: Browse generated articles
 - **Editions Page**: View compiled newspaper editions
-- **Daily Edition Page**: Access the latest daily newspaper
+
 
 ## Testing
 
@@ -230,6 +227,5 @@ The primary test file at `src/app/services/sqlite-data-storage.test.ts` contains
 | Event | 4 | CRUD, by reporter, latest updated |
 | NewspaperEdition / DailyEdition | 6 | CRUD, ordering, empty topics |
 | User | 8 | create, lookup by ID/email, login tracking, delete, unique constraint |
-| Ad | 5 | full CRUD lifecycle |
 | Job status, KPI, Log | 8 | running/lastRun/lastSuccess, set/get/increment, add/get |
 | clearAllData | 1 | wipes all tables for isolation |

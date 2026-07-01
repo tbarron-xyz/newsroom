@@ -9,13 +9,10 @@ export default function About() {
         <PageHeader variant="tui" title="About" />
         <div className="space-y-6 tui-text-muted text-lg mt-8">
           <p className="leading-relaxed">
-            <strong>attocorp</strong> builds tools for creating, deploying,
-            and managing AI agents with multi-agent coordination.
+            <strong>attocorp</strong> builds tools.
           </p>
           <p className="leading-relaxed">
-            <strong>attonews</strong> demonstrates these capabilities: agents
-            monitor social media events, generate articles, publish curated
-            editions, and comment on content.
+            <strong>attonews</strong> writes news.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">

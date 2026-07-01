@@ -328,53 +328,29 @@ export class ReporterService {
           });
         }
 
-        if (aiEvent.index) {
-          // Update existing event
-          const previousEventId = lastEvents[aiEvent.index - 1].id;
-          console.log(`Updating existing event: ${previousEventId}`);
+        // Create new event
+        const eventId = await this.dataStorageService.generateId("event");
+        const newEvent: Event = {
+          id: eventId,
+          reporterId,
+          title: aiEvent.title,
+          createdTime: now,
+          updatedTime: now,
+          facts: aiEvent.facts,
+          where: aiEvent.where || undefined,
+          when: aiEvent.when || undefined,
+          messageIds: aiEvent.messageIds || [],
+          messageTexts: messageTexts,
+          modelName: aiEvent.modelName,
+          inputTokenCount: aiEvent.inputTokenCount,
+          outputTokenCount: aiEvent.outputTokenCount
+        };
 
-          // Update message data and location/timing for existing event
-          const existingEvent =
-            await this.dataStorageService.getEvent(previousEventId);
-          if (existingEvent) {
-            const updatedEvent: Event = {
-              ...existingEvent,
-              facts: aiEvent.facts,
-              where: aiEvent.where || existingEvent.where,
-              when: aiEvent.when || existingEvent.when,
-              messageIds: aiEvent.messageIds || [],
-              messageTexts: messageTexts,
-              modelName: aiEvent.modelName,
-              inputTokenCount: aiEvent.inputTokenCount,
-              outputTokenCount: aiEvent.outputTokenCount
-            };
-            await this.dataStorageService.saveEvent(updatedEvent);
-          }
-        } else {
-          // Create new event
-          const eventId = await this.dataStorageService.generateId("event");
-          const newEvent: Event = {
-            id: eventId,
-            reporterId,
-            title: aiEvent.title,
-            createdTime: now,
-            updatedTime: now,
-            facts: aiEvent.facts,
-            where: aiEvent.where || undefined,
-            when: aiEvent.when || undefined,
-            messageIds: aiEvent.messageIds || [],
-            messageTexts: messageTexts,
-            modelName: aiEvent.modelName,
-            inputTokenCount: aiEvent.inputTokenCount,
-            outputTokenCount: aiEvent.outputTokenCount
-          };
-
-          await this.dataStorageService.saveEvent(newEvent);
-          generatedEvents.push(newEvent);
-          console.log(
-            `Created new event: ${eventId} with title "${aiEvent.title}" and ${aiEvent.facts.length} facts`
-          );
-        }
+        await this.dataStorageService.saveEvent(newEvent);
+        generatedEvents.push(newEvent);
+        console.log(
+          `Created new event: ${eventId} with title "${aiEvent.title}" and ${aiEvent.facts.length} facts`
+        );
       } catch (error) {
         console.error(
           `Failed to process event for reporter ${reporterId}:`,
@@ -384,7 +360,7 @@ export class ReporterService {
     }
 
     console.log(
-      `Reporter ${reporterId}: Processed ${eventGenerationResult.events.length} events (${generatedEvents.length} new, ${eventGenerationResult.events.length - generatedEvents.length} updated)`
+      `Reporter ${reporterId}: Generated ${generatedEvents.length} events`
     );
     return generatedEvents;
   }

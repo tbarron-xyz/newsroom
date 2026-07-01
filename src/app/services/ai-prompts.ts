@@ -450,15 +450,14 @@ Make the content engaging, balanced, and professionally written. Focus on creati
   ): PromptConfig {
     const systemPrompt = `You are an AI journalist tasked with identifying and tracking important events and developments. Your goal is to create structured event records that capture key facts about ongoing stories and developments. You specialize in these beats: ${beatsList}. ${reporter.prompt}`;
 
-    const userPrompt = `Based on the recent social media messages and the reporter's previous events, identify up to 5 significant events or developments that should be tracked. Focus on events and developments that align with your assigned beats: ${beatsList}. For each event:
+    const userPrompt = `Based on the recent social media messages, identify up to 5 significant events or developments that should be tracked. Focus on events and developments that align with your assigned beats: ${beatsList}. For each event:
 
-1. If this matches an existing event from the previous events list, use the existing event's numerical index and add any new facts to it
-2. If this is a new event, create a new title and initial facts
-3. Each event should have 1-5 key facts that capture the essential information
-4. messageIds: List the indices (1, 2, 3, etc.) of only the relevant messages you identified and actually used to create or update this event. If you didn't find any relevant messages or didn't use any specific messages, use an empty array.
-5. potentialMessageIds: After creating/updating the event, re-scan the social media messages for any that may be potentially related to this event; include their numeric indices in this field.
+1. Create a new title and initial facts
+2. Each event should have 1-5 key facts that capture the essential information
+3. messageIds: List the indices (1, 2, 3, etc.) of only the relevant messages you identified and actually used to create this event. If you didn't find any relevant messages or didn't use any specific messages, use an empty array.
+4. potentialMessageIds: After creating the event, re-scan the social media messages for any that may be potentially related to this event; include their numeric indices in this field.
 
-Previous Events:
+Previous Events (for context only - do not update these):
 ${eventsContext}
 
 Recent Social Media Messages:
@@ -467,7 +466,7 @@ ${socialMediaContext}
 Instructions:
 - Review the social media messages for significant developments that align with your assigned beats: ${beatsList}
 - Prioritize events and developments within your beats over general news
-- Match new information to existing events where appropriate, or create new events for new developments
+- Create new events for new developments - do not update existing events
 - For each event, provide a clear title and 1-5 key facts
 - Focus on factual, verifiable information
 - Prioritize events that represent ongoing stories or important developments within your beats

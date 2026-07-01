@@ -39,13 +39,6 @@ export const eventGenerationResponseSchema = z.object({
   events: z
     .array(
       z.object({
-        index: z
-          .number()
-          .nullable()
-          .optional()
-          .describe(
-            "The index of the existing event that this updates. If this is a new event, leave blank"
-          ),
         title: z.string(),
         facts: z.array(z.string()).max(5),
         where: z
@@ -63,7 +56,7 @@ export const eventGenerationResponseSchema = z.object({
           .optional()
           .default([])
           .describe(
-            "The indexes of the social media messages used to create or update this event"
+            "The indexes of the social media messages used to create this event"
           ),
         potentialMessageIds: z
           .array(z.number())
