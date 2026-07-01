@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import PageContainer from "@/components/PageContainer";
+import ContentCard from "@/components/ContentCard";
+import PageHeader from "@/components/PageHeader";
 import { Event } from "../schemas/types";
 import { apiService } from "@/app/services/api.service";
 import { useAuth } from "@/hooks/useAuth";
@@ -95,56 +98,39 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-        <div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-          style={{ animationDelay: "1s" }}
-        ></div>
-
-        <div className="text-center relative z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-white/80">Loading events...</p>
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading events...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-        style={{ animationDelay: "1s" }}
-      ></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-8">
-        {/* Public Events Grid */}
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl border border-white/20 p-6">
-          <h3 className="text-lg font-semibold text-white mb-6">
-            Recent Events
-          </h3>
+    <PageContainer variant="tui" maxWidth="max-w-7xl">
+      {/* Public Events Grid */}
+      <ContentCard variant="tui" className="p-6 mb-8">
+        <h3 className="tui-section-title mb-6">
+          Recent Events
+        </h3>
           {publicEvents.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {publicEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="backdrop-blur-xl bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors duration-200"
+                  className="border border-[var(--tui-border)] p-4 font-mono hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
                 >
-                  <h4 className="text-sm font-medium text-white mb-2">
+                  <h4 className="text-sm font-medium tui-text-primary mb-2">
                     {event.title}
                   </h4>
-                  <div className="text-xs text-white/60 mb-2">
+                  <div className="tui-text-muted text-xs mb-2">
                     Updated: {formatDate(event.updatedTime)}
                   </div>
                   {event.facts.length > 0 && (
-                    <div className="text-xs text-white/70">
+                    <div className="text-xs tui-text-muted">
                       {event.facts.map((fact, index) => (
-                        <div key={index}>• {fact}</div>
+                        <div key={index} className="font-mono">• {fact}</div>
                       ))}
                     </div>
                   )}
@@ -152,120 +138,114 @@ export default function EventsPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-white/70">No events available</p>
+            <div className="border border-[var(--tui-border)] p-12 text-center">
+              <p className="tui-text-muted">No events available</p>
             </div>
           )}
-        </div>
+      </ContentCard>
 
         {/* Admin Section */}
         {isAdmin && (
-          <div className="backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl border border-white/20">
-            <div className="px-6 py-4 border-b border-white/20 flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-bold text-white">
-                  Event Management
-                </h1>
-                <p className="mt-1 text-sm text-white/80">
-                  View and manage all tracked events in the system
-                </p>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleGenerateEvents}
-                  disabled={adminLoading}
-                  className="group relative inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                  <span className="relative">Generate Events</span>
-                </button>
-                <button
-                  onClick={handleGenerateArticlesFromEvents}
-                  disabled={adminLoading}
-                  className="group relative inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                  <span className="relative">
+          <ContentCard variant="tui">
+            <div className="p-6 border-b border-[var(--tui-border)]">
+              <PageHeader
+                variant="tui"
+                title="Event Management"
+                description="View and manage all tracked events in the system"
+              >
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleGenerateEvents}
+                    disabled={adminLoading}
+                    className="tui-btn-primary"
+                  >
+                    Generate Events
+                  </button>
+                  <button
+                    onClick={handleGenerateArticlesFromEvents}
+                    disabled={adminLoading}
+                    className="tui-btn"
+                  >
                     Generate Articles from Events
-                  </span>
-                </button>
-              </div>
+                  </button>
+                </div>
+              </PageHeader>
             </div>
 
             {error && (
-              <div className="px-6 py-4 border-b border-red-500/20 bg-red-500/10">
-                <p className="text-red-300 text-sm">{error}</p>
+              <div className="tui-msg-error m-6">
+                {error}
               </div>
             )}
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-white/10">
-                <thead className="backdrop-blur-xl bg-white/5">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-[var(--tui-border)]">
+                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
                       Title
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-white/70 uppercase tracking-wider w-1/3">
+                    <th className="px-6 py-3 text-center text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider w-1/3">
                       Facts
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
                       Where
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
                       When
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
                       Social Media Messages
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
                       Details
                     </th>
                   </tr>
                 </thead>
-                <tbody className="backdrop-blur-xl bg-white/5 divide-y divide-white/10">
+                <tbody>
                   {adminEvents.map((event) => (
                     <tr
                       key={event.id}
-                      className="hover:bg-white/5 transition-colors duration-200"
+                      className="border-b border-[var(--tui-border)] hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-white">
+                      <td className="px-6 py-4 text-sm tui-text-primary">
                         <div className="font-semibold">{event.title}</div>
-                        <div className="text-xs text-white/60 mt-1">
+                        <div className="text-xs tui-text-muted mt-1">
                           ID: {event.id}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-white/70 w-1/3 text-center">
+                      <td className="px-6 py-4 text-sm tui-text-muted w-1/3 text-center">
                         <div className="space-y-1">
                           {event.facts.map((fact, index) => (
-                            <div key={index} className="text-xs">
+                            <div key={index} className="text-xs font-mono">
                               • {fact}
                             </div>
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-white/70">
+                      <td className="px-6 py-4 text-sm tui-text-muted">
                         {event.where || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-white/70">
+                      <td className="px-6 py-4 text-sm tui-text-muted">
                         {event.when || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-white/70">
+                      <td className="px-6 py-4 text-sm tui-text-muted">
                         {event.messageTexts && event.messageTexts.length > 0 ? (
                           <div className="space-y-1 max-h-32 overflow-y-auto">
                             {event.messageTexts.map((text, index) => (
                               <div
                                 key={index}
-                                className="text-xs bg-black/20 p-2 rounded"
+                                className="text-xs font-mono bg-black border border-[var(--tui-border)] p-2"
                               >
                                 {text}
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-white/50">No messages</span>
+                          <span className="text-[var(--tui-placeholder)] font-mono">No messages</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm tui-text-muted">
                         Reporter: {event.reporterId}
                         <br />
                         Created: {formatDate(event.createdTime)}
@@ -279,17 +259,16 @@ export default function EventsPage() {
             </div>
 
             {adminEvents.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-white/70">No events found</p>
-                <p className="text-white/50 text-sm mt-2">
+              <div className="border-t border-[var(--tui-border)] p-12 text-center">
+                <p className="tui-text-primary">No events found</p>
+                <p className="tui-text-muted text-sm mt-2">
                   Click "Generate Events" to create new events from recent
                   social media data
                 </p>
               </div>
             )}
-          </div>
+          </ContentCard>
         )}
-      </div>
-    </div>
+      </PageContainer>
   );
 }

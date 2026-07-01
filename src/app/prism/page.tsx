@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import PageContainer from "../../components/PageContainer";
 import PageHeader from "../../components/PageHeader";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import EmptyState from "../../components/EmptyState";
+import ContentCard from "../../components/ContentCard";
 import SourceArticleCard from "../../components/SourceArticleCard";
 import { apiService } from "../services/api.service";
 import type { Article } from "../schemas/types";
@@ -84,72 +83,69 @@ function DailyEditionCard({
 
   return (
     <div className="space-y-6">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
-        <div className="border-b border-white/20 pb-6 mb-6">
+      <ContentCard variant="tui" className="p-8">
+        <div className="border-b border-[var(--tui-border)] pb-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-white/90">
+            <h2 className="text-2xl font-bold text-[var(--tui-primary)]">
               {edition.newspaperName || "Daily Edition"}
             </h2>
-            <span className="text-sm text-white/70">
+            <span className="tui-muted">
               {formatDate(edition.generationTime)}
             </span>
           </div>
-          <span className="px-3 py-1 backdrop-blur-sm bg-white/10 border border-white/20 text-white/80 rounded-full text-xs font-medium mb-3 inline-block">
+          <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs inline-block mb-3">
             {perspectiveLabel}
           </span>
-          <h1 className="text-3xl font-bold text-white mb-4 leading-tight mt-3">
+          <h1 className="text-3xl font-bold text-[var(--tui-primary)] mb-4 leading-tight mt-3">
             {edition.frontPageHeadline}
           </h1>
         </div>
 
         <div className="prose prose-lg max-w-none">
-          <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
+          <p className="tui-text-muted leading-relaxed whitespace-pre-wrap">
             {edition.frontPageArticle}
           </p>
         </div>
-      </div>
+      </ContentCard>
 
       <div className="space-y-6">
         {edition.topics.map((topic, index) => (
-          <div
-            key={index}
-            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl"
-          >
+          <ContentCard key={index} variant="tui" className="p-8">
             <div className="mb-4">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-8 h-8 backdrop-blur-sm bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-white/80">
+                <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
+                  <span className="tui-muted">
                     {index + 1}
                   </span>
                 </div>
-                <span className="px-3 py-1 backdrop-blur-sm bg-white/10 border border-white/20 text-white/80 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">
                   {topic.name}
                 </span>
               </div>
-              <h3 className="text-xl font-bold text-white/90 mb-2">
+              <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">
                 {topic.headline}
               </h3>
-              <p className="text-sm text-white/70 italic">
+              <p className="tui-muted italic">
                 {topic.oneLineSummary}
               </p>
             </div>
 
             <div className="prose prose-lg max-w-none mb-6">
-              <p className="text-white/80 leading-relaxed mb-4">
+              <p className="tui-text-muted leading-relaxed mb-4">
                 {topic.newsStoryFirstParagraph}
               </p>
-              <p className="text-white/80 leading-relaxed">
+              <p className="tui-text-muted leading-relaxed">
                 {topic.newsStorySecondParagraph}
               </p>
             </div>
-          </div>
+          </ContentCard>
         ))}
       </div>
 
       {articles && articles.length > 0 && (
-        <div className="mt-8 pt-8 border-t border-white/20">
-          <h3 className="text-lg font-bold text-white/90 mb-4">Source Articles</h3>
-          {articles.map(article => <SourceArticleCard key={article.id} article={article} />)}
+        <div className="mt-8 pt-8 border-t border-[var(--tui-border)]">
+          <h3 className="text-lg font-bold text-[var(--tui-primary)] mb-4">Source Articles</h3>
+          {articles.map(article => <SourceArticleCard key={article.id} article={article} variant="tui" />)}
         </div>
       )}
     </div>
@@ -225,19 +221,22 @@ export default function PrismPage() {
 
   if (loading) {
     return (
-      <PageContainer>
-        <LoadingSpinner message="Loading..." />
-      </PageContainer>
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading...</p>
+        </div>
+      </div>
     );
   }
 
   if (dailyEditions.length === 0) {
     return (
-      <PageContainer>
-        <EmptyState
-          icon={
+      <PageContainer variant="tui">
+        <ContentCard variant="tui" className="p-12 text-center">
+          <div className="w-16 h-16 border border-[var(--tui-border)] flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-8 h-8 text-white/70"
+              className="w-8 h-8 text-[var(--tui-primary)]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -249,10 +248,10 @@ export default function PrismPage() {
                 d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM16 2v4M8 2v4M3 10h18"
               />
             </svg>
-          }
-          title="No Daily Editions Available"
-          description="Daily editions are generated automatically. Check back later!"
-        />
+          </div>
+          <h3 className="text-xl font-semibold text-[var(--tui-primary)] mb-2">No Daily Editions Available</h3>
+          <p className="tui-text-muted">Daily editions are generated automatically. Check back later!</p>
+        </ContentCard>
       </PageContainer>
     );
   }
@@ -260,15 +259,16 @@ export default function PrismPage() {
   const selectedPair = PAIR_METADATA.find((p) => p.id === selectedPairId)!;
 
   return (
-    <PageContainer maxWidth="max-w-7xl">
+    <PageContainer variant="tui" maxWidth="max-w-7xl">
       <PageHeader
+        variant="tui"
         title="Perspective Prism"
         description="Rewrite a daily edition through paired editorial lenses for side-by-side comparison"
       />
 
       {/* Pair selector */}
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shadow-2xl mb-6">
-        <h2 className="text-lg font-semibold text-white/90 mb-4">
+      <ContentCard variant="tui" className="p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[var(--tui-primary)] mb-4">
           Select Perspective Pair
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -280,40 +280,38 @@ export default function PrismPage() {
                 setLeftResult(null);
                 setRightResult(null);
               }}
-              className={`p-4 backdrop-blur-sm rounded-xl transition-all duration-300 text-left ${
+              className={`p-4 transition-all duration-300 text-left ${
                 selectedPairId === pair.id
-                  ? "bg-white/20 border-2 border-white/30 text-white"
-                  : "bg-white/5 border border-white/10 text-white/80 hover:bg-white/10"
+                  ? "bg-[var(--tui-hover-bg)] border-2 border-[var(--tui-primary)] text-[var(--tui-primary)]"
+                  : "bg-black border border-[var(--tui-border)] text-[var(--tui-muted)] hover:bg-[var(--tui-hover-bg)]"
               }`}
             >
               <div className="font-medium text-sm mb-2">{pair.name}</div>
-              <div className="flex items-center gap-2 text-xs text-white/60">
-                <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">
+              <div className="flex items-center gap-2 text-xs text-[var(--tui-muted)]">
+                <span className="px-2 py-0.5 border border-[var(--tui-border)] text-[var(--tui-primary)]">
                   {pair.leftLabel}
                 </span>
-                <span className="text-white/40">vs</span>
-                <span className="px-2 py-0.5 rounded bg-green-500/20 text-green-300">
+                <span className="text-[var(--tui-muted)]">vs</span>
+                <span className="px-2 py-0.5 border border-[var(--tui-border)] text-[var(--tui-primary)]">
                   {pair.rightLabel}
                 </span>
               </div>
             </button>
           ))}
         </div>
-      </div>
+      </ContentCard>
 
       {/* Remap button */}
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={handleRemap}
           disabled={remapping}
-          className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-300 shadow-lg"
+          className="tui-btn-primary"
         >
           {remapping ? "Remapping..." : "Remap"}
         </button>
         {error && (
-          <div className="px-4 py-3 backdrop-blur-sm rounded-xl text-sm font-medium bg-red-500/20 border border-red-500/30 text-red-200 flex-1">
-            {error}
-          </div>
+          <div className="tui-msg-error flex-1">{error}</div>
         )}
       </div>
 
@@ -322,7 +320,7 @@ export default function PrismPage() {
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <div className="text-lg font-bold text-white/90 mb-4 flex items-center gap-2">
+              <div className="text-lg font-bold text-[var(--tui-primary)] mb-4 flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-blue-400" />
                 {leftResult.label}
               </div>
@@ -333,7 +331,7 @@ export default function PrismPage() {
               />
             </div>
             <div>
-              <div className="text-lg font-bold text-white/90 mb-4 flex items-center gap-2">
+              <div className="text-lg font-bold text-[var(--tui-primary)] mb-4 flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-green-400" />
                 {rightResult.label}
               </div>
@@ -347,22 +345,22 @@ export default function PrismPage() {
 
           {/* Prompt disclosure */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
-              <h2 className="text-xl font-bold text-white/90 mb-4">
+            <ContentCard variant="tui" className="p-8">
+              <h2 className="text-xl font-bold text-[var(--tui-primary)] mb-4">
                 Prompt — {leftResult.label}
               </h2>
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg p-4 text-sm text-white/70 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
+              <div className="border border-[var(--tui-border)] bg-black p-4 tui-muted font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
                 {leftResult.content.prompt}
               </div>
-            </div>
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
-              <h2 className="text-xl font-bold text-white/90 mb-4">
+            </ContentCard>
+            <ContentCard variant="tui" className="p-8">
+              <h2 className="text-xl font-bold text-[var(--tui-primary)] mb-4">
                 Prompt — {rightResult.label}
               </h2>
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg p-4 text-sm text-white/70 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
+              <div className="border border-[var(--tui-border)] bg-black p-4 tui-muted font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
                 {rightResult.content.prompt}
               </div>
-            </div>
+            </ContentCard>
           </div>
         </div>
       )}
