@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +33,7 @@ export default function LoginPage() {
         // Store JWT tokens in localStorage
         localStorage.setItem("accessToken", data.tokens.accessToken);
         localStorage.setItem("refreshToken", data.tokens.refreshToken);
+        setUser(data.user);
         router.push("/editor");
       } else {
         const data = await response.json();
@@ -61,6 +64,7 @@ export default function LoginPage() {
         // Store JWT tokens in localStorage
         localStorage.setItem("accessToken", data.tokens.accessToken);
         localStorage.setItem("refreshToken", data.tokens.refreshToken);
+        setUser(data.user);
         router.push("/editor");
       } else {
         const data = await response.json();

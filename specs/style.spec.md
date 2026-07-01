@@ -1,5 +1,11 @@
 # Style Specifications
 
+## Theme System
+
+- The default UI theme is "tui" (terminal-style).
+- All shared components accept a `variant?: "glass" | "tui"` prop, defaulting to `"tui"`:
+  - `PageContainer`, `PageHeader`, `ContentCard`, `ExpandableSection`, `FormInput`, `SourceArticleCard`, `SourceMessageCard`
+
 ## Text Inputs
 
 - Must use high-contrast colors: dark text on light background.

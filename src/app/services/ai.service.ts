@@ -2,6 +2,8 @@ import {
   Reporter,
   Article,
   Event,
+  OpinionArticle,
+  OpinionPersona,
   ArticleGenerationMetadata,
   EventGenerationMetadata,
   DynamicPersona,
@@ -22,7 +24,8 @@ import {
   DynamicPersonasSchema,
   threadRepliesSchema,
   prismPerspectivesSchema,
-  tickerSchema
+  tickerSchema,
+  opinionArticleSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -30,7 +33,10 @@ import { fetchLatestMessages, BlueskyMessage } from "./bluesky.service";
 import {
   AIPrompts,
   PERSONA_DISPLAY_NAMES,
-  PERSONA_SYSTEM_PROMPTS
+  PERSONA_SYSTEM_PROMPTS,
+  OPINION_PERSONA_SYSTEM_PROMPTS,
+  OPINION_PERSONA_DISPLAY_NAMES,
+  OPINION_PERSONAS
 } from "./ai-prompts";
 import { Persona } from "../schemas/types";
 import { AIResponseUtils } from "./ai-response-utils";
@@ -423,11 +429,11 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
-        `Calling openai daily edition generation with ${AIModelOption.EDITION_SELECTION}`
+        `Calling openai daily edition generation with ${AIModelOption.ARTICLE_GENERATION}`
       );
       console.log("Full prompt:", fullPrompt);
       const result = await this.aiClient.createChatCompletion(
-        AIModelOption.EDITION_SELECTION,
+        AIModelOption.ARTICLE_GENERATION,
         {
           messages: [
             {
@@ -512,10 +518,10 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
-        `Calling openai prism perspectives generation with ${AIModelOption.EDITION_SELECTION}`
+        `Calling openai prism perspectives generation with ${AIModelOption.ARTICLE_GENERATION}`
       );
       const result = await this.aiClient.createChatCompletion(
-        AIModelOption.EDITION_SELECTION,
+        AIModelOption.ARTICLE_GENERATION,
         {
           messages: [
             { role: "system", content: config.systemPrompt },
@@ -576,11 +582,11 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
-        `Calling openai prism remap with ${AIModelOption.EDITION_SELECTION}`
+        `Calling openai prism remap with ${AIModelOption.ARTICLE_GENERATION}`
       );
       console.log("Full prompt:", fullPrompt);
       const result = await this.aiClient.createChatCompletion(
-        AIModelOption.EDITION_SELECTION,
+        AIModelOption.ARTICLE_GENERATION,
         {
           messages: [
             {
@@ -1264,7 +1270,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       const result = await this.aiClient.createChatCompletion(
-        AIModelOption.EDITION_SELECTION,
+        AIModelOption.ARTICLE_GENERATION,
         {
           messages: [
             { role: "system", content: config.systemPrompt },
@@ -1300,6 +1306,126 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       await this.logOpenAIError(
         "Error generating ticker text",
         "Ticker text generation",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async generateOpinionArticle(): Promise<{
+    opinion: OpinionArticle | null;
+    fullPrompt: string;
+    modelName: string;
+  }> {
+    console.log("AIService: Starting opinion article generation...");
+
+    try {
+      // 1. Randomly pick one of the 4 opinion personas
+      const personaKey: OpinionPersona =
+        OPINION_PERSONAS[Math.floor(Math.random() * OPINION_PERSONAS.length)];
+      const personaSystemPrompt = OPINION_PERSONA_SYSTEM_PROMPTS[personaKey];
+      const personaDisplayName = OPINION_PERSONA_DISPLAY_NAMES[personaKey];
+
+      console.log(`AIService: Selected persona "${personaDisplayName}"`);
+
+      // 2. Fetch latest 25 articles
+      const articles = await this.dataStorageService.getLatestArticles(25);
+      if (articles.length === 0) {
+        console.log("AIService: No articles available for opinion generation");
+        return {
+          opinion: null,
+          fullPrompt: "No articles available",
+          modelName: ""
+        };
+      }
+
+      console.log(
+        `AIService: Fetched ${articles.length} articles for opinion context`
+      );
+
+      // 3. Format articles with full text
+      const articlesText = AIResponseUtils.formatArticlesFullText(articles);
+
+      // 4. Generate prompts
+      const config = AIPrompts.generateOpinionArticlePrompts(
+        articlesText,
+        personaSystemPrompt,
+        personaDisplayName
+      );
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
+
+      console.log(
+        `AIService: Calling opinion generation with ${AIModelOption.ARTICLE_GENERATION}`
+      );
+
+      // 5. Call AI
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.ARTICLE_GENERATION,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        }
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      await this.logAIResponse("Opinion article generation", result.response);
+
+      const content = result.response.choices[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error("No response content from AI service");
+      }
+
+      // 7. Parse response — declined means "no opinion warranted"
+      const parsed = opinionArticleSchema.parse(JSON.parse(content));
+
+      if (parsed.declined) {
+        console.log(
+          `AIService: ${personaDisplayName} declined to write an opinion piece`
+        );
+        return {
+          opinion: null,
+          fullPrompt,
+          modelName: result.modelUsed
+        };
+      }
+
+      // 8. Build OpinionArticle
+      const now = Date.now();
+      const opinionArticle: OpinionArticle = {
+        id: `opinion_${now}_${Math.random().toString(36).substring(2, 8)}`,
+        persona: personaKey,
+        headline: parsed.headline ?? "",
+        content: parsed.content ?? "",
+        generationTime: now,
+        articleIds: articles.map((a) => a.id),
+        modelName: result.modelUsed,
+        inputTokenCount: result.response.usage?.prompt_tokens,
+        outputTokenCount: result.response.usage?.completion_tokens
+      };
+
+      // 9. Save
+      await this.dataStorageService.saveOpinionArticle(opinionArticle);
+
+      console.log(
+        `AIService: Opinion article "${opinionArticle.headline}" saved (persona: ${personaDisplayName})`
+      );
+
+      return {
+        opinion: opinionArticle,
+        fullPrompt,
+        modelName: result.modelUsed
+      };
+    } catch (error) {
+      await this.logOpenAIError(
+        "Error generating opinion article",
+        "Opinion article generation",
         error
       );
       throw error;

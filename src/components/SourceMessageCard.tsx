@@ -11,7 +11,7 @@ export default function SourceMessageCard({
   did,
   rkey,
   text,
-  variant = "glass"
+  variant = "tui"
 }: SourceMessageCardProps) {
   const bskyUrl = did && rkey ? `https://bsky.app/profile/${did}/post/${rkey}` : null;
   const isTui = variant === "tui";

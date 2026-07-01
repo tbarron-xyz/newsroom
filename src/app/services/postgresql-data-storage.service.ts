@@ -3,6 +3,8 @@ import {
   Editor,
   Reporter,
   Article,
+  OpinionArticle,
+  OpinionPersona,
   NewspaperEdition,
   DailyEdition,
   Event,
@@ -10,6 +12,7 @@ import {
   ForumSection,
   ForumThread,
   ForumPost,
+  PrismDailyEditionPair,
   Ticker
 } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
@@ -173,6 +176,24 @@ export class PostgreSQLDataStorageService {
           output_token_count INTEGER
         )
       `);
+
+      // Create opinion_articles table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS opinion_articles (
+          id TEXT PRIMARY KEY,
+          persona TEXT NOT NULL,
+          headline TEXT NOT NULL,
+          content TEXT NOT NULL,
+          generation_time BIGINT NOT NULL,
+          article_ids TEXT NOT NULL,
+          model_name TEXT NOT NULL,
+          input_token_count INTEGER,
+          output_token_count INTEGER
+        )
+      `);
+      await client.query(
+        `CREATE INDEX IF NOT EXISTS idx_opinion_articles_time ON opinion_articles(generation_time DESC)`
+      );
 
       // Create users table
       await client.query(`
@@ -970,6 +991,62 @@ export class PostgreSQLDataStorageService {
         inputTokenCount: row.input_token_count,
         outputTokenCount: row.output_token_count
       };
+    } finally {
+      client.release();
+    }
+  }
+
+  // Opinion Article operations
+  async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      const query = `
+        INSERT INTO opinion_articles (id, persona, headline, content, generation_time, article_ids, model_name, input_token_count, output_token_count)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (id) DO UPDATE SET
+          persona = EXCLUDED.persona,
+          headline = EXCLUDED.headline,
+          content = EXCLUDED.content,
+          generation_time = EXCLUDED.generation_time,
+          article_ids = EXCLUDED.article_ids,
+          model_name = EXCLUDED.model_name,
+          input_token_count = EXCLUDED.input_token_count,
+          output_token_count = EXCLUDED.output_token_count
+      `;
+      await client.query(query, [
+        opinion.id,
+        opinion.persona,
+        opinion.headline,
+        opinion.content,
+        opinion.generationTime,
+        JSON.stringify(opinion.articleIds),
+        opinion.modelName,
+        opinion.inputTokenCount ?? null,
+        opinion.outputTokenCount ?? null
+      ]);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        "SELECT * FROM opinion_articles ORDER BY generation_time DESC LIMIT $1",
+        [limit || 50]
+      );
+      return result.rows.map((row: any) => ({
+        id: row.id,
+        persona: row.persona as OpinionPersona,
+        headline: row.headline,
+        content: row.content,
+        generationTime: row.generation_time,
+        articleIds: row.article_ids ? JSON.parse(row.article_ids) : [],
+        modelName: row.model_name || "",
+        inputTokenCount: row.input_token_count || undefined,
+        outputTokenCount: row.output_token_count || undefined
+      }));
     } finally {
       client.release();
     }

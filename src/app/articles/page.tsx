@@ -215,10 +215,8 @@ function ArticlesContent() {
                 </div>
               </div>
 
-              <div className="prose prose-slate max-w-none">
-                <p className="tui-text-muted leading-relaxed whitespace-pre-wrap">
-                  {article.body}
-                </p>
+              <div className="prose prose-invert max-w-none font-mono text-sm leading-relaxed whitespace-pre-wrap text-white/80">
+                {article.body}
               </div>
 
               {/* Source Messages Section */}

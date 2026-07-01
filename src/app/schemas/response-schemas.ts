@@ -101,3 +101,10 @@ export const prismPerspectivesSchema = z.object({
 export const tickerSchema = z.object({
   text: z.string()
 });
+
+export const opinionArticleSchema = z.object({
+  declined: z.boolean(),
+  headline: z.string().nullable(),
+  content: z.string().nullable(),
+  topicIndexes: z.array(z.number()).nullable()
+});

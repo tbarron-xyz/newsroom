@@ -2,6 +2,7 @@ import {
   Editor,
   Reporter,
   Article,
+  OpinionArticle,
   NewspaperEdition,
   DailyEdition,
   Event,
@@ -66,6 +67,10 @@ export interface IDataStorageService {
   // Ticker operations
   saveTicker(ticker: Ticker): Promise<void>;
   getLatestTicker(): Promise<Ticker | null>;
+
+  // Opinion Article operations
+  saveOpinionArticle(opinion: OpinionArticle): Promise<void>;
+  getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]>;
 
   // User operations
   createUser(

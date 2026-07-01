@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { User } from "../../schemas/types";
 import { apiService } from "@/app/services/api.service";
+import PageContainer from "@/components/PageContainer";
+import ContentCard from "@/components/ContentCard";
+import PageHeader from "@/components/PageHeader";
 
 interface BlueskyMessage {
   did: string;
@@ -28,7 +32,6 @@ export default function BlueskyMessagesPage() {
 
   const checkAuthAndFetchMessages = async () => {
     try {
-      // Get token from localStorage
       const token = localStorage.getItem("accessToken");
       if (!token) {
         setError("Not authenticated");
@@ -36,18 +39,15 @@ export default function BlueskyMessagesPage() {
         return;
       }
 
-      // First, verify the current user
       const userData = await apiService.get<{ user: User }>("/api/auth/verify");
       setCurrentUser(userData.user);
 
-      // Check if user is admin
       if (userData.user.role !== "admin") {
         setError("Admin access required");
         setLoading(false);
         return;
       }
 
-      // Fetch Bluesky messages
       const messagesData = await apiService.get<BlueskyResponse>(
         "/api/admin/bluesky-messages"
       );
@@ -72,18 +72,10 @@ export default function BlueskyMessagesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-        <div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-          style={{ animationDelay: "1s" }}
-        ></div>
-
-        <div className="text-center relative z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-white/80">Loading Bluesky messages...</p>
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+          <p className="mt-4 tui-muted">Loading Bluesky messages...</p>
         </div>
       </div>
     );
@@ -91,153 +83,124 @@ export default function BlueskyMessagesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-        <div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-          style={{ animationDelay: "1s" }}
-        ></div>
-
-        <div className="text-center relative z-10">
-          <div className="text-red-300 text-lg font-semibold mb-2">
-            Access Denied
+      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)] p-6">
+            <h2 className="text-xl font-semibold text-[var(--tui-primary)] font-mono mb-2">
+              Access Denied
+            </h2>
+            <p className="tui-muted">{error}</p>
+            <Link
+              href="/login"
+              className="inline-block mt-4 tui-btn-primary no-underline"
+            >
+              Go to Login
+            </Link>
           </div>
-          <p className="text-white/80">{error}</p>
-          <a
-            href="/login"
-            className="group relative inline-flex items-center mt-4 px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 overflow-hidden transition-all duration-300"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-            <span className="relative">Go to Login</span>
-          </a>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 via-gray-500/20 to-gray-400/20 animate-pulse duration-3000"></div>
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gray-400/30 to-gray-500/30 rounded-full blur-3xl duration-3000"></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-gray-500/30 to-gray-400/30 rounded-full blur-3xl duration-3000"
-        style={{ animationDelay: "1s" }}
-      ></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl border border-white/20">
-          <div className="px-6 py-4 border-b border-white/20">
-            <h1 className="text-2xl font-bold text-white">Bluesky Messages</h1>
-            <p className="mt-1 text-sm text-white/80">
-              Bluesky messages will be obtained from bluesky.service.ts by
-              constructing a fresh TinyJetstream from the npm package "mbjc",
-              listening for "n" messages, and then disposing the TinyJetstream.
-            </p>
-            {data && (
-              <div className="mt-2 text-sm text-white/70">
-                <span className="font-medium">{data.count}</span> messages
-                fetched at {formatTimestamp(data.timestamp)}
-              </div>
-            )}
-          </div>
-
-          <div className="p-6">
-            {data ? (
-              <div className="space-y-4">
-                {/* Summary */}
-                <div className="backdrop-blur-xl bg-white/5 rounded-lg p-4 border border-white/10">
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    Summary
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-white/70">Total Messages:</span>
-                      <span className="ml-2 font-medium text-white">
-                        {data.count}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-white/70">Fetched At:</span>
-                      <span className="ml-2 font-medium text-white">
-                        {formatTimestamp(data.timestamp)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-white/70">Response Time:</span>
-                      <span className="ml-2 font-medium text-white">
-                        {Date.now() - data.timestamp}ms ago
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Messages List */}
-                <div className="backdrop-blur-xl bg-white/5 rounded-lg border border-white/10">
-                  <div className="px-4 py-3 border-b border-white/10">
-                    <h3 className="text-lg font-semibold text-white">
-                      Messages
-                    </h3>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {data.messages.length > 0 ? (
-                      <div className="divide-y divide-white/10">
-                        {data.messages.map((message, index) => (
-                          <div
-                            key={index}
-                            className="p-4 hover:bg-white/5 transition-colors"
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="text-sm font-medium text-blue-300">
-                                #{index + 1}
-                              </span>
-                              <span className="text-xs text-white/50">
-                                {formatTimestamp(message.time)}
-                              </span>
-                            </div>
-                            <div className="text-sm text-white/90 mb-2">
-                              <strong className="text-white/70">DID:</strong>{" "}
-                              {message.did}
-                            </div>
-                            <div className="text-sm text-white">
-                              <strong className="text-white/70">Text:</strong>{" "}
-                              {message.text}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-8 text-center text-white/70">
-                        No messages available
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Raw JSON */}
-                <div className="backdrop-blur-xl bg-white/5 rounded-lg border border-white/10">
-                  <div className="px-4 py-3 border-b border-white/10">
-                    <h3 className="text-lg font-semibold text-white">
-                      Raw JSON Response
-                    </h3>
-                  </div>
-                  <div className="p-4">
-                    <pre className="text-xs text-white/80 bg-black/20 p-4 rounded overflow-x-auto max-h-96 overflow-y-auto">
-                      {JSON.stringify(data, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-white/70">No data available</p>
-              </div>
-            )}
-          </div>
+    <PageContainer variant="tui" maxWidth="max-w-7xl">
+      <ContentCard variant="tui">
+        <div className="p-6 border-b border-[var(--tui-border)]">
+          <PageHeader
+            variant="tui"
+            title="Bluesky Messages"
+            description="Bluesky messages will be obtained from bluesky.service.ts by constructing a fresh TinyJetstream from the npm package &quot;mbjc&quot;, listening for &quot;n&quot; messages, and then disposing the TinyJetstream."
+          />
+          {data && (
+            <div className="mt-2 tui-text-muted">
+              <span className="tui-text-primary font-medium">{data.count}</span> messages
+              fetched at {formatTimestamp(data.timestamp)}
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+
+        <div className="p-6">
+          {data ? (
+            <div className="space-y-4">
+              <div className="border border-[var(--tui-border)] p-4">
+                <h3 className="tui-section-title mb-4">Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-sm">
+                  <div>
+                    <span className="tui-text-muted">Total Messages:</span>
+                    <span className="ml-2 tui-text-primary">{data.count}</span>
+                  </div>
+                  <div>
+                    <span className="tui-text-muted">Fetched At:</span>
+                    <span className="ml-2 tui-text-primary">
+                      {formatTimestamp(data.timestamp)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="tui-text-muted">Response Time:</span>
+                    <span className="ml-2 tui-text-primary">
+                      {Date.now() - data.timestamp}ms ago
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-[var(--tui-border)]">
+                <div className="px-4 py-3 border-b border-[var(--tui-border)]">
+                  <h3 className="tui-section-title">Messages</h3>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {data.messages.length > 0 ? (
+                    <div className="divide-y divide-[var(--tui-border)]">
+                      {data.messages.map((message, index) => (
+                        <div
+                          key={index}
+                          className="p-4 hover:bg-[var(--tui-hover-bg)] transition-colors"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="tui-text-primary font-mono text-sm font-semibold">
+                              #{index + 1}
+                            </span>
+                            <span className="tui-text-muted text-xs">
+                              {formatTimestamp(message.time)}
+                            </span>
+                          </div>
+                          <div className="font-mono text-sm tui-text-muted mb-2">
+                            <strong className="text-[var(--tui-primary)]">DID:</strong>{" "}
+                            {message.did}
+                          </div>
+                          <div className="font-mono text-sm tui-text-muted">
+                            <strong className="text-[var(--tui-primary)]">Text:</strong>{" "}
+                            {message.text}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center tui-text-muted">
+                      No messages available
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="border border-[var(--tui-border)]">
+                <div className="px-4 py-3 border-b border-[var(--tui-border)]">
+                  <h3 className="tui-section-title">Raw JSON Response</h3>
+                </div>
+                <div className="p-4">
+                  <pre className="text-xs tui-text-muted bg-black border border-[var(--tui-border)] p-4 overflow-x-auto max-h-96 overflow-y-auto">
+                    {JSON.stringify(data, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="tui-text-muted">No data available</p>
+            </div>
+          )}
+        </div>
+      </ContentCard>
+    </PageContainer>
   );
 }

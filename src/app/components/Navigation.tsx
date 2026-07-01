@@ -11,13 +11,14 @@ interface NavigationProps {
 }
 
 export default function Navigation({ appFullName }: NavigationProps) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, setUser } = useAuth();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    setUser(null);
     router.push("/");
   };
 
@@ -73,7 +74,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation — admin items intentionally mobile-only (shown in collapsed menu) */}
           <div className="hidden md:flex items-center space-x-4">
             {navigationItems.filter((item) => item.condition).map((item) => {
               return (

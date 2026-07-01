@@ -25,7 +25,7 @@ export default function FormInput({
   as: Component = "input",
   rows,
   className = "",
-  variant = "glass",
+  variant = "tui",
   ...props
 }: FormInputProps) {
   const labelClass =

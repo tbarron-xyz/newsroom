@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navigation from "./components/Navigation";
+import { AuthProvider } from "@/hooks/useAuth";
 import "./globals.css";
 import { ServiceContainer } from "./services/service-container";
 
@@ -38,10 +39,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased tui-theme`}
       >
-        <Navigation appFullName={appFullName} />
-        {children}
+        <AuthProvider>
+          <Navigation appFullName={appFullName} />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

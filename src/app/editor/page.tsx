@@ -1553,6 +1553,31 @@ export default function EditorPage() {
                   {jobTriggering === "ticker" ? "Generating..." : "Generate Ticker"}
                 </button>
               </div>
+
+              {/* Opinion Article Job */}
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Opinion</h3>
+                    <p className="tui-muted">On demand</p>
+                  </div>
+                </div>
+                <p className="tui-muted">
+                  Generates an opinion article from a randomly chosen persona based on the latest 25 articles.
+                </p>
+                <button
+                  onClick={() => triggerJob("opinion")}
+                  disabled={jobTriggering === "opinion" || !isAdmin}
+                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {jobTriggering === "opinion" ? "Generating..." : "Generate Opinion"}
+                </button>
+              </div>
             </div>
 
             {/* Job Status Information */}

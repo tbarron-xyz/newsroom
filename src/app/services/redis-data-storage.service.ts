@@ -3,6 +3,8 @@ import {
   Editor,
   Reporter,
   Article,
+  OpinionArticle,
+  OpinionPersona,
   NewspaperEdition,
   DailyEdition,
   Event,
@@ -1542,6 +1544,79 @@ export class RedisDataStorageService implements IDataStorageService {
       inputTokenCount: data.inputTokenCount ? parseInt(data.inputTokenCount) : undefined,
       outputTokenCount: data.outputTokenCount ? parseInt(data.outputTokenCount) : undefined
     };
+  }
+
+  // Opinion Article operations
+  async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
+    const { id, persona, headline, content, generationTime, articleIds, modelName, inputTokenCount, outputTokenCount } = opinion;
+    const multi = this.client.multi();
+
+    multi.zAdd(REDIS_KEYS.OPINIONS_LATEST, {
+      score: generationTime,
+      value: id
+    });
+
+    multi.zRemRangeByRank(
+      REDIS_KEYS.OPINIONS_LATEST,
+      0,
+      -(REDIS_KEYS.OPINIONS_LATEST_MAX_LENGTH + 1)
+    );
+
+    multi.set(REDIS_KEYS.OPINION_PERSONA(id), persona);
+    multi.set(REDIS_KEYS.OPINION_HEADLINE(id), headline);
+    multi.set(REDIS_KEYS.OPINION_CONTENT(id), content);
+    multi.set(REDIS_KEYS.OPINION_TIME(id), generationTime.toString());
+    multi.set(REDIS_KEYS.OPINION_ARTICLE_IDS(id), JSON.stringify(articleIds));
+    multi.set(REDIS_KEYS.OPINION_MODEL_NAME(id), modelName);
+    if (inputTokenCount !== undefined) {
+      multi.set(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id), inputTokenCount.toString());
+    }
+    if (outputTokenCount !== undefined) {
+      multi.set(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id), outputTokenCount.toString());
+    }
+
+    await multi.exec();
+  }
+
+  async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
+    const count = limit || 50;
+    const opinionIds = await this.client.zRange(
+      REDIS_KEYS.OPINIONS_LATEST,
+      0,
+      count - 1,
+      { REV: true }
+    );
+
+    const opinions: OpinionArticle[] = [];
+    for (const id of opinionIds) {
+      const [persona, headline, content, time, articleIdsStr, modelName, inputTokenCount, outputTokenCount] =
+        await Promise.all([
+          this.client.get(REDIS_KEYS.OPINION_PERSONA(id)),
+          this.client.get(REDIS_KEYS.OPINION_HEADLINE(id)),
+          this.client.get(REDIS_KEYS.OPINION_CONTENT(id)),
+          this.client.get(REDIS_KEYS.OPINION_TIME(id)),
+          this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(id)),
+          this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(id)),
+          this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id)),
+          this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id))
+        ]);
+
+      if (!headline || !content) continue;
+
+      opinions.push({
+        id,
+        persona: persona as OpinionPersona,
+        headline,
+        content,
+        generationTime: parseInt(time || "0"),
+        articleIds: articleIdsStr ? JSON.parse(articleIdsStr) : [],
+        modelName: modelName || "",
+        inputTokenCount: inputTokenCount ? parseInt(inputTokenCount) : undefined,
+        outputTokenCount: outputTokenCount ? parseInt(outputTokenCount) : undefined
+      });
+    }
+
+    return opinions;
   }
 
   // User operations

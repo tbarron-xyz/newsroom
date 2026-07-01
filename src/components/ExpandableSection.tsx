@@ -15,7 +15,7 @@ export default function ExpandableSection({
   expanded,
   onToggle,
   className = "",
-  variant = "glass"
+  variant = "tui"
 }: ExpandableSectionProps) {
   return (
     <div className={className}>

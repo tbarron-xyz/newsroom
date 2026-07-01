@@ -13,7 +13,7 @@ export default function PageHeader({
   description,
   children,
   className = "",
-  variant = "glass"
+  variant = "tui"
 }: PageHeaderProps) {
   const titleClass =
     variant === "tui"

@@ -4,6 +4,8 @@ import {
   Editor,
   Reporter,
   Article,
+  OpinionArticle,
+  OpinionPersona,
   NewspaperEdition,
   DailyEdition,
   Event,
@@ -219,6 +221,20 @@ export class SQLiteDataStorageService implements IDataStorageService {
         data TEXT,  -- JSON
         expiresAt INTEGER
       );
+
+      -- Opinion Articles
+      CREATE TABLE IF NOT EXISTS opinion_articles (
+        id TEXT PRIMARY KEY,
+        persona TEXT NOT NULL,
+        headline TEXT NOT NULL,
+        content TEXT NOT NULL,
+        generationTime INTEGER,
+        articleIds TEXT,  -- JSON arr
+        modelName TEXT,
+        inputTokenCount INTEGER,
+        outputTokenCount INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS idx_opinion_articles_time ON opinion_articles(generationTime DESC);
 
       -- Artifacts
       CREATE TABLE IF NOT EXISTS artifacts (
@@ -677,6 +693,45 @@ export class SQLiteDataStorageService implements IDataStorageService {
       inputTokenCount: row.inputTokenCount || undefined,
       outputTokenCount: row.outputTokenCount || undefined
     };
+  }
+
+    // Opinion Article operations
+  async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
+    const db = this.getDb();
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO opinion_articles (id, persona, headline, content, generationTime, articleIds, modelName, inputTokenCount, outputTokenCount)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `
+    ).run(
+      opinion.id,
+      opinion.persona,
+      opinion.headline,
+      opinion.content,
+      opinion.generationTime,
+      JSON.stringify(opinion.articleIds),
+      opinion.modelName,
+      opinion.inputTokenCount ?? null,
+      opinion.outputTokenCount ?? null
+    );
+  }
+
+  async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
+    const db = this.getDb();
+    const rows = db
+      .prepare("SELECT * FROM opinion_articles ORDER BY generationTime DESC LIMIT ?")
+      .all(limit || 50) as any[];
+    return rows.map((row: any) => ({
+      id: row.id,
+      persona: row.persona as OpinionPersona,
+      headline: row.headline,
+      content: row.content,
+      generationTime: row.generationTime,
+      articleIds: row.articleIds ? JSON.parse(row.articleIds) : [],
+      modelName: row.modelName || "",
+      inputTokenCount: row.inputTokenCount || undefined,
+      outputTokenCount: row.outputTokenCount || undefined
+    }));
   }
 
   // User operations

@@ -20,7 +20,8 @@ export type JobType =
   | "comments"
   | "events"
   | "prism-daily"
-  | "ticker";
+  | "ticker"
+  | "opinion";
 
 export interface JobResult {
   message: string;
@@ -505,6 +506,28 @@ export class EditorService {
     };
   }
 
+  async generateOpinionArticle(): Promise<JobResult> {
+    console.log("Editor: Starting opinion article generation...");
+
+    const result = await this.aiService.generateOpinionArticle();
+
+    if (!result.opinion) {
+      console.log("Editor: AI declined to write an opinion piece");
+      return {
+        message: "Opinion generation completed — AI did not take a stance on any article",
+        jobType: "opinion"
+      };
+    }
+
+    console.log(
+      `Editor: Opinion article "${result.opinion.headline}" generated (persona: ${result.opinion.persona})`
+    );
+    return {
+      message: `Opinion article generated: "${result.opinion.headline}" (${result.opinion.persona})`,
+      jobType: "opinion"
+    };
+  }
+
   async runJob(
     jobType: JobType,
     options: { enforceTimeConstraint?: boolean; count?: number } = {}
@@ -764,6 +787,10 @@ export class EditorService {
 
       case "ticker": {
         return await this.generateTicker();
+      }
+
+      case "opinion": {
+        return await this.generateOpinionArticle();
       }
     }
   }

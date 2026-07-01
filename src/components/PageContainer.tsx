@@ -14,7 +14,7 @@ export default function PageContainer({
   className = "",
   maxWidth = "max-w-4xl",
   background = true,
-  variant = "glass"
+  variant = "tui"
 }: PageContainerProps) {
   const bgClass =
     variant === "tui"

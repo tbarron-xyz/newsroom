@@ -9,7 +9,7 @@ interface SourceArticleCardProps {
   variant?: "glass" | "tui";
 }
 
-export default function SourceArticleCard({ article, variant = "glass" }: SourceArticleCardProps) {
+export default function SourceArticleCard({ article, variant = "tui" }: SourceArticleCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const hasSources = article.messageDids?.length > 0;

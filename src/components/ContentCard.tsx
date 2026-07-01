@@ -11,7 +11,7 @@ export default function ContentCard({
   children,
   className = "",
   sheen = false,
-  variant = "glass"
+  variant = "tui"
 }: ContentCardProps) {
   const cardClass =
     variant === "tui"

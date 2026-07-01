@@ -1,3 +1,9 @@
+export type OpinionPersona =
+  | "US conservative"
+  | "US liberal"
+  | "financial globalist"
+  | "national populist";
+
 export type Persona =
   | "crypto_zealot"
   | "loafy"
@@ -74,6 +80,18 @@ export interface Article {
   modelName: string; // The AI model used to generate this article
   inputTokenCount?: number; // Number of input tokens used in the API call
   outputTokenCount?: number; // Number of output tokens used in the API call
+}
+
+export interface OpinionArticle {
+  id: string;
+  persona: OpinionPersona;
+  headline: string;
+  content: string;
+  generationTime: number;
+  articleIds: string[];
+  modelName: string;
+  inputTokenCount?: number;
+  outputTokenCount?: number;
 }
 
 export interface NewspaperEdition {
@@ -291,6 +309,20 @@ export const REDIS_KEYS = {
   ARTIFACTS_LATEST: "artifact:latest",
   // Ticker
   TICKER_LATEST: "ticker:latest",
+
+  // Opinion Articles
+  OPINIONS_LATEST: "opinions:latest",
+  OPINIONS_LATEST_MAX_LENGTH: 50,
+  OPINION_PERSONA: (id: string) => `opinion:${id}:persona`,
+  OPINION_HEADLINE: (id: string) => `opinion:${id}:headline`,
+  OPINION_CONTENT: (id: string) => `opinion:${id}:content`,
+  OPINION_TIME: (id: string) => `opinion:${id}:time`,
+  OPINION_ARTICLE_IDS: (id: string) => `opinion:${id}:article_ids`,
+  OPINION_MODEL_NAME: (id: string) => `opinion:${id}:model_name`,
+  OPINION_INPUT_TOKEN_COUNT: (id: string) =>
+    `opinion:${id}:input_token_count`,
+  OPINION_OUTPUT_TOKEN_COUNT: (id: string) =>
+    `opinion:${id}:output_token_count`,
 
   ARTIFACTS_BY_TYPE: (type: string) => `artifact:${type}`,
   ARTIFACT_TYPE: (artifactId: string) => `artifact:${artifactId}:type`,

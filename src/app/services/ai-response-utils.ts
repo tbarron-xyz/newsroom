@@ -110,6 +110,17 @@ export class AIResponseUtils {
       .join("\n\n");
   }
 
+  static formatArticlesFullText(
+    articles: Array<{ headline: string; body: string }>
+  ): string {
+    return articles
+      .map(
+        (article, index) =>
+          `Article ${index + 1}:\nHeadline: ${article.headline}\nFull Text:\n${article.body}`
+      )
+      .join("\n\n---\n\n");
+  }
+
   static formatArticlesContext(articles: any[]): string {
     if (articles.length === 0) {
       return "No previous articles available for this reporter.";
