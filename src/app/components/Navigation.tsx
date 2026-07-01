@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import Ticker from "../../components/Ticker";
 
 interface NavigationProps {
   appFullName: string;
@@ -62,6 +63,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
   };
 
   return (
+    <>
     <nav className="bg-black border-b border-[var(--tui-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-12">
@@ -204,5 +206,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
         </div>
       </div>
     </nav>
+      <Ticker />
+    </>
   );
 }
