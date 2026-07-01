@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withRedis } from "../../../utils/redis";
 
-// GET /api/articles/public - Get latest 5 articles (public access, no auth required)
-export const GET = withRedis(async (_request: NextRequest, redis) => {
-  // Get latest 5 articles (sorted by generation time, most recent first)
-  const articles = await redis.getLatestArticles(5);
+// GET /api/articles/public - Get latest articles (public access, no auth required)
+export const GET = withRedis(async (request: NextRequest, redis) => {
+  const url = new URL(request.url);
+  const limit = parseInt(url.searchParams.get("limit") || "5", 10);
+
+  const articles = await redis.getLatestArticles(limit);
 
   return NextResponse.json(articles);
 });

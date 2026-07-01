@@ -5,24 +5,27 @@ import Link from "next/link";
 import PageContainer from "../components/PageContainer";
 import ContentCard from "../components/ContentCard";
 import { apiService } from "@/app/services/api.service";
-import type { DailyEdition, OpinionArticle } from "./schemas/types";
+import type { DailyEdition, OpinionArticle, Article } from "./schemas/types";
 
 export default function Home() {
   const [edition, setEdition] = useState<DailyEdition | null>(null);
   const [opinions, setOpinions] = useState<OpinionArticle[]>([]);
+  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [editionsData, opinionsData] = await Promise.all([
+        const [editionsData, opinionsData, articlesData] = await Promise.all([
           apiService.get<DailyEdition[]>("/api/daily-editions"),
           apiService.get<{ opinions: OpinionArticle[] }>("/api/opinion/public"),
+          apiService.get<Article[]>("/api/articles/public?limit=8"),
         ]);
         if (editionsData.length > 0) {
           setEdition(editionsData[0]);
         }
         setOpinions(opinionsData.opinions || []);
+        setLatestArticles(articlesData || []);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -61,8 +64,8 @@ export default function Home() {
 
   return (
     <PageContainer variant="tui" maxWidth="max-w-7xl">
-      <div className="relative">
-        <aside className="float-right w-72 ml-8 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+        <aside className="space-y-6 lg:order-last">
           <ContentCard variant="tui" className="p-6">
             <h2 className="text-lg font-bold text-[var(--tui-primary)] mb-4">Opinion</h2>
             {opinions.length === 0 ? (
@@ -75,7 +78,26 @@ export default function Home() {
                     href="/opinion"
                     className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
                   >
-                    {opinion.headline}
+                    <span className="tui-muted mr-2 select-none">❯</span>{opinion.headline}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </ContentCard>
+
+          <ContentCard variant="tui" className="p-6">
+            <h2 className="text-lg font-bold text-[var(--tui-primary)] mb-4">Latest Articles</h2>
+            {latestArticles.length === 0 ? (
+              <p className="tui-muted text-sm">No articles yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {latestArticles.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/articles/${article.id}`}
+                    className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
+                  >
+                    <span className="tui-muted mr-2 select-none">❯</span>{article.headline}
                   </Link>
                 ))}
               </div>
@@ -83,7 +105,7 @@ export default function Home() {
           </ContentCard>
         </aside>
 
-        <div className="min-w-[30rem] space-y-6">
+        <div className="space-y-6">
           <h2 className="text-xl font-bold text-[var(--tui-primary)]">Today's Stories</h2>
           {edition.topics.map((topic, index) => (
             <ContentCard key={index} variant="tui" className="p-8">

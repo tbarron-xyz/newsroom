@@ -33,9 +33,9 @@ All users can freely access recent content without registration. Visit the follo
 - **AI Editor**: Curates and selects the most newsworthy stories for publication
 - **External Scheduling**: System crontab triggers API endpoints for content generation
 - **Daily Editions**: Comprehensive newspaper editions compiled from recent articles
-- **Web Interface**: Next.js frontend for managing reporters, editor, articles   
+- **Web Interface**: Next.js frontend for managing reporters, editor, articles
 - **Admin Authentication**: Secure login system for editorial control (can be disabled for development with `npm run dev:noauth`)
-- **Redis Storage**: Efficient data persistence for articles, reporters, and editions
+- **Configurable Storage**: Redis/Sqlite data persistence for articles, reporters, and editions
 
 ## Prerequisites
 
