@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withRedis } from "../../utils/redis";
 import { AuthService } from "../../services/auth.service";
 import { loginRequestSchema } from "../../schemas/request-schemas";
+import { AbilitiesService } from "../../services/abilities.service";
 
 export const POST = withRedis(async (request: NextRequest, redis) => {
   const body = await request.json();
@@ -34,6 +35,8 @@ export const POST = withRedis(async (request: NextRequest, redis) => {
   // Generate tokens
   const tokens = authService.generateTokens(user);
 
+  const abilitiesService = new AbilitiesService();
+
   // Return success response with tokens
   return NextResponse.json(
     {
@@ -41,7 +44,10 @@ export const POST = withRedis(async (request: NextRequest, redis) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        hasReader: abilitiesService.userIsReader(user),
+        hasReporter: abilitiesService.userIsReporter(user),
+        hasEditor: abilitiesService.userIsEditor(user)
       },
       tokens
     },
