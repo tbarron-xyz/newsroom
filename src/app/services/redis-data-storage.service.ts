@@ -1547,6 +1547,34 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   // Opinion Article operations
+  async getOpinionArticle(opinionId: string): Promise<OpinionArticle | null> {
+    const [persona, headline, content, time, articleIdsStr, modelName, inputTokenCount, outputTokenCount] =
+      await Promise.all([
+        this.client.get(REDIS_KEYS.OPINION_PERSONA(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_HEADLINE(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_CONTENT(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_TIME(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(opinionId)),
+        this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(opinionId))
+      ]);
+
+    if (!headline || !content) return null;
+
+    return {
+      id: opinionId,
+      persona: persona as OpinionPersona,
+      headline,
+      content,
+      generationTime: parseInt(time || "0"),
+      articleIds: articleIdsStr ? JSON.parse(articleIdsStr) : [],
+      modelName: modelName || "",
+      inputTokenCount: inputTokenCount ? parseInt(inputTokenCount) : undefined,
+      outputTokenCount: outputTokenCount ? parseInt(outputTokenCount) : undefined
+    };
+  }
+
   async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
     const { id, persona, headline, content, generationTime, articleIds, modelName, inputTokenCount, outputTokenCount } = opinion;
     const multi = this.client.multi();

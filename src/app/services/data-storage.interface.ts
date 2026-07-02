@@ -70,6 +70,7 @@ export interface IDataStorageService {
 
   // Opinion Article operations
   saveOpinionArticle(opinion: OpinionArticle): Promise<void>;
+  getOpinionArticle(opinionId: string): Promise<OpinionArticle | null>;
   getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]>;
 
   // User operations

@@ -1029,6 +1029,31 @@ export class PostgreSQLDataStorageService {
     }
   }
 
+  async getOpinionArticle(opinionId: string): Promise<OpinionArticle | null> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        "SELECT * FROM opinion_articles WHERE id = $1",
+        [opinionId]
+      );
+      if (result.rows.length === 0) return null;
+      const row = result.rows[0];
+      return {
+        id: row.id,
+        persona: row.persona as OpinionPersona,
+        headline: row.headline,
+        content: row.content,
+        generationTime: row.generation_time,
+        articleIds: row.article_ids ? JSON.parse(row.article_ids) : [],
+        modelName: row.model_name || "",
+        inputTokenCount: row.input_token_count || undefined,
+        outputTokenCount: row.output_token_count || undefined
+      };
+    } finally {
+      client.release();
+    }
+  }
+
   async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
     const client = await this.pool.connect();
     try {

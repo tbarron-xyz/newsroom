@@ -75,7 +75,7 @@ export default function Home() {
                 {opinions.map((opinion) => (
                   <Link
                     key={opinion.id}
-                    href="/opinion"
+                    href={`/opinion/${opinion.id}`}
                     className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
                   >
                     <span className="tui-muted mr-2 select-none">❯</span>{opinion.headline}

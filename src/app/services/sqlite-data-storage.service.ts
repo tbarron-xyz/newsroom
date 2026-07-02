@@ -716,6 +716,27 @@ export class SQLiteDataStorageService implements IDataStorageService {
     );
   }
 
+  async getOpinionArticle(opinionId: string): Promise<OpinionArticle | null> {
+    const db = this.getDb();
+    const row = db
+      .prepare("SELECT * FROM opinion_articles WHERE id = ?")
+      .get(opinionId) as any;
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      persona: row.persona as OpinionPersona,
+      headline: row.headline,
+      content: row.content,
+      generationTime: row.generationTime,
+      articleIds: row.articleIds ? JSON.parse(row.articleIds) : [],
+      modelName: row.modelName || "",
+      inputTokenCount: row.inputTokenCount || undefined,
+      outputTokenCount: row.outputTokenCount || undefined
+    };
+  }
+
   async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
     const db = this.getDb();
     const rows = db
