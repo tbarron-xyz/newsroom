@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navigation from "./components/Navigation";
 import { AuthProvider } from "@/hooks/useAuth";
 import "./globals.css";
-import { ServiceContainer } from "./services/service-container";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,12 +14,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"]
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const configService = await ServiceContainer.getInstance().getConfigService();
-  const fullName = await configService.getAppFullName();
+const appFullName = process.env.APP_FULL_NAME || "attonews";
 
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: fullName,
+    title: appFullName,
     description: "AI-powered newsroom with automated reporting and editing",
     icons: {
       icon: "/icon.png"
@@ -33,9 +31,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const configService = await ServiceContainer.getInstance().getConfigService();
-  const appFullName = await configService.getAppFullName();
-
   return (
     <html lang="en">
       <body
