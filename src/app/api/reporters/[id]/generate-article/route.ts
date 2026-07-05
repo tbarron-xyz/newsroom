@@ -61,5 +61,5 @@ export const POST = withAuth(
       );
     }
   },
-  { requiredPermission: "reporter" }
+  { requiredPermission: "editor" }
 );

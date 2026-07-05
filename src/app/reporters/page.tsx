@@ -522,7 +522,7 @@ export default function ReportersPage() {
                         </svg>
                       </button>
                     ) : null}
-                    {hasReporterPermission ? (
+                    {hasEditorPermission ? (
                       <button
                         onClick={() => generateArticle(reporter.id)}
                         disabled={saving}
@@ -545,7 +545,7 @@ export default function ReportersPage() {
                       </button>
                     ) : (
                       <div className="tui-btn opacity-50 cursor-not-allowed px-4 py-2">
-                        Generate Article (Requires Reporter Permission)
+                        Generate Article (Requires Editor Permission)
                       </div>
                     )}
                     {hasReporterPermission ? (
