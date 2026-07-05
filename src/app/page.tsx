@@ -7,6 +7,8 @@ import ContentCard from "../components/ContentCard";
 import CollapsibleSection from "../components/CollapsibleSection";
 import { apiService } from "@/app/services/api.service";
 import type { DailyEdition, OpinionArticle, Article } from "./schemas/types";
+import { ChatProvider } from "../components/chat/ChatProvider";
+import { AssistantModal } from "../components/assistant-ui/assistant-modal";
 
 export default function Home() {
   const [edition, setEdition] = useState<DailyEdition | null>(null);
@@ -78,97 +80,100 @@ export default function Home() {
   }
 
   return (
-    <PageContainer variant="tui" maxWidth="max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-        <aside className="space-y-6 lg:order-last">
-          <ContentCard variant="tui" className="p-6">
-            <CollapsibleSection title="Opinion">
-              {opinions.length === 0 ? (
-                <p className="tui-muted text-sm">No opinion articles yet.</p>
-              ) : (
-                <div className="space-y-3">
-                  {opinions.map((opinion) => (
-                    <Link
-                      key={opinion.id}
-                      href={`/opinion/${opinion.id}`}
-                      className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
-                    >
-                      <span className="tui-muted mr-2 select-none">❯</span>
-                      {opinion.headline}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CollapsibleSection>
-          </ContentCard>
-
-          <ContentCard variant="tui" className="p-6">
-            <CollapsibleSection title="Latest Articles">
-              {latestArticles.length === 0 ? (
-                <p className="tui-muted text-sm">No articles yet.</p>
-              ) : (
-                <div className="space-y-2">
-                  {latestArticles.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/articles/${article.id}`}
-                      className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
-                    >
-                      <span className="tui-muted mr-2 select-none">❯</span>
-                      {article.headline}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CollapsibleSection>
-          </ContentCard>
-        </aside>
-
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-[var(--tui-primary)]">
-            Today's Stories
-          </h2>
-          {edition.topics.map((topic, index) => (
-            <ContentCard key={index} variant="tui" className="p-8">
-              <div className="mb-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
-                    <span className="tui-muted">{index + 1}</span>
+    <ChatProvider>
+      <PageContainer variant="tui" maxWidth="max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+          <aside className="space-y-6 lg:order-last">
+            <ContentCard variant="tui" className="p-6">
+              <CollapsibleSection title="Opinion">
+                {opinions.length === 0 ? (
+                  <p className="tui-muted text-sm">No opinion articles yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {opinions.map((opinion) => (
+                      <Link
+                        key={opinion.id}
+                        href={`/opinion/${opinion.id}`}
+                        className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
+                      >
+                        <span className="tui-muted mr-2 select-none">❯</span>
+                        {opinion.headline}
+                      </Link>
+                    ))}
                   </div>
-                  <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">
-                    {topic.name}
-                  </span>
-                  <span className="tui-muted">
-                    {new Date(edition.generationTime).toLocaleDateString(
-                      "en-US",
-                      {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      }
-                    )}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">
-                  {topic.headline}
-                </h3>
-                <p className="tui-muted italic">{topic.oneLineSummary}</p>
-              </div>
-              <div className="prose prose-lg max-w-none">
-                <p className="tui-text-muted leading-relaxed mb-4">
-                  {topic.newsStoryFirstParagraph}
-                </p>
-                <p className="tui-text-muted leading-relaxed">
-                  {topic.newsStorySecondParagraph}
-                </p>
-              </div>
+                )}
+              </CollapsibleSection>
             </ContentCard>
-          ))}
+
+            <ContentCard variant="tui" className="p-6">
+              <CollapsibleSection title="Latest Articles">
+                {latestArticles.length === 0 ? (
+                  <p className="tui-muted text-sm">No articles yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {latestArticles.map((article) => (
+                      <Link
+                        key={article.id}
+                        href={`/articles/${article.id}`}
+                        className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
+                      >
+                        <span className="tui-muted mr-2 select-none">❯</span>
+                        {article.headline}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </CollapsibleSection>
+            </ContentCard>
+          </aside>
+
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-[var(--tui-primary)]">
+              Today's Stories
+            </h2>
+            {edition.topics.map((topic, index) => (
+              <ContentCard key={index} variant="tui" className="p-8">
+                <div className="mb-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
+                      <span className="tui-muted">{index + 1}</span>
+                    </div>
+                    <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">
+                      {topic.name}
+                    </span>
+                    <span className="tui-muted">
+                      {new Date(edition.generationTime).toLocaleDateString(
+                        "en-US",
+                        {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        }
+                      )}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">
+                    {topic.headline}
+                  </h3>
+                  <p className="tui-muted italic">{topic.oneLineSummary}</p>
+                </div>
+                <div className="prose prose-lg max-w-none">
+                  <p className="tui-text-muted leading-relaxed mb-4">
+                    {topic.newsStoryFirstParagraph}
+                  </p>
+                  <p className="tui-text-muted leading-relaxed">
+                    {topic.newsStorySecondParagraph}
+                  </p>
+                </div>
+              </ContentCard>
+            ))}
+          </div>
         </div>
-      </div>
-    </PageContainer>
+      </PageContainer>
+      <AssistantModal />
+    </ChatProvider>
   );
 }

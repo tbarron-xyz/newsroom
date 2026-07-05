@@ -152,6 +152,14 @@ export interface IDataStorageService {
   savePrismDailyEditionPair(pair: PrismDailyEditionPair): Promise<void>;
   getPrismDailyEditionPairs(limit?: number): Promise<PrismDailyEditionPair[]>;
 
+  // Chat session operations
+  saveChatSession(
+    sessionId: string,
+    messages: unknown[],
+    ttlSeconds?: number
+  ): Promise<void>;
+  getChatSession(sessionId: string): Promise<unknown[] | null>;
+
   // Artifact operations
   saveArtifact(artifact: Artifact): Promise<void>;
   getArtifact(artifactId: string): Promise<Artifact | null>;

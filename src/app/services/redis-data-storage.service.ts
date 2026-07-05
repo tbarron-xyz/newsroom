@@ -2466,4 +2466,20 @@ export class RedisDataStorageService implements IDataStorageService {
     }
     return pairs;
   }
+
+  async saveChatSession(
+    sessionId: string,
+    messages: unknown[],
+    ttlSeconds = 1800
+  ): Promise<void> {
+    const key = REDIS_KEYS.CHAT_SESSION(sessionId);
+    console.log("Redis Write: SETEX", key);
+    await this.client.setEx(key, ttlSeconds, JSON.stringify(messages));
+  }
+
+  async getChatSession(sessionId: string): Promise<unknown[] | null> {
+    const key = REDIS_KEYS.CHAT_SESSION(sessionId);
+    const raw = await this.client.get(key);
+    return raw ? JSON.parse(raw) : null;
+  }
 }

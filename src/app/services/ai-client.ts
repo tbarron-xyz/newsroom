@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { Stream } from "openai/streaming";
 import { IDataStorageService } from "./data-storage.interface";
 import { AIModelOption } from "../schemas/types";
 
@@ -91,5 +92,30 @@ export class AIClient {
     });
 
     return { response, modelUsed: model };
+  }
+
+  async createChatCompletionStream(
+    option: AIModelOption,
+    createParams: Omit<
+      OpenAI.Chat.Completions.ChatCompletionCreateParams,
+      "model" | "stream"
+    >,
+    modelOverride?: string
+  ): Promise<Stream<OpenAI.Chat.Completions.ChatCompletionChunk>> {
+    const editor = await this.dataStorageService.getEditor();
+    if (!editor) {
+      throw new Error("No editor configuration found");
+    }
+
+    const model = modelOverride || editor[option];
+    if (!model) {
+      throw new Error(`Model not configured for option: ${option}`);
+    }
+
+    return this.getClient().chat.completions.create({
+      ...createParams,
+      model,
+      stream: true
+    });
   }
 }

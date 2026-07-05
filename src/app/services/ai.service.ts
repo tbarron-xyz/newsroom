@@ -61,7 +61,7 @@ export class AIService {
     this.aiClient = new AIClient(dataStorageService);
   }
 
-  protected async fetchSocialMediaMessages(
+  public async fetchSocialMediaMessages(
     messageSliceCount: number
   ): Promise<BlueskyMessage[]> {
     return fetchLatestMessages(messageSliceCount);

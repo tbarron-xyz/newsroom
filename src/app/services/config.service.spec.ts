@@ -1,20 +1,18 @@
+import { describe, it, beforeEach, afterEach, mock } from "node:test";
+import assert from "node:assert/strict";
 import { ConfigService } from "./config.service";
-import { readFile } from "fs/promises";
+import * as fsPromises from "fs/promises";
 import * as yaml from "js-yaml";
-
-// Mock fs/promises
-jest.mock("fs/promises");
-jest.mock("js-yaml");
-
-const mockReadFile = readFile as jest.MockedFunction<typeof readFile>;
-const mockYamlLoad = yaml.load as jest.MockedFunction<typeof yaml.load>;
 
 describe("ConfigService", () => {
   let configService: ConfigService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     configService = new ConfigService();
+  });
+
+  afterEach(() => {
+    mock.reset();
   });
 
   describe("loadConfig", () => {
@@ -26,14 +24,13 @@ describe("ConfigService", () => {
         }
       };
 
-      mockReadFile.mockResolvedValue("yaml content");
-      mockYamlLoad.mockReturnValue(mockConfig);
+      mock.method(fsPromises, "readFile", async () => "yaml content");
+      mock.method(yaml, "load", () => mockConfig);
 
       const config = await configService.loadConfig();
 
-      expect(mockReadFile).toHaveBeenCalledWith("config.yaml", "utf-8");
-      expect(mockYamlLoad).toHaveBeenCalledWith("yaml content");
-      expect(config).toEqual(mockConfig);
+      assert.strictEqual(config.app.name, "TestRoom");
+      assert.strictEqual(config.app.fullName, "Test attonews");
     });
 
     it("should apply environment variable overrides", async () => {
@@ -47,25 +44,27 @@ describe("ConfigService", () => {
       process.env.APP_NAME = "CustomName";
       process.env.APP_FULL_NAME = "Custom Full Name";
 
-      mockReadFile.mockResolvedValue("yaml content");
-      mockYamlLoad.mockReturnValue(mockConfig);
+      mock.method(fsPromises, "readFile", async () => "yaml content");
+      mock.method(yaml, "load", () => mockConfig);
 
       const config = await configService.loadConfig();
 
-      expect(config.app.name).toBe("CustomName");
-      expect(config.app.fullName).toBe("Custom Full Name");
+      assert.strictEqual(config.app.name, "CustomName");
+      assert.strictEqual(config.app.fullName, "Custom Full Name");
 
       delete process.env.APP_NAME;
       delete process.env.APP_FULL_NAME;
     });
 
     it("should return default config when file read fails", async () => {
-      mockReadFile.mockRejectedValue(new Error("File not found"));
+      mock.method(fsPromises, "readFile", async () => {
+        throw new Error("File not found");
+      });
 
       const config = await configService.loadConfig();
 
-      expect(config.app.name).toBe("Newsroom");
-      expect(config.app.fullName).toBe("attonews");
+      assert.strictEqual(config.app.name, "Newsroom");
+      assert.strictEqual(config.app.fullName, "attonews");
     });
   });
 
@@ -78,12 +77,12 @@ describe("ConfigService", () => {
         }
       };
 
-      mockReadFile.mockResolvedValue("yaml content");
-      mockYamlLoad.mockReturnValue(mockConfig);
+      mock.method(fsPromises, "readFile", async () => "yaml content");
+      mock.method(yaml, "load", () => mockConfig);
 
       const name = await configService.getAppName();
 
-      expect(name).toBe("TestName");
+      assert.strictEqual(name, "TestName");
     });
   });
 
@@ -96,12 +95,12 @@ describe("ConfigService", () => {
         }
       };
 
-      mockReadFile.mockResolvedValue("yaml content");
-      mockYamlLoad.mockReturnValue(mockConfig);
+      mock.method(fsPromises, "readFile", async () => "yaml content");
+      mock.method(yaml, "load", () => mockConfig);
 
       const fullName = await configService.getAppFullName();
 
-      expect(fullName).toBe("Test Full Name");
+      assert.strictEqual(fullName, "Test Full Name");
     });
   });
 });

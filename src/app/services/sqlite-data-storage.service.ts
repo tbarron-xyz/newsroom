@@ -257,6 +257,13 @@ export class SQLiteDataStorageService implements IDataStorageService {
         generationTime INTEGER
       );
       CREATE INDEX IF NOT EXISTS idx_prism_daily_edition_pairs_time ON prism_daily_edition_pairs(generationTime DESC);
+
+      CREATE TABLE IF NOT EXISTS chat_sessions (
+        sessionId TEXT PRIMARY KEY,
+        data TEXT,
+        expiresAt INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS idx_chat_sessions_expires ON chat_sessions(expiresAt);
     `);
   }
 
@@ -1353,5 +1360,33 @@ export class SQLiteDataStorageService implements IDataStorageService {
       )
       .all(limit || 3) as any[];
     return rows.map((row) => JSON.parse(row.data));
+  }
+
+  async saveChatSession(
+    sessionId: string,
+    messages: unknown[],
+    ttlSeconds = 1800
+  ): Promise<void> {
+    const db = this.getDb();
+    const expiresAt = Date.now() + ttlSeconds * 1000;
+    db.prepare(
+      `INSERT OR REPLACE INTO chat_sessions (sessionId, data, expiresAt)
+       VALUES (?, ?, ?)`
+    ).run(sessionId, JSON.stringify(messages), expiresAt);
+  }
+
+  async getChatSession(sessionId: string): Promise<unknown[] | null> {
+    const db = this.getDb();
+    const row = db
+      .prepare("SELECT data, expiresAt FROM chat_sessions WHERE sessionId = ?")
+      .get(sessionId) as { data: string; expiresAt: number } | undefined;
+    if (!row) return null;
+    if (Date.now() > row.expiresAt) {
+      db.prepare("DELETE FROM chat_sessions WHERE sessionId = ?").run(
+        sessionId
+      );
+      return null;
+    }
+    return JSON.parse(row.data);
   }
 }

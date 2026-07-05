@@ -310,6 +310,9 @@ export const REDIS_KEYS = {
 
   // Artifacts
   ARTIFACTS_LATEST: "artifact:latest",
+  // Chat
+  CHAT_SESSION: (id: string) => `chat:session:${id}`,
+
   // Ticker
   TICKER_LATEST: "ticker:latest",
 
