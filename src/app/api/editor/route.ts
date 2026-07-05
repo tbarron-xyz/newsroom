@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "../../utils/auth";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 
 // GET /api/editor - Get current editor data
-export const GET = withRedis(async (_request: NextRequest, redis) => {
-  const editor = await redis.getEditor();
+export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
+  const editor = await dataStorage.getEditor();
 
   return NextResponse.json({
     bio: editor?.bio || "",
@@ -32,7 +32,7 @@ export const GET = withRedis(async (_request: NextRequest, redis) => {
 
 // PUT /api/editor - Update editor data
 export const PUT = withAuth(
-  async (request: NextRequest, user, redis) => {
+  async (request: NextRequest, user, dataStorage) => {
     const body = await request.json();
     const {
       bio,
@@ -142,7 +142,7 @@ export const PUT = withAuth(
       );
     }
 
-    await redis.saveEditor({
+    await dataStorage.saveEditor({
       bio,
       prompt,
       modelName,

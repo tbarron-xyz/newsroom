@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 
 // GET /api/events/public - Get latest 12 events sorted by updated time (public access, no auth required)
-export const GET = withRedis(async (_request: NextRequest, redis) => {
+export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
   // Get latest 12 events sorted by updated time (most recent first)
-  const events = await redis.getLatestUpdatedEvents(12);
+  const events = await dataStorage.getLatestUpdatedEvents(12);
 
   return NextResponse.json(events);
 });

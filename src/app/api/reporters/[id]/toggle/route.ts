@@ -13,14 +13,14 @@ async function getContainer(): Promise<ServiceContainer> {
 
 // POST /api/reporters/[id]/toggle - Toggle reporter enabled status
 export const POST = withAuth(
-  async (request: NextRequest, user, redis, context) => {
+  async (request: NextRequest, user, dataStorage, context) => {
     const { id: reporterId } = await context.params;
 
     const container = await getContainer();
     const reporterService = await container.getReporterService();
 
     // Get current reporter
-    const reporter = await redis.getReporter(reporterId);
+    const reporter = await dataStorage.getReporter(reporterId);
     if (!reporter) {
       return NextResponse.json(
         { error: "Reporter not found" },

@@ -12,7 +12,7 @@ async function getContainer(): Promise<ServiceContainer> {
 }
 
 export const GET = withAuth(
-  async (_request: NextRequest, _user, _redis) => {
+  async (_request: NextRequest, _user, _dataStorage) => {
     try {
       const container = await getContainer();
       const dataStorage = await container.getDataStorageService();

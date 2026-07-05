@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "../../../utils/auth";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 import { ServiceContainer } from "../../../services/service-container";
 
 let container: ServiceContainer | null = null;
@@ -13,15 +13,15 @@ async function getContainer(): Promise<ServiceContainer> {
 }
 
 // GET /api/reporters/[id] - Get specific reporter (public read-only access)
-export const GET = withRedis(
+export const GET = withDataStorage(
   async (
     request: NextRequest,
-    redis,
+    dataStorage,
     context: { params: Promise<{ id: string }> }
   ) => {
     const { id: reporterId } = await context.params;
 
-    const reporter = await redis.getReporter(reporterId);
+    const reporter = await dataStorage.getReporter(reporterId);
     if (!reporter) {
       return NextResponse.json(
         { error: "Reporter not found" },
@@ -35,7 +35,7 @@ export const GET = withRedis(
 
 // PUT /api/reporters/[id] - Update specific reporter
 export const PUT = withAuth(
-  async (request: NextRequest, user, redis, context) => {
+  async (request: NextRequest, user, dataStorage, context) => {
     const { id: reporterId } = await context.params;
 
     const container = await getContainer();
@@ -74,7 +74,7 @@ export const PUT = withAuth(
 
 // DELETE /api/reporters/[id] - Delete specific reporter
 export const DELETE = withAuth(
-  async (request: NextRequest, user, redis, context) => {
+  async (request: NextRequest, user, dataStorage, context) => {
     const { id: reporterId } = await context.params;
 
     const container = await getContainer();

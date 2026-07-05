@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 import { AuthService } from "../../services/auth.service";
 import { AbilitiesService } from "../../services/abilities.service";
 
 // GET /api/daily-editions - Get daily editions (limited to 3 results for all users)
-export const GET = withRedis(async (request: NextRequest, redis) => {
+export const GET = withDataStorage(async (request: NextRequest, dataStorage) => {
   // Limit to 3 results for all users
   const limit = 3;
-  const dailyEditions = await redis.getDailyEditions(limit);
+  const dailyEditions = await dataStorage.getDailyEditions(limit);
 
   return NextResponse.json(dailyEditions);
 });

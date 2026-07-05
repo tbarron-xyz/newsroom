@@ -13,11 +13,11 @@ async function getContainer(): Promise<ServiceContainer> {
 
 // POST /api/reporters/[id]/generate-article - Generate an article for a specific reporter
 export const POST = withAuth(
-  async (request: NextRequest, user, redis, context) => {
+  async (request: NextRequest, user, dataStorage, context) => {
     const { id: reporterId } = await context.params;
 
     // Verify reporter exists
-    const reporter = await redis.getReporter(reporterId);
+    const reporter = await dataStorage.getReporter(reporterId);
     if (!reporter) {
       return NextResponse.json(
         { error: "Reporter not found" },

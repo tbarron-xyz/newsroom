@@ -14,9 +14,9 @@ async function getContainer(): Promise<ServiceContainer> {
 export async function GET(_request: NextRequest) {
   try {
     const container = await getContainer();
-    const redis = await container.getDataStorageService();
+    const dataStorage = await container.getDataStorageService();
 
-    const logs = await redis.getAllLogs();
+    const logs = await dataStorage.getAllLogs();
 
     return NextResponse.json({
       logs,

@@ -19,11 +19,11 @@ export async function GET(_request: NextRequest) {
     );
 
     const container = await getContainer();
-    const redis = await container.getDataStorageService();
+    const dataStorage = await container.getDataStorageService();
     const reporterService = await container.getReporterService();
 
     // Check if we should skip generation based on time constraints
-    const editor = await redis.getEditor();
+    const editor = await dataStorage.getEditor();
     const currentTime = Date.now();
 
     if (
@@ -53,8 +53,8 @@ export async function GET(_request: NextRequest) {
     }
 
     // Set job as running and update last run time
-    await redis.setJobRunning("reporter", true);
-    await redis.setJobLastRun("reporter", currentTime);
+    await dataStorage.setJobRunning("reporter", true);
+    await dataStorage.setJobLastRun("reporter", currentTime);
     console.log(
       `[${new Date().toISOString()}] Set reporter job running=true and last_run=${currentTime}`
     );
@@ -73,15 +73,15 @@ export async function GET(_request: NextRequest) {
           ...editor,
           lastArticleGenerationTime: currentTime
         };
-        await redis.saveEditor(updatedEditor);
+        await dataStorage.saveEditor(updatedEditor);
         console.log(
           `[${new Date().toISOString()}] Updated last generation time to ${new Date(currentTime).toISOString()}`
         );
       }
 
       // Mark job as completed successfully
-      await redis.setJobRunning("reporter", false);
-      await redis.setJobLastSuccess("reporter", currentTime);
+      await dataStorage.setJobRunning("reporter", false);
+      await dataStorage.setJobLastSuccess("reporter", currentTime);
       console.log(
         `[${new Date().toISOString()}] Set reporter job running=false and last_success=${currentTime}`
       );
@@ -99,7 +99,7 @@ export async function GET(_request: NextRequest) {
       });
     } catch (error) {
       // Mark job as not running on error (don't update last_success)
-      await redis.setJobRunning("reporter", false);
+      await dataStorage.setJobRunning("reporter", false);
       console.log(
         `[${new Date().toISOString()}] Set reporter job running=false due to error`
       );

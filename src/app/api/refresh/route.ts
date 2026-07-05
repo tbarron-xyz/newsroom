@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 import { AuthService } from "../../services/auth.service";
 
-export const POST = withRedis(async (request: NextRequest, redis) => {
+export const POST = withDataStorage(async (request: NextRequest, dataStorage) => {
   const body = await request.json();
   const { refreshToken } = body;
 
@@ -13,7 +13,7 @@ export const POST = withRedis(async (request: NextRequest, redis) => {
     );
   }
 
-  const authService = new AuthService(redis);
+  const authService = new AuthService(dataStorage);
 
   // Refresh the access token
   const newTokens = await authService.refreshAccessToken(refreshToken);

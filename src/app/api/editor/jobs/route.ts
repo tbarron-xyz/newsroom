@@ -24,7 +24,7 @@ const VALID_JOB_TYPES: JobType[] = [
 ];
 
 export const POST = withAuth(
-  async (request: NextRequest, _user, _redis) => {
+  async (request: NextRequest, _user, _dataStorage) => {
     const container = await getContainer();
     const editorService = await container.getEditorService();
 
@@ -75,23 +75,23 @@ export const POST = withAuth(
 export async function GET() {
   try {
     const container = await getContainer();
-    const redis = await container.getDataStorageService();
+    const dataStorage = await container.getDataStorageService();
 
-    const editor = await redis.getEditor();
+    const editor = await dataStorage.getEditor();
 
     const [reporterRunning, newspaperRunning, dailyRunning] = await Promise.all(
       [
-        redis.getJobRunning("reporter"),
-        redis.getJobRunning("newspaper"),
-        redis.getJobRunning("daily")
+        dataStorage.getJobRunning("reporter"),
+        dataStorage.getJobRunning("newspaper"),
+        dataStorage.getJobRunning("daily")
       ]
     );
 
     const [reporterLastRun, newspaperLastRun, dailyLastRun] = await Promise.all(
       [
-        redis.getJobLastRun("reporter"),
-        redis.getJobLastRun("newspaper"),
-        redis.getJobLastRun("daily")
+        dataStorage.getJobLastRun("reporter"),
+        dataStorage.getJobLastRun("newspaper"),
+        dataStorage.getJobLastRun("daily")
       ]
     );
 

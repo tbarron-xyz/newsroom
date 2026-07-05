@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 
-export const GET = withRedis(
+export const GET = withDataStorage(
   async (
     request: NextRequest,
-    redis,
+    dataStorage,
     context: { params: Promise<{ id: string }> }
   ) => {
     const { id: opinionId } = await context.params;
@@ -16,7 +16,7 @@ export const GET = withRedis(
       );
     }
 
-    const opinion = await redis.getOpinionArticle(opinionId);
+    const opinion = await dataStorage.getOpinionArticle(opinionId);
 
     if (!opinion) {
       return NextResponse.json(

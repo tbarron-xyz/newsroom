@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 
 // GET /api/articles/public - Get latest articles (public access, no auth required)
-export const GET = withRedis(async (request: NextRequest, redis) => {
+export const GET = withDataStorage(async (request: NextRequest, dataStorage) => {
   const url = new URL(request.url);
   const limit = parseInt(url.searchParams.get("limit") || "5", 10);
 
-  const articles = await redis.getLatestArticles(limit);
+  const articles = await dataStorage.getLatestArticles(limit);
 
   return NextResponse.json(articles);
 });

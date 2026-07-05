@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 
 // GET /api/opinion/public - Get latest 4 opinion articles (public access, no auth required)
-export const GET = withRedis(async (_request: NextRequest, redis) => {
-  const opinions = await redis.getLatestOpinionArticles(4);
+export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
+  const opinions = await dataStorage.getLatestOpinionArticles(4);
 
   return NextResponse.json({ opinions });
 });

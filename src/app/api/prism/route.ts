@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 import { ServiceContainer } from "../../services/service-container";
 import { PERSPECTIVE_PAIRS } from "../../services/perspectives";
 
-export const POST = withRedis(async (request: NextRequest, redis) => {
+export const POST = withDataStorage(async (request: NextRequest, dataStorage) => {
   try {
     const body = await request.json();
     const { dailyEditionId, pairId } = body;
@@ -25,9 +25,9 @@ export const POST = withRedis(async (request: NextRequest, redis) => {
 
     let dailyEdition;
     if (dailyEditionId) {
-      dailyEdition = await redis.getDailyEdition(dailyEditionId);
+      dailyEdition = await dataStorage.getDailyEdition(dailyEditionId);
     } else {
-      const editions = await redis.getDailyEditions(1);
+      const editions = await dataStorage.getDailyEditions(1);
       dailyEdition = editions[0] || null;
     }
 

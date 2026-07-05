@@ -3,7 +3,7 @@ import { withAuth } from "../../../utils/auth";
 
 // GET /api/articles/all - Get all articles (requires Reader permission)
 export const GET = withAuth(
-  async (request: NextRequest, user, redis) => {
+  async (request: NextRequest, user, dataStorage) => {
     // Parse and validate results parameter
     const { searchParams } = new URL(request.url);
     const resultsParam = searchParams.get("results");
@@ -20,7 +20,7 @@ export const GET = withAuth(
     }
 
     // Get all articles with limit
-    const articles = await redis.getLatestArticles(limit);
+    const articles = await dataStorage.getLatestArticles(limit);
 
     return NextResponse.json(articles);
   },

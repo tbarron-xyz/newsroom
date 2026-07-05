@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../../utils/redis";
+import { withDataStorage } from "../../../utils/data-storage";
 
-export const GET = withRedis(
+export const GET = withDataStorage(
   async (
     request: NextRequest,
     dataStorage,

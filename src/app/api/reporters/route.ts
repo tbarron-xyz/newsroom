@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "../../utils/auth";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 import { ServiceContainer } from "../../services/service-container";
 
 let container: ServiceContainer | null = null;
@@ -49,7 +49,7 @@ async function checkReporterPermission(
 }
 
 // GET /api/reporters - Get all reporters (public read-only access)
-export const GET = withRedis(async (_request: NextRequest, dataStorage) => {
+export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
   const reporters = await dataStorage.getAllReporters();
   return NextResponse.json(reporters);
 });

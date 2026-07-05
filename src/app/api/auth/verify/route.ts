@@ -3,7 +3,7 @@ import { withAuth } from "../../../utils/auth";
 import { AbilitiesService } from "../../../services/abilities.service";
 
 // GET /api/auth/verify - Verify token and return user info
-export const GET = withAuth(async (request: NextRequest, user, redis) => {
+export const GET = withAuth(async (request: NextRequest, user, dataStorage) => {
   const abilitiesService = new AbilitiesService();
 
   // Check user abilities

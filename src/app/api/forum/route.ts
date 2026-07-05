@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 import { ForumSection, ForumThread } from "../../schemas/types";
 
-export const GET = withRedis(
+export const GET = withDataStorage(
   async (_request: NextRequest, dataStorage): Promise<NextResponse> => {
     const sections = await dataStorage.getForumSections();
 

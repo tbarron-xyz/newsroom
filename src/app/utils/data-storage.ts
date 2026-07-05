@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { IDataStorageService } from "../services/data-storage.interface";
 import { ServiceContainer } from "../services/service-container";
 
-export function withRedis(
+export function withDataStorage(
   handler: (
     request: NextRequest,
     dataStorage: IDataStorageService,

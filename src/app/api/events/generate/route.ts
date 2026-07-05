@@ -4,7 +4,7 @@ import { ServiceContainer } from "../../../services/service-container";
 
 // POST /api/events/generate - Generate events for all reporters (admin only)
 export const POST = withAuth(
-  async (request: NextRequest, user, redis) => {
+  async (request: NextRequest, user, dataStorage) => {
     const container = ServiceContainer.getInstance();
     const reporterService = await container.getReporterService();
 

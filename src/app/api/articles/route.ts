@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withRedis } from "../../utils/redis";
+import { withDataStorage } from "../../utils/data-storage";
 
-export const GET = withRedis(async (request: NextRequest, redis) => {
+export const GET = withDataStorage(async (request: NextRequest, dataStorage) => {
   const { searchParams } = new URL(request.url);
   const reporterId = searchParams.get("reporterId");
   const resultsParam = searchParams.get("results");
@@ -27,7 +27,7 @@ export const GET = withRedis(async (request: NextRequest, redis) => {
   }
 
   // Get articles for this reporter with limit
-  const articles = await redis.getArticlesByReporter(reporterId, limit);
+  const articles = await dataStorage.getArticlesByReporter(reporterId, limit);
 
   return NextResponse.json(articles);
 });

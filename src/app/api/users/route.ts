@@ -3,9 +3,9 @@ import { withAuth } from "../../utils/auth";
 
 // GET /api/users - Get all users (admin only)
 export const GET = withAuth(
-  async (request: NextRequest, user, redis) => {
+  async (request: NextRequest, user, dataStorage) => {
     // Get all users
-    const users = await redis.getAllUsers();
+    const users = await dataStorage.getAllUsers();
 
     // Return users without password hashes
     const safeUsers = users.map((user) => ({
