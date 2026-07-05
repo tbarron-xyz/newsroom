@@ -92,7 +92,9 @@ export default function ForumPage() {
         {sections.map((section) => (
           <div key={section.id} className="tui-section-card">
             <div className="tui-section-card-header">
-              <h2 className="text-xl font-bold tui-text-primary">{section.title}</h2>
+              <h2 className="text-xl font-bold tui-text-primary">
+                {section.title}
+              </h2>
             </div>
 
             <div className="divide-y divide-[var(--tui-border)]">
@@ -106,10 +108,11 @@ export default function ForumPage() {
                       >
                         {forum.title}
                       </Link>
-                      <p className="tui-text-muted mt-1">
-                        {forum.description}
-                      </p>
-                      <div className="flex items-center gap-4 mt-2 tui-text-muted" style={{ fontSize: '0.75rem' }}>
+                      <p className="tui-text-muted mt-1">{forum.description}</p>
+                      <div
+                        className="flex items-center gap-4 mt-2 tui-text-muted"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <span>{forum.threadCount} threads</span>
                         <span>{forum.postCount} posts</span>
                       </div>
@@ -123,7 +126,10 @@ export default function ForumPage() {
                         >
                           {forum.latestThread.title}
                         </Link>
-                        <div className="flex items-center justify-end gap-2 mt-1 tui-text-muted" style={{ fontSize: '0.75rem' }}>
+                        <div
+                          className="flex items-center justify-end gap-2 mt-1 tui-text-muted"
+                          style={{ fontSize: "0.75rem" }}
+                        >
                           <span>{forum.latestThread.replyCount} replies</span>
                           <span>•</span>
                           <span>

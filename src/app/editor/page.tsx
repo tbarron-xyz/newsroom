@@ -190,13 +190,15 @@ export default function EditorPage() {
 
       if (jobType === "daily") {
         const result = await apiService.post<{ message: string }>(
-          "/api/editor/jobs", requestBody
+          "/api/editor/jobs",
+          requestBody
         );
         setMessage(result.message);
         setTimeout(() => setMessage(""), 5000);
       } else if (jobType === "reporter") {
         const result = await apiService.post<{ message: string }>(
-          "/api/editor/jobs", requestBody
+          "/api/editor/jobs",
+          requestBody
         );
         setMessage(result.message);
         setTimeout(() => setMessage(""), 5000);
@@ -251,7 +253,8 @@ export default function EditorPage() {
     return (
       <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
         <div className="text-[var(--tui-primary)] font-mono text-sm">
-          <span className="animate-pulse">$</span> Loading editor configuration...
+          <span className="animate-pulse">$</span> Loading editor
+          configuration...
         </div>
       </div>
     );
@@ -268,7 +271,8 @@ export default function EditorPage() {
                 # Newsroom Editor Configuration
               </h1>
               <p className="text-[#557755] text-sm font-mono">
-                Configure your AI editor&apos;s biography and editorial guidelines
+                Configure your AI editor&apos;s biography and editorial
+                guidelines
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -923,7 +927,9 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">API Spend</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                        API Spend
+                      </h3>
                       <p className="tui-muted">Total cost</p>
                     </div>
                   </div>
@@ -951,7 +957,9 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Input Tokens</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                        Input Tokens
+                      </h3>
                       <p className="tui-muted">Total sent</p>
                     </div>
                   </div>
@@ -979,7 +987,9 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">Output Tokens</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                        Output Tokens
+                      </h3>
                       <p className="tui-muted">Total received</p>
                     </div>
                   </div>
@@ -990,22 +1000,21 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">$ Loading KPI data...</div>
+                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">
+                  $ Loading KPI data...
+                </div>
               </div>
             )}
 
             <div className="flex items-center justify-center pt-4">
-              <button
-                onClick={fetchKpiData}
-                className="tui-btn"
-              >
+              <button onClick={fetchKpiData} className="tui-btn">
                 $ Refresh Metrics
               </button>
             </div>
           </div>
         </div>
 
-          {/* Memory & Storage Section */}
+        {/* Memory & Storage Section */}
         <div className="border border-[var(--tui-border)] p-6 mt-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
@@ -1056,7 +1065,9 @@ export default function EditorPage() {
                         {memoryInfo.backend === "redis" ? "Redis" : "Database"}
                       </h3>
                       <p className="tui-muted">
-                        {memoryInfo.backend === "redis" ? "In-memory database" : "On-disk storage"}
+                        {memoryInfo.backend === "redis"
+                          ? "In-memory database"
+                          : "On-disk storage"}
                       </p>
                     </div>
                   </div>
@@ -1066,7 +1077,8 @@ export default function EditorPage() {
                         {memoryInfo.backend === "redis" ? "Used" : "File Size"}
                       </span>
                       <span className="text-[var(--tui-primary)] font-mono text-lg">
-                        {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)} MB
+                        {(memoryInfo.redis.usedMemory / 1024 / 1024).toFixed(2)}{" "}
+                        MB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -1078,7 +1090,8 @@ export default function EditorPage() {
                           memoryInfo.redis.usedMemoryPeak /
                           1024 /
                           1024
-                        ).toFixed(2)} MB
+                        ).toFixed(2)}{" "}
+                        MB
                       </span>
                     </div>
                   </div>
@@ -1103,7 +1116,9 @@ export default function EditorPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">System</h3>
+                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                        System
+                      </h3>
                       <p className="tui-muted">Host machine</p>
                     </div>
                   </div>
@@ -1116,7 +1131,8 @@ export default function EditorPage() {
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)} GB
+                        ).toFixed(2)}{" "}
+                        GB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -1127,7 +1143,8 @@ export default function EditorPage() {
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)} GB
+                        ).toFixed(2)}{" "}
+                        GB
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -1138,7 +1155,8 @@ export default function EditorPage() {
                           1024 /
                           1024 /
                           1024
-                        ).toFixed(2)} GB
+                        ).toFixed(2)}{" "}
+                        GB
                       </span>
                     </div>
                   </div>
@@ -1146,15 +1164,14 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">$ Loading memory info...</div>
+                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse mb-4">
+                  $ Loading memory info...
+                </div>
               </div>
             )}
 
             <div className="flex items-center justify-center pt-4">
-              <button
-                onClick={fetchMemoryInfo}
-                className="tui-btn"
-              >
+              <button onClick={fetchMemoryInfo} className="tui-btn">
                 $ Refresh Memory
               </button>
             </div>
@@ -1209,7 +1226,9 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Articles</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Generate Articles
+                    </h3>
                     <p className="tui-muted">Every 15 minutes</p>
                   </div>
                 </div>
@@ -1225,11 +1244,11 @@ export default function EditorPage() {
                   }
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "reporter" || jobStatus?.status.reporterJob ? (
-                    jobTriggering === "reporter" ? "Generating..." : "Running..."
-                  ) : (
-                    "Trigger Articles"
-                  )}
+                  {jobTriggering === "reporter" || jobStatus?.status.reporterJob
+                    ? jobTriggering === "reporter"
+                      ? "Generating..."
+                      : "Running..."
+                    : "Trigger Articles"}
                 </button>
               </div>
 
@@ -1252,7 +1271,9 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Newspaper Edition</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Newspaper Edition
+                    </h3>
                     <p className="tui-muted">Every 3 hours</p>
                   </div>
                 </div>
@@ -1264,7 +1285,9 @@ export default function EditorPage() {
                   disabled={jobTriggering === "newspaper" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "newspaper" ? "Creating..." : "Create Edition"}
+                  {jobTriggering === "newspaper"
+                    ? "Creating..."
+                    : "Create Edition"}
                 </button>
               </div>
 
@@ -1287,7 +1310,9 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Daily Edition</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Daily Edition
+                    </h3>
                     <p className="tui-muted">Every 24 hours</p>
                   </div>
                 </div>
@@ -1297,15 +1322,17 @@ export default function EditorPage() {
                 <button
                   onClick={() => triggerJob("daily")}
                   disabled={
-                    jobTriggering === "daily" || jobStatus?.status.dailyJob || !isAdmin
+                    jobTriggering === "daily" ||
+                    jobStatus?.status.dailyJob ||
+                    !isAdmin
                   }
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "daily" || jobStatus?.status.dailyJob ? (
-                    jobTriggering === "daily" ? "Compiling..." : "Running..."
-                  ) : (
-                    "Trigger Manually"
-                  )}
+                  {jobTriggering === "daily" || jobStatus?.status.dailyJob
+                    ? jobTriggering === "daily"
+                      ? "Compiling..."
+                      : "Running..."
+                    : "Trigger Manually"}
                 </button>
               </div>
 
@@ -1328,7 +1355,9 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Comments</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Generate Comments
+                    </h3>
                     <p className="tui-muted">Once daily</p>
                   </div>
                 </div>
@@ -1355,7 +1384,9 @@ export default function EditorPage() {
                   disabled={jobTriggering === "comments" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "comments" ? "Generating..." : "Generate Comments"}
+                  {jobTriggering === "comments"
+                    ? "Generating..."
+                    : "Generate Comments"}
                 </button>
               </div>
 
@@ -1384,7 +1415,9 @@ export default function EditorPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Events</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Generate Events
+                    </h3>
                     <p className="tui-muted">Every 30 minutes</p>
                   </div>
                 </div>
@@ -1396,7 +1429,9 @@ export default function EditorPage() {
                   disabled={jobTriggering === "events" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "events" ? "Generating..." : "Generate Events"}
+                  {jobTriggering === "events"
+                    ? "Generating..."
+                    : "Generate Events"}
                 </button>
               </div>
 
@@ -1404,24 +1439,39 @@ export default function EditorPage() {
               <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                    <svg
+                      className="w-5 h-5 text-[var(--tui-primary)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Prism Daily</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Generate Prism Daily
+                    </h3>
                     <p className="tui-muted">Once daily at 8:30am</p>
                   </div>
                 </div>
                 <p className="tui-muted">
-                  Generates a pair of opposing daily editions using AI-determined editorial perspectives.
+                  Generates a pair of opposing daily editions using
+                  AI-determined editorial perspectives.
                 </p>
                 <button
                   onClick={() => triggerJob("prism-daily")}
                   disabled={jobTriggering === "prism-daily" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "prism-daily" ? "Generating..." : "Trigger Manually"}
+                  {jobTriggering === "prism-daily"
+                    ? "Generating..."
+                    : "Trigger Manually"}
                 </button>
               </div>
 
@@ -1429,24 +1479,39 @@ export default function EditorPage() {
               <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    <svg
+                      className="w-5 h-5 text-[var(--tui-primary)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">News Ticker</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      News Ticker
+                    </h3>
                     <p className="tui-muted">Once daily at 8:10am</p>
                   </div>
                 </div>
                 <p className="tui-muted">
-                  Generates a scrolling ticker text from the latest daily edition.
+                  Generates a scrolling ticker text from the latest daily
+                  edition.
                 </p>
                 <button
                   onClick={() => triggerJob("ticker")}
                   disabled={jobTriggering === "ticker" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "ticker" ? "Generating..." : "Generate Ticker"}
+                  {jobTriggering === "ticker"
+                    ? "Generating..."
+                    : "Generate Ticker"}
                 </button>
               </div>
 
@@ -1454,24 +1519,39 @@ export default function EditorPage() {
               <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                    <svg className="w-5 h-5 text-[var(--tui-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    <svg
+                      className="w-5 h-5 text-[var(--tui-primary)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">Generate Opinion</h3>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      Generate Opinion
+                    </h3>
                     <p className="tui-muted">On demand</p>
                   </div>
                 </div>
                 <p className="tui-muted">
-                  Generates an opinion article from a randomly chosen persona based on the latest 25 articles.
+                  Generates an opinion article from a randomly chosen persona
+                  based on the latest 25 articles.
                 </p>
                 <button
                   onClick={() => triggerJob("opinion")}
                   disabled={jobTriggering === "opinion" || !isAdmin}
                   className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {jobTriggering === "opinion" ? "Generating..." : "Generate Opinion"}
+                  {jobTriggering === "opinion"
+                    ? "Generating..."
+                    : "Generate Opinion"}
                 </button>
               </div>
             </div>
@@ -1490,9 +1570,13 @@ export default function EditorPage() {
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.reporterJob ? (
-                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
+                          <span className="text-[#ffb000] font-mono text-xs">
+                            [RUNNING]
+                          </span>
                         ) : (
-                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">
+                            [IDLE]
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1520,9 +1604,13 @@ export default function EditorPage() {
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.newspaperJob ? (
-                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
+                          <span className="text-[#ffb000] font-mono text-xs">
+                            [RUNNING]
+                          </span>
                         ) : (
-                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">
+                            [IDLE]
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1550,9 +1638,13 @@ export default function EditorPage() {
                       </span>
                       <div className="flex items-center space-x-2">
                         {jobStatus.status.dailyJob ? (
-                          <span className="text-[#ffb000] font-mono text-xs">[RUNNING]</span>
+                          <span className="text-[#ffb000] font-mono text-xs">
+                            [RUNNING]
+                          </span>
                         ) : (
-                          <span className="text-[var(--tui-primary)] font-mono text-xs">[IDLE]</span>
+                          <span className="text-[var(--tui-primary)] font-mono text-xs">
+                            [IDLE]
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1590,10 +1682,10 @@ export default function EditorPage() {
                         />
                       </svg>
                       <div>
-                        <h4 className="text-[var(--tui-primary)] font-mono text-sm">Note</h4>
-                        <p className="tui-muted mt-1">
-                          {jobStatus.note}
-                        </p>
+                        <h4 className="text-[var(--tui-primary)] font-mono text-sm">
+                          Note
+                        </h4>
+                        <p className="tui-muted mt-1">{jobStatus.note}</p>
                       </div>
                     </div>
                   </div>

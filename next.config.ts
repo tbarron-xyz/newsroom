@@ -17,8 +17,8 @@ try {
 
 const nextConfig: NextConfig = {
   env: {
-    APP_FULL_NAME: appFullName,
-  },
+    APP_FULL_NAME: appFullName
+  }
 };
 
 export default nextConfig;

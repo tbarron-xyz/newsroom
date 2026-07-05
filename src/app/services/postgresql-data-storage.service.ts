@@ -162,7 +162,7 @@ export class PostgreSQLDataStorageService {
           input_token_count INTEGER,
           output_token_count INTEGER
         )
-      `      );
+      `);
 
       // Create ticker table
       await client.query(`

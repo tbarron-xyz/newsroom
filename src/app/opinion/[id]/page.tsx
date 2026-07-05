@@ -25,7 +25,9 @@ export default function OpinionArticlePage() {
 
   const fetchOpinion = useCallback(async () => {
     try {
-      const data = await apiService.get<OpinionArticle>(`/api/opinion/${opinionId}`);
+      const data = await apiService.get<OpinionArticle>(
+        `/api/opinion/${opinionId}`
+      );
       setOpinion(data);
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {

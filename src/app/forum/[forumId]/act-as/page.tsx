@@ -157,10 +157,7 @@ export default function ActAsPage() {
           title="Act as Forum User"
           description="Generate authentic replies as different forum personas"
         >
-          <Link
-            href={`/forum/${forumId}`}
-            className="tui-btn"
-          >
+          <Link href={`/forum/${forumId}`} className="tui-btn">
             ← Back to Forum
           </Link>
         </PageHeader>
@@ -212,7 +209,10 @@ export default function ActAsPage() {
       )}
 
       {success && (
-        <ContentCard variant="tui" className="mt-6 p-4 border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)]">
+        <ContentCard
+          variant="tui"
+          className="mt-6 p-4 border border-[color-mix(in_srgb,var(--tui-primary)_30%,transparent)]"
+        >
           <p className="tui-text-primary">{success}</p>
         </ContentCard>
       )}

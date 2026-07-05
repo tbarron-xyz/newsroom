@@ -1520,15 +1520,27 @@ export class RedisDataStorageService implements IDataStorageService {
 
   // Ticker operations
   async saveTicker(ticker: Ticker): Promise<void> {
-    const { id, text, generationTime, dailyEditionId, modelName, inputTokenCount, outputTokenCount } = ticker;
+    const {
+      id,
+      text,
+      generationTime,
+      dailyEditionId,
+      modelName,
+      inputTokenCount,
+      outputTokenCount
+    } = ticker;
     await this.client.hSet(REDIS_KEYS.TICKER_LATEST, {
       id,
       text,
       generationTime: String(generationTime),
       dailyEditionId,
       modelName,
-      ...(inputTokenCount !== undefined && { inputTokenCount: String(inputTokenCount) }),
-      ...(outputTokenCount !== undefined && { outputTokenCount: String(outputTokenCount) })
+      ...(inputTokenCount !== undefined && {
+        inputTokenCount: String(inputTokenCount)
+      }),
+      ...(outputTokenCount !== undefined && {
+        outputTokenCount: String(outputTokenCount)
+      })
     });
   }
 
@@ -1541,24 +1553,36 @@ export class RedisDataStorageService implements IDataStorageService {
       generationTime: parseInt(data.generationTime || "0"),
       dailyEditionId: data.dailyEditionId || "",
       modelName: data.modelName || "",
-      inputTokenCount: data.inputTokenCount ? parseInt(data.inputTokenCount) : undefined,
-      outputTokenCount: data.outputTokenCount ? parseInt(data.outputTokenCount) : undefined
+      inputTokenCount: data.inputTokenCount
+        ? parseInt(data.inputTokenCount)
+        : undefined,
+      outputTokenCount: data.outputTokenCount
+        ? parseInt(data.outputTokenCount)
+        : undefined
     };
   }
 
   // Opinion Article operations
   async getOpinionArticle(opinionId: string): Promise<OpinionArticle | null> {
-    const [persona, headline, content, time, articleIdsStr, modelName, inputTokenCount, outputTokenCount] =
-      await Promise.all([
-        this.client.get(REDIS_KEYS.OPINION_PERSONA(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_HEADLINE(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_CONTENT(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_TIME(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(opinionId)),
-        this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(opinionId))
-      ]);
+    const [
+      persona,
+      headline,
+      content,
+      time,
+      articleIdsStr,
+      modelName,
+      inputTokenCount,
+      outputTokenCount
+    ] = await Promise.all([
+      this.client.get(REDIS_KEYS.OPINION_PERSONA(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_HEADLINE(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_CONTENT(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_TIME(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(opinionId)),
+      this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(opinionId))
+    ]);
 
     if (!headline || !content) return null;
 
@@ -1571,12 +1595,24 @@ export class RedisDataStorageService implements IDataStorageService {
       articleIds: articleIdsStr ? JSON.parse(articleIdsStr) : [],
       modelName: modelName || "",
       inputTokenCount: inputTokenCount ? parseInt(inputTokenCount) : undefined,
-      outputTokenCount: outputTokenCount ? parseInt(outputTokenCount) : undefined
+      outputTokenCount: outputTokenCount
+        ? parseInt(outputTokenCount)
+        : undefined
     };
   }
 
   async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
-    const { id, persona, headline, content, generationTime, articleIds, modelName, inputTokenCount, outputTokenCount } = opinion;
+    const {
+      id,
+      persona,
+      headline,
+      content,
+      generationTime,
+      articleIds,
+      modelName,
+      inputTokenCount,
+      outputTokenCount
+    } = opinion;
     const multi = this.client.multi();
 
     multi.zAdd(REDIS_KEYS.OPINIONS_LATEST, {
@@ -1597,10 +1633,16 @@ export class RedisDataStorageService implements IDataStorageService {
     multi.set(REDIS_KEYS.OPINION_ARTICLE_IDS(id), JSON.stringify(articleIds));
     multi.set(REDIS_KEYS.OPINION_MODEL_NAME(id), modelName);
     if (inputTokenCount !== undefined) {
-      multi.set(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id), inputTokenCount.toString());
+      multi.set(
+        REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id),
+        inputTokenCount.toString()
+      );
     }
     if (outputTokenCount !== undefined) {
-      multi.set(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id), outputTokenCount.toString());
+      multi.set(
+        REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id),
+        outputTokenCount.toString()
+      );
     }
 
     await multi.exec();
@@ -1617,17 +1659,25 @@ export class RedisDataStorageService implements IDataStorageService {
 
     const opinions: OpinionArticle[] = [];
     for (const id of opinionIds) {
-      const [persona, headline, content, time, articleIdsStr, modelName, inputTokenCount, outputTokenCount] =
-        await Promise.all([
-          this.client.get(REDIS_KEYS.OPINION_PERSONA(id)),
-          this.client.get(REDIS_KEYS.OPINION_HEADLINE(id)),
-          this.client.get(REDIS_KEYS.OPINION_CONTENT(id)),
-          this.client.get(REDIS_KEYS.OPINION_TIME(id)),
-          this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(id)),
-          this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(id)),
-          this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id)),
-          this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id))
-        ]);
+      const [
+        persona,
+        headline,
+        content,
+        time,
+        articleIdsStr,
+        modelName,
+        inputTokenCount,
+        outputTokenCount
+      ] = await Promise.all([
+        this.client.get(REDIS_KEYS.OPINION_PERSONA(id)),
+        this.client.get(REDIS_KEYS.OPINION_HEADLINE(id)),
+        this.client.get(REDIS_KEYS.OPINION_CONTENT(id)),
+        this.client.get(REDIS_KEYS.OPINION_TIME(id)),
+        this.client.get(REDIS_KEYS.OPINION_ARTICLE_IDS(id)),
+        this.client.get(REDIS_KEYS.OPINION_MODEL_NAME(id)),
+        this.client.get(REDIS_KEYS.OPINION_INPUT_TOKEN_COUNT(id)),
+        this.client.get(REDIS_KEYS.OPINION_OUTPUT_TOKEN_COUNT(id))
+      ]);
 
       if (!headline || !content) continue;
 
@@ -1639,8 +1689,12 @@ export class RedisDataStorageService implements IDataStorageService {
         generationTime: parseInt(time || "0"),
         articleIds: articleIdsStr ? JSON.parse(articleIdsStr) : [],
         modelName: modelName || "",
-        inputTokenCount: inputTokenCount ? parseInt(inputTokenCount) : undefined,
-        outputTokenCount: outputTokenCount ? parseInt(outputTokenCount) : undefined
+        inputTokenCount: inputTokenCount
+          ? parseInt(inputTokenCount)
+          : undefined,
+        outputTokenCount: outputTokenCount
+          ? parseInt(outputTokenCount)
+          : undefined
       });
     }
 
@@ -2383,11 +2437,13 @@ export class RedisDataStorageService implements IDataStorageService {
     await multi.exec();
   }
 
-  async getPrismDailyEditionPairs(limit?: number): Promise<PrismDailyEditionPair[]> {
+  async getPrismDailyEditionPairs(
+    limit?: number
+  ): Promise<PrismDailyEditionPair[]> {
     const count = limit || 3;
-    const ids = await this.client.zRange(
-      "prism_daily_editions", 0, count - 1, { REV: true }
-    );
+    const ids = await this.client.zRange("prism_daily_editions", 0, count - 1, {
+      REV: true
+    });
     const pairs: PrismDailyEditionPair[] = [];
     for (const id of ids) {
       const json = await this.client.get(`prism_daily_edition:${id}:data`);

@@ -126,11 +126,12 @@ export default function ThreadViewPage() {
   return (
     <PageContainer variant="tui">
       <ContentCard variant="tui" className="p-8 mb-8">
-        <PageHeader variant="tui" title={threadTitle} description={`${posts.length} posts`}>
-          <Link
-            href="/forum"
-            className="tui-btn"
-          >
+        <PageHeader
+          variant="tui"
+          title={threadTitle}
+          description={`${posts.length} posts`}
+        >
+          <Link href="/forum" className="tui-btn">
             ← Back to Forum
           </Link>
         </PageHeader>
@@ -148,7 +149,7 @@ export default function ThreadViewPage() {
             disabled={submitting}
           />
           <div className="flex items-center justify-between mt-4">
-            <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
+            <span className="tui-text-muted" style={{ fontSize: "0.75rem" }}>
               {newPost.length}/4096 characters
             </span>
             <button
@@ -181,11 +182,17 @@ export default function ThreadViewPage() {
                     {post.author}
                   </span>
                 </div>
-                <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
+                <span
+                  className="tui-text-muted"
+                  style={{ fontSize: "0.75rem" }}
+                >
                   {formatDate(post.createdAt)}
                 </span>
               </div>
-              <div className="text-[var(--tui-primary)] font-mono whitespace-pre-wrap leading-relaxed" style={{ opacity: 0.85 }}>
+              <div
+                className="text-[var(--tui-primary)] font-mono whitespace-pre-wrap leading-relaxed"
+                style={{ opacity: 0.85 }}
+              >
                 {post.content}
               </div>
             </div>

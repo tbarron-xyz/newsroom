@@ -93,7 +93,8 @@ export default function LogsPage() {
           />
           {data && (
             <div className="mt-2 tui-text-muted">
-              <span className="tui-text-primary font-medium">{data.count}</span> log entries
+              <span className="tui-text-primary font-medium">{data.count}</span>{" "}
+              log entries
             </div>
           )}
         </div>

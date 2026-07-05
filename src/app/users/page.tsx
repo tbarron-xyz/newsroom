@@ -178,9 +178,7 @@ export default function UsersPage() {
                     {formatDate(user.createdAt)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-mono tui-text-muted">
-                    {user.lastLoginAt
-                      ? formatDate(user.lastLoginAt)
-                      : "Never"}
+                    {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
                   </td>
                 </tr>
               ))}

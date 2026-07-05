@@ -319,8 +319,7 @@ export const REDIS_KEYS = {
   OPINION_TIME: (id: string) => `opinion:${id}:time`,
   OPINION_ARTICLE_IDS: (id: string) => `opinion:${id}:article_ids`,
   OPINION_MODEL_NAME: (id: string) => `opinion:${id}:model_name`,
-  OPINION_INPUT_TOKEN_COUNT: (id: string) =>
-    `opinion:${id}:input_token_count`,
+  OPINION_INPUT_TOKEN_COUNT: (id: string) => `opinion:${id}:input_token_count`,
   OPINION_OUTPUT_TOKEN_COUNT: (id: string) =>
     `opinion:${id}:output_token_count`,
 

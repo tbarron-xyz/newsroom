@@ -11,7 +11,10 @@ export const GET = withDataStorage(
 
     const dailyEdition = await dataStorage.getDailyEdition(id);
     if (!dailyEdition) {
-      return NextResponse.json({ error: "Daily edition not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Daily edition not found" },
+        { status: 404 }
+      );
     }
 
     const enrichedEditions = await Promise.all(
@@ -19,9 +22,11 @@ export const GET = withDataStorage(
         const edition = await dataStorage.getNewspaperEdition(editionId);
         if (!edition) return null;
 
-        const articles = (await Promise.all(
-          edition.stories.map((storyId) => dataStorage.getArticle(storyId))
-        )).filter(Boolean);
+        const articles = (
+          await Promise.all(
+            edition.stories.map((storyId) => dataStorage.getArticle(storyId))
+          )
+        ).filter(Boolean);
 
         return { ...edition, stories: articles };
       })
@@ -29,7 +34,7 @@ export const GET = withDataStorage(
 
     return NextResponse.json({
       ...dailyEdition,
-      editions: enrichedEditions.filter(Boolean),
+      editions: enrichedEditions.filter(Boolean)
     });
   }
 );

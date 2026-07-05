@@ -68,10 +68,7 @@ export default function NewThreadPage() {
           <p className="tui-muted mb-4">
             You need reader permission to create a new thread.
           </p>
-          <Link
-            href={`/forum/${forumId}`}
-            className="tui-link"
-          >
+          <Link href={`/forum/${forumId}`} className="tui-link">
             ← Back to Forum
           </Link>
         </ContentCard>
@@ -102,10 +99,7 @@ export default function NewThreadPage() {
     <PageContainer variant="tui">
       <ContentCard variant="tui" className="p-8 mb-8">
         <PageHeader variant="tui" title="New Thread" description={forumTitle}>
-          <Link
-            href={`/forum/${forumId}`}
-            className="tui-btn"
-          >
+          <Link href={`/forum/${forumId}`} className="tui-btn">
             ← Back to Forum
           </Link>
         </PageHeader>
@@ -123,14 +117,12 @@ export default function NewThreadPage() {
               maxLength={200}
               required
             />
-            <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
+            <span className="tui-text-muted" style={{ fontSize: "0.75rem" }}>
               {subject.length}/200 characters
             </span>
 
             <div className="space-y-2">
-              <label className="tui-label block mb-2">
-                Body
-              </label>
+              <label className="tui-label block mb-2">Body</label>
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -140,7 +132,7 @@ export default function NewThreadPage() {
                 required
                 className="tui-textarea"
               />
-              <span className="tui-text-muted" style={{ fontSize: '0.75rem' }}>
+              <span className="tui-text-muted" style={{ fontSize: "0.75rem" }}>
                 {body.length}/4096 characters
               </span>
             </div>

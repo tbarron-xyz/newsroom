@@ -111,164 +111,162 @@ export default function EventsPage() {
     <PageContainer variant="tui" maxWidth="max-w-7xl">
       {/* Public Events Grid */}
       <ContentCard variant="tui" className="p-6 mb-8">
-        <h3 className="tui-section-title mb-6">
-          Recent Events
-        </h3>
-          {publicEvents.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {publicEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="border border-[var(--tui-border)] p-4 font-mono hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
-                >
-                  <h4 className="text-sm font-medium tui-text-primary mb-2">
-                    {event.title}
-                  </h4>
-                  <div className="tui-text-muted text-xs mb-2">
-                    Updated: {formatDate(event.updatedTime)}
-                  </div>
-                  {event.facts.length > 0 && (
-                    <div className="text-xs tui-text-muted">
-                      {event.facts.map((fact, index) => (
-                        <div key={index} className="font-mono">• {fact}</div>
-                      ))}
-                    </div>
-                  )}
+        <h3 className="tui-section-title mb-6">Recent Events</h3>
+        {publicEvents.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {publicEvents.map((event) => (
+              <div
+                key={event.id}
+                className="border border-[var(--tui-border)] p-4 font-mono hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
+              >
+                <h4 className="text-sm font-medium tui-text-primary mb-2">
+                  {event.title}
+                </h4>
+                <div className="tui-text-muted text-xs mb-2">
+                  Updated: {formatDate(event.updatedTime)}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="border border-[var(--tui-border)] p-12 text-center">
-              <p className="tui-text-muted">No events available</p>
-            </div>
-          )}
+                {event.facts.length > 0 && (
+                  <div className="text-xs tui-text-muted">
+                    {event.facts.map((fact, index) => (
+                      <div key={index} className="font-mono">
+                        • {fact}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border border-[var(--tui-border)] p-12 text-center">
+            <p className="tui-text-muted">No events available</p>
+          </div>
+        )}
       </ContentCard>
 
-        {/* Admin Section */}
-        {isAdmin && (
-          <ContentCard variant="tui">
-            <div className="p-6 border-b border-[var(--tui-border)]">
-              <PageHeader
-                variant="tui"
-                title="Event Management"
-                description="View and manage all tracked events in the system"
-              >
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleGenerateEvents}
-                    disabled={adminLoading}
-                    className="tui-btn-primary"
-                  >
-                    Generate Events
-                  </button>
-                  <button
-                    onClick={handleGenerateArticlesFromEvents}
-                    disabled={adminLoading}
-                    className="tui-btn"
-                  >
-                    Generate Articles from Events
-                  </button>
-                </div>
-              </PageHeader>
-            </div>
-
-            {error && (
-              <div className="tui-msg-error m-6">
-                {error}
+      {/* Admin Section */}
+      {isAdmin && (
+        <ContentCard variant="tui">
+          <div className="p-6 border-b border-[var(--tui-border)]">
+            <PageHeader
+              variant="tui"
+              title="Event Management"
+              description="View and manage all tracked events in the system"
+            >
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleGenerateEvents}
+                  disabled={adminLoading}
+                  className="tui-btn-primary"
+                >
+                  Generate Events
+                </button>
+                <button
+                  onClick={handleGenerateArticlesFromEvents}
+                  disabled={adminLoading}
+                  className="tui-btn"
+                >
+                  Generate Articles from Events
+                </button>
               </div>
-            )}
+            </PageHeader>
+          </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-[var(--tui-border)]">
-                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider w-1/3">
-                      Facts
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
-                      Where
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
-                      When
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
-                      Social Media Messages
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
-                      Details
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {adminEvents.map((event) => (
-                    <tr
-                      key={event.id}
-                      className="border-b border-[var(--tui-border)] hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
-                    >
-                      <td className="px-6 py-4 text-sm tui-text-primary">
-                        <div className="font-semibold">{event.title}</div>
-                        <div className="text-xs tui-text-muted mt-1">
-                          ID: {event.id}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm tui-text-muted w-1/3 text-center">
-                        <div className="space-y-1">
-                          {event.facts.map((fact, index) => (
-                            <div key={index} className="text-xs font-mono">
-                              • {fact}
+          {error && <div className="tui-msg-error m-6">{error}</div>}
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse">
+              <thead>
+                <tr className="border-b border-[var(--tui-border)]">
+                  <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider w-1/3">
+                    Facts
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
+                    Where
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
+                    When
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
+                    Social Media Messages
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-mono text-[var(--tui-primary)] uppercase tracking-wider">
+                    Details
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {adminEvents.map((event) => (
+                  <tr
+                    key={event.id}
+                    className="border-b border-[var(--tui-border)] hover:bg-[var(--tui-hover-bg)] transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 text-sm tui-text-primary">
+                      <div className="font-semibold">{event.title}</div>
+                      <div className="text-xs tui-text-muted mt-1">
+                        ID: {event.id}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm tui-text-muted w-1/3 text-center">
+                      <div className="space-y-1">
+                        {event.facts.map((fact, index) => (
+                          <div key={index} className="text-xs font-mono">
+                            • {fact}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm tui-text-muted">
+                      {event.where || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-sm tui-text-muted">
+                      {event.when || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-sm tui-text-muted">
+                      {event.messageTexts && event.messageTexts.length > 0 ? (
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {event.messageTexts.map((text, index) => (
+                            <div
+                              key={index}
+                              className="text-xs font-mono bg-black border border-[var(--tui-border)] p-2"
+                            >
+                              {text}
                             </div>
                           ))}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm tui-text-muted">
-                        {event.where || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm tui-text-muted">
-                        {event.when || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm tui-text-muted">
-                        {event.messageTexts && event.messageTexts.length > 0 ? (
-                          <div className="space-y-1 max-h-32 overflow-y-auto">
-                            {event.messageTexts.map((text, index) => (
-                              <div
-                                key={index}
-                                className="text-xs font-mono bg-black border border-[var(--tui-border)] p-2"
-                              >
-                                {text}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-[var(--tui-placeholder)] font-mono">No messages</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm tui-text-muted">
-                        Reporter: {event.reporterId}
-                        <br />
-                        Created: {formatDate(event.createdTime)}
-                        <br />
-                        Updated: {formatDate(event.updatedTime)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      ) : (
+                        <span className="text-[var(--tui-placeholder)] font-mono">
+                          No messages
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm tui-text-muted">
+                      Reporter: {event.reporterId}
+                      <br />
+                      Created: {formatDate(event.createdTime)}
+                      <br />
+                      Updated: {formatDate(event.updatedTime)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            {adminEvents.length === 0 && (
-              <div className="border-t border-[var(--tui-border)] p-12 text-center">
-                <p className="tui-text-primary">No events found</p>
-                <p className="tui-text-muted text-sm mt-2">
-                  Click "Generate Events" to create new events from recent
-                  social media data
-                </p>
-              </div>
-            )}
-          </ContentCard>
-        )}
-      </PageContainer>
+          {adminEvents.length === 0 && (
+            <div className="border-t border-[var(--tui-border)] p-12 text-center">
+              <p className="tui-text-primary">No events found</p>
+              <p className="tui-text-muted text-sm mt-2">
+                Click "Generate Events" to create new events from recent social
+                media data
+              </p>
+            </div>
+          )}
+        </ContentCard>
+      )}
+    </PageContainer>
   );
 }

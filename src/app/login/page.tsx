@@ -96,17 +96,14 @@ export default function LoginPage() {
               email and password you wish to register with, then click Register.
             </p>
             <p className="tui-text-muted text-sm">
-              <strong className="tui-text-primary">Existing users:</strong> Enter
-              your existing email and password, then click Login.
+              <strong className="tui-text-primary">Existing users:</strong>{" "}
+              Enter your existing email and password, then click Login.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label
-                htmlFor="email"
-                className="tui-label block mb-2"
-              >
+              <label htmlFor="email" className="tui-label block mb-2">
                 Email
               </label>
               <input
@@ -121,10 +118,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="tui-label block mb-2"
-              >
+              <label htmlFor="password" className="tui-label block mb-2">
                 Password
               </label>
               <input
@@ -138,11 +132,7 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && (
-              <div className="tui-msg-error">
-                {error}
-              </div>
-            )}
+            {error && <div className="tui-msg-error">{error}</div>}
 
             <button
               type="submit"

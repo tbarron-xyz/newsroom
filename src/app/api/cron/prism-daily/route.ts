@@ -28,7 +28,10 @@ export async function GET(_request: NextRequest) {
       message: result.message
     });
   } catch (error) {
-    console.error(`[${new Date().toISOString()}] Prism daily cron failed:`, error);
+    console.error(
+      `[${new Date().toISOString()}] Prism daily cron failed:`,
+      error
+    );
     return NextResponse.json(
       {
         success: false,

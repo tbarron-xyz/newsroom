@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode
+} from "react";
 import { apiService } from "@/app/services/api.service";
 
 export interface User {
@@ -36,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: "admin",
         hasReader: true,
         hasReporter: true,
-        hasEditor: true,
+        hasEditor: true
       });
       setLoading(false);
       return;
@@ -73,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasEditor: user?.hasEditor ?? false,
         isAdmin: user?.role === "admin",
         refresh: checkAuth,
-        setUser,
+        setUser
       }}
     >
       {children}

@@ -114,9 +114,7 @@ function DailyEditionCard({
             <div className="mb-4">
               <div className="flex items-center space-x-3 mb-2">
                 <div className="w-8 h-8 border border-[var(--tui-border)] flex items-center justify-center">
-                  <span className="tui-muted">
-                    {index + 1}
-                  </span>
+                  <span className="tui-muted">{index + 1}</span>
                 </div>
                 <span className="px-3 py-1 border border-[var(--tui-border)] tui-muted text-xs">
                   {topic.name}
@@ -125,9 +123,7 @@ function DailyEditionCard({
               <h3 className="text-xl font-bold text-[var(--tui-primary)] mb-2">
                 {topic.headline}
               </h3>
-              <p className="tui-muted italic">
-                {topic.oneLineSummary}
-              </p>
+              <p className="tui-muted italic">{topic.oneLineSummary}</p>
             </div>
 
             <div className="prose prose-lg max-w-none mb-6">
@@ -144,8 +140,16 @@ function DailyEditionCard({
 
       {articles && articles.length > 0 && (
         <div className="mt-8 pt-8 border-t border-[var(--tui-border)]">
-          <h3 className="text-lg font-bold text-[var(--tui-primary)] mb-4">Source Articles</h3>
-          {articles.map(article => <SourceArticleCard key={article.id} article={article} variant="tui" />)}
+          <h3 className="text-lg font-bold text-[var(--tui-primary)] mb-4">
+            Source Articles
+          </h3>
+          {articles.map((article) => (
+            <SourceArticleCard
+              key={article.id}
+              article={article}
+              variant="tui"
+            />
+          ))}
         </div>
       )}
     </div>
@@ -157,8 +161,12 @@ export default function PrismPage() {
   const [selectedPairId, setSelectedPairId] = useState(PAIR_METADATA[0].id);
   const [leftResult, setLeftResult] = useState<ColumnResult | null>(null);
   const [rightResult, setRightResult] = useState<ColumnResult | null>(null);
-  const [leftArticles, setLeftArticles] = useState<Article[] | undefined>(undefined);
-  const [rightArticles, setRightArticles] = useState<Article[] | undefined>(undefined);
+  const [leftArticles, setLeftArticles] = useState<Article[] | undefined>(
+    undefined
+  );
+  const [rightArticles, setRightArticles] = useState<Article[] | undefined>(
+    undefined
+  );
   const [loading, setLoading] = useState(true);
   const [remapping, setRemapping] = useState(false);
   const [error, setError] = useState("");
@@ -166,8 +174,9 @@ export default function PrismPage() {
   useEffect(() => {
     const fetchEditions = async () => {
       try {
-        const data =
-          await apiService.get<DailyEdition[]>("/api/daily-editions");
+        const data = await apiService.get<DailyEdition[]>(
+          "/api/daily-editions"
+        );
         setDailyEditions(data);
       } catch (err) {
         setError("Failed to load daily editions");
@@ -198,8 +207,12 @@ export default function PrismPage() {
 
       // Fetch enriched source articles for both perspectives
       const [leftEnriched, rightEnriched] = await Promise.all([
-        apiService.get<any>(`/api/daily-editions/${result.left.content.id}`).catch(() => null),
-        apiService.get<any>(`/api/daily-editions/${result.right.content.id}`).catch(() => null),
+        apiService
+          .get<any>(`/api/daily-editions/${result.left.content.id}`)
+          .catch(() => null),
+        apiService
+          .get<any>(`/api/daily-editions/${result.right.content.id}`)
+          .catch(() => null)
       ]);
       if (leftEnriched) {
         setLeftArticles(leftEnriched.editions.flatMap((e: any) => e.stories));
@@ -249,8 +262,12 @@ export default function PrismPage() {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-[var(--tui-primary)] mb-2">No Daily Editions Available</h3>
-          <p className="tui-text-muted">Daily editions are generated automatically. Check back later!</p>
+          <h3 className="text-xl font-semibold text-[var(--tui-primary)] mb-2">
+            No Daily Editions Available
+          </h3>
+          <p className="tui-text-muted">
+            Daily editions are generated automatically. Check back later!
+          </p>
         </ContentCard>
       </PageContainer>
     );
@@ -310,9 +327,7 @@ export default function PrismPage() {
         >
           {remapping ? "Remapping..." : "Remap"}
         </button>
-        {error && (
-          <div className="tui-msg-error flex-1">{error}</div>
-        )}
+        {error && <div className="tui-msg-error flex-1">{error}</div>}
       </div>
 
       {/* Two-column results */}

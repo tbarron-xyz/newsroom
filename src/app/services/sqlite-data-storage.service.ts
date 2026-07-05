@@ -695,7 +695,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
     };
   }
 
-    // Opinion Article operations
+  // Opinion Article operations
   async saveOpinionArticle(opinion: OpinionArticle): Promise<void> {
     const db = this.getDb();
     db.prepare(
@@ -740,7 +740,9 @@ export class SQLiteDataStorageService implements IDataStorageService {
   async getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]> {
     const db = this.getDb();
     const rows = db
-      .prepare("SELECT * FROM opinion_articles ORDER BY generationTime DESC LIMIT ?")
+      .prepare(
+        "SELECT * FROM opinion_articles ORDER BY generationTime DESC LIMIT ?"
+      )
       .all(limit || 50) as any[];
     return rows.map((row: any) => ({
       id: row.id,
@@ -1322,7 +1324,9 @@ export class SQLiteDataStorageService implements IDataStorageService {
     throw new Error("Not implemented in SQLite");
   }
 
-  async getPrismDailyEditionPairs(_limit?: number): Promise<PrismDailyEditionPair[]> {
+  async getPrismDailyEditionPairs(
+    _limit?: number
+  ): Promise<PrismDailyEditionPair[]> {
     return [];
   }
 }

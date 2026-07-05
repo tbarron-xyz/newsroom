@@ -49,7 +49,10 @@ export default function OpinionPage() {
           $ Loading opinions...
         </div>
       ) : opinions.length === 0 ? (
-        <EmptyState title="No opinion articles yet" description="Trigger generation from the Editor Settings page." />
+        <EmptyState
+          title="No opinion articles yet"
+          description="Trigger generation from the Editor Settings page."
+        />
       ) : (
         <div className="space-y-8">
           {opinions.map((opinion) => (

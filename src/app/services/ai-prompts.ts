@@ -1,4 +1,9 @@
-import { Persona, OpinionPersona, Reporter, DynamicPersona } from "../schemas/types";
+import {
+  Persona,
+  OpinionPersona,
+  Reporter,
+  DynamicPersona
+} from "../schemas/types";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import {
@@ -668,8 +673,11 @@ Return valid JSON matching the schema: frontPageHeadline, frontPageArticle, topi
     };
   }
 
-  static generatePrismDailyEditorialPrompts(editionsText: string): PromptConfig {
-    const systemPrompt = "You are a media analyst who identifies contrasting editorial perspectives. Given a set of newspaper stories, you determine two opposing but intellectually coherent political/ideological lenses that would frame the same facts differently.";
+  static generatePrismDailyEditorialPrompts(
+    editionsText: string
+  ): PromptConfig {
+    const systemPrompt =
+      "You are a media analyst who identifies contrasting editorial perspectives. Given a set of newspaper stories, you determine two opposing but intellectually coherent political/ideological lenses that would frame the same facts differently.";
     const userPrompt = `Analyze the following newspaper editions and determine two opposing editorial perspectives that would frame these stories differently.
 
 ${editionsText}
@@ -726,10 +734,7 @@ Return a JSON object with "declined", "headline", "content", and "topicIndexes".
     return {
       systemPrompt,
       userPrompt,
-      responseFormat: zodResponseFormat(
-        opinionArticleSchema,
-        "opinion_article"
-      )
+      responseFormat: zodResponseFormat(opinionArticleSchema, "opinion_article")
     };
   }
 

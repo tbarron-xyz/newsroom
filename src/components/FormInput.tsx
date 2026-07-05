@@ -40,9 +40,7 @@ export default function FormInput({
 
   return (
     <div className="space-y-2">
-      {label && (
-        <label className={labelClass}>{label}</label>
-      )}
+      {label && <label className={labelClass}>{label}</label>}
       {Component === "textarea" ? (
         <textarea className={inputClass} rows={rows} {...props} />
       ) : (

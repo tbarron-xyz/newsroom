@@ -4,13 +4,15 @@ import { AuthService } from "../../services/auth.service";
 import { AbilitiesService } from "../../services/abilities.service";
 
 // GET /api/daily-editions - Get daily editions (limited to 3 results for all users)
-export const GET = withDataStorage(async (request: NextRequest, dataStorage) => {
-  // Limit to 3 results for all users
-  const limit = 3;
-  const dailyEditions = await dataStorage.getDailyEditions(limit);
+export const GET = withDataStorage(
+  async (request: NextRequest, dataStorage) => {
+    // Limit to 3 results for all users
+    const limit = 3;
+    const dailyEditions = await dataStorage.getDailyEditions(limit);
 
-  return NextResponse.json(dailyEditions);
-});
+    return NextResponse.json(dailyEditions);
+  }
+);
 
 // POST /api/daily-editions - Generate a new daily edition (placeholder for now)
 export async function POST() {

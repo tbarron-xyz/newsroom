@@ -245,9 +245,8 @@ export class EditorService {
       })
     );
 
-    const perspectives = await this.aiService.generatePrismPerspectives(
-      detailedEditions
-    );
+    const perspectives =
+      await this.aiService.generatePrismPerspectives(detailedEditions);
 
     console.log(
       `Generated perspectives: "${perspectives.leftLabel}" vs "${perspectives.rightLabel}"`
@@ -499,7 +498,9 @@ export class EditorService {
 
     await this.dataStorageService.saveTicker(ticker);
 
-    console.log(`[${new Date().toISOString()}] Successfully generated ticker text`);
+    console.log(
+      `[${new Date().toISOString()}] Successfully generated ticker text`
+    );
     return {
       message: `Ticker text generated: "${result.text.substring(0, 60)}..."`,
       jobType: "ticker"
@@ -514,7 +515,8 @@ export class EditorService {
     if (!result.opinion) {
       console.log("Editor: AI declined to write an opinion piece");
       return {
-        message: "Opinion generation completed — AI did not take a stance on any article",
+        message:
+          "Opinion generation completed — AI did not take a stance on any article",
         jobType: "opinion"
       };
     }

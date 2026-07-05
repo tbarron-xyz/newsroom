@@ -127,8 +127,12 @@ export default function EditionsPage() {
 
       {editions.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-xl font-semibold tui-text-primary mb-2">No Editions Available</h3>
-          <p className="tui-text-muted">Newspaper editions are generated automatically. Check back later!</p>
+          <h3 className="text-xl font-semibold tui-text-primary mb-2">
+            No Editions Available
+          </h3>
+          <p className="tui-text-muted">
+            Newspaper editions are generated automatically. Check back later!
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -171,7 +175,11 @@ export default function EditionsPage() {
                     </h4>
                     <div className="space-y-4">
                       {articles.map((article: Article) => (
-                        <SourceArticleCard key={article.id} article={article} variant="tui" />
+                        <SourceArticleCard
+                          key={article.id}
+                          article={article}
+                          variant="tui"
+                        />
                       ))}
                     </div>
                   </div>

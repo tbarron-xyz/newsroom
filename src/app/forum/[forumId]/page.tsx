@@ -124,25 +124,16 @@ export default function ForumViewPage() {
           title={forumTitle}
           description={`${threads.length} threads`}
         >
-          <Link
-            href="/forum"
-            className="tui-btn"
-          >
+          <Link href="/forum" className="tui-btn">
             ← Back to Forum
           </Link>
           {hasReader && (
-            <Link
-              href={`/forum/${forumId}/new`}
-              className="tui-btn-primary"
-            >
+            <Link href={`/forum/${forumId}/new`} className="tui-btn-primary">
               + New Thread
             </Link>
           )}
           {hasReader && (
-            <Link
-              href={`/forum/${forumId}/act-as`}
-              className="tui-btn"
-            >
+            <Link href={`/forum/${forumId}/act-as`} className="tui-btn">
               Act as forum user
             </Link>
           )}
@@ -166,13 +157,19 @@ export default function ForumViewPage() {
                     >
                       {thread.title}
                     </Link>
-                    <div className="flex items-center gap-2 mt-2 tui-text-muted" style={{ fontSize: '0.75rem' }}>
+                    <div
+                      className="flex items-center gap-2 mt-2 tui-text-muted"
+                      style={{ fontSize: "0.75rem" }}
+                    >
                       <span>by {thread.author}</span>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="flex items-center gap-3 tui-text-muted" style={{ fontSize: '0.875rem' }}>
+                    <div
+                      className="flex items-center gap-3 tui-text-muted"
+                      style={{ fontSize: "0.875rem" }}
+                    >
                       <span>{thread.replyCount} replies</span>
                       <span className="tui-text-muted" style={{ opacity: 0.7 }}>
                         {formatTime(thread.lastReplyTime)}

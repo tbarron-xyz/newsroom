@@ -22,9 +22,7 @@ export default function PageContainer({
       : "min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600";
 
   return (
-    <div
-      className={`${bgClass} relative overflow-hidden ${className}`}
-    >
+    <div className={`${bgClass} relative overflow-hidden ${className}`}>
       {variant !== "tui" && background && <AnimatedBackground />}
       <div
         className={`${maxWidth} mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10`}

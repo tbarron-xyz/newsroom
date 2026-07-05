@@ -307,14 +307,16 @@ function ArticlesContent() {
 
 export default function ArticlesPage() {
   return (
-    <Suspense fallback={
-      <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
-          <p className="mt-4 tui-muted">Loading articles...</p>
+    <Suspense
+      fallback={
+        <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+            <p className="mt-4 tui-muted">Loading articles...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ArticlesContent />
     </Suspense>
   );

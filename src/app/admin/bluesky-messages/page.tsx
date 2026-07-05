@@ -109,12 +109,12 @@ export default function BlueskyMessagesPage() {
           <PageHeader
             variant="tui"
             title="Bluesky Messages"
-            description="Bluesky messages will be obtained from bluesky.service.ts by constructing a fresh TinyJetstream from the npm package &quot;mbjc&quot;, listening for &quot;n&quot; messages, and then disposing the TinyJetstream."
+            description='Bluesky messages will be obtained from bluesky.service.ts by constructing a fresh TinyJetstream from the npm package "mbjc", listening for "n" messages, and then disposing the TinyJetstream.'
           />
           {data && (
             <div className="mt-2 tui-text-muted">
-              <span className="tui-text-primary font-medium">{data.count}</span> messages
-              fetched at {formatTimestamp(data.timestamp)}
+              <span className="tui-text-primary font-medium">{data.count}</span>{" "}
+              messages fetched at {formatTimestamp(data.timestamp)}
             </div>
           )}
         </div>
@@ -165,11 +165,15 @@ export default function BlueskyMessagesPage() {
                             </span>
                           </div>
                           <div className="font-mono text-sm tui-text-muted mb-2">
-                            <strong className="text-[var(--tui-primary)]">DID:</strong>{" "}
+                            <strong className="text-[var(--tui-primary)]">
+                              DID:
+                            </strong>{" "}
                             {message.did}
                           </div>
                           <div className="font-mono text-sm tui-text-muted">
-                            <strong className="text-[var(--tui-primary)]">Text:</strong>{" "}
+                            <strong className="text-[var(--tui-primary)]">
+                              Text:
+                            </strong>{" "}
                             {message.text}
                           </div>
                         </div>

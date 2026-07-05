@@ -29,12 +29,14 @@ export const POST = withAuth(
     const reporterService = await container.getReporterService();
 
     try {
-      const articles = await reporterService.generateArticlesForReporter(reporterId);
+      const articles =
+        await reporterService.generateArticlesForReporter(reporterId);
 
       if (articles.length === 0) {
         return NextResponse.json({
           success: true,
-          message: "No articles were generated — no suitable source messages found.",
+          message:
+            "No articles were generated — no suitable source messages found.",
           articles: []
         });
       }
@@ -45,7 +47,10 @@ export const POST = withAuth(
         articles
       });
     } catch (error) {
-      console.error(`Error generating article for reporter ${reporterId}:`, error);
+      console.error(
+        `Error generating article for reporter ${reporterId}:`,
+        error
+      );
       return NextResponse.json(
         {
           success: false,

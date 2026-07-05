@@ -21,8 +21,10 @@ const mockMessages = [
 ];
 
 const mockHeadline = "AI Innovations Reshape News Industry";
-const mockLead = "Artificial intelligence is fundamentally changing how news organizations operate.";
-const mockBody = "From automated fact-checking to personalized content delivery, AI tools are becoming essential in modern newsrooms. Publishers report significant efficiency gains while maintaining editorial quality.";
+const mockLead =
+  "Artificial intelligence is fundamentally changing how news organizations operate.";
+const mockBody =
+  "From automated fact-checking to personalized content delivery, AI tools are becoming essential in modern newsrooms. Publishers report significant efficiency gains while maintaining editorial quality.";
 
 const mockCompletionContent = JSON.stringify({
   id: "article_mock_001",
@@ -40,7 +42,8 @@ const mockCompletionContent = JSON.stringify({
     sourceDiversity: "medium",
     factualAccuracy: "high"
   },
-  socialMediaSummary: "Social media discussions highlight AI's growing role in journalism"
+  socialMediaSummary:
+    "Social media discussions highlight AI's growing role in journalism"
 });
 
 const mockChatCompletion = {
@@ -112,7 +115,8 @@ describe("Article generation pipeline", () => {
     const aiService = new AIService(storage);
     const reporterService = new ReporterService(storage, aiService);
 
-    const articles = await reporterService.generateArticlesForReporter(reporterId);
+    const articles =
+      await reporterService.generateArticlesForReporter(reporterId);
 
     assert.equal(articles.length, 1);
     assert.equal(articles[0].headline, mockHeadline);

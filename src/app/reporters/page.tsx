@@ -232,7 +232,6 @@ export default function ReportersPage() {
       </PageHeader>
 
       <div className="mt-8">
-
         {/* Create New Reporter Button */}
         <div className="mb-6">
           {hasReporterPermission ? (
@@ -498,12 +497,12 @@ export default function ReportersPage() {
                         onClick={() => toggleReporterStatus(reporter.id)}
                         disabled={saving}
                         className={`px-4 py-2 flex items-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed ${
-                          reporter.enabled ? "tui-btn-danger" : "tui-btn-primary"
+                          reporter.enabled
+                            ? "tui-btn-danger"
+                            : "tui-btn-primary"
                         }`}
                       >
-                        <span>
-                          {reporter.enabled ? "Disable" : "Enable"}
-                        </span>
+                        <span>{reporter.enabled ? "Disable" : "Enable"}</span>
                         <svg
                           className="w-4 h-4"
                           fill="none"
@@ -655,9 +654,7 @@ export default function ReportersPage() {
 
                     {/* Add Beat Input */}
                     <div>
-                      <label className="tui-label block mb-2">
-                        Add Beat
-                      </label>
+                      <label className="tui-label block mb-2">Add Beat</label>
                       <div className="flex space-x-2">
                         <input
                           type="text"
@@ -718,9 +715,7 @@ export default function ReportersPage() {
                         disabled={saving}
                         className="tui-btn-primary px-6 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <span>
-                          {saving ? "Saving..." : "Save Changes"}
-                        </span>
+                        <span>{saving ? "Saving..." : "Save Changes"}</span>
                         {!saving && (
                           <svg
                             className="w-4 h-4"

@@ -49,10 +49,12 @@ async function checkReporterPermission(
 }
 
 // GET /api/reporters - Get all reporters (public read-only access)
-export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
-  const reporters = await dataStorage.getAllReporters();
-  return NextResponse.json(reporters);
-});
+export const GET = withDataStorage(
+  async (_request: NextRequest, dataStorage) => {
+    const reporters = await dataStorage.getAllReporters();
+    return NextResponse.json(reporters);
+  }
+);
 
 // POST /api/reporters - Create new reporter
 export const POST = withAuth(

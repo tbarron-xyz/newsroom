@@ -162,18 +162,16 @@ export class AIService {
       // Fetch recent social media messages to inform article generation
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await this.fetchSocialMediaMessages(
-          messageSliceCount
-        );
+        socialMediaMessages =
+          await this.fetchSocialMediaMessages(messageSliceCount);
       } catch (error) {
         console.warn("Failed to fetch social media messages:", error);
         // Continue with article generation even if social media fetch fails
       }
 
       // Format social media messages for the prompt
-      const socialMediaContext = AIResponseUtils.formatSocialMediaContext(
-        socialMediaMessages
-      );
+      const socialMediaContext =
+        AIResponseUtils.formatSocialMediaContext(socialMediaMessages);
 
       const config = AIPrompts.generateStructuredArticlePrompts(
         reporter,
@@ -536,7 +534,10 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         this.dataStorageService
       );
 
-      await this.logAIResponse("Prism perspectives generation", result.response);
+      await this.logAIResponse(
+        "Prism perspectives generation",
+        result.response
+      );
 
       const content = result.response.choices[0]?.message?.content?.trim();
       if (!content) {
@@ -578,7 +579,10 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
   }> {
     try {
       const editionText = this.serialiseDailyEdition(dailyEdition);
-      const config = AIPrompts.prismRemapPrompts(editionText, perspectivePrompt);
+      const config = AIPrompts.prismRemapPrompts(
+        editionText,
+        perspectivePrompt
+      );
       const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
 
       console.log(
@@ -707,9 +711,8 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       // Fetch recent social media messages
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await this.fetchSocialMediaMessages(
-          messageSliceCount
-        );
+        socialMediaMessages =
+          await this.fetchSocialMediaMessages(messageSliceCount);
       } catch (error) {
         console.warn(
           "Failed to fetch social media messages for events:",
@@ -863,18 +866,16 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       // Fetch recent social media messages to inform article generation
       let socialMediaMessages: BlueskyMessage[] = [];
       try {
-        socialMediaMessages = await this.fetchSocialMediaMessages(
-          messageSliceCount
-        );
+        socialMediaMessages =
+          await this.fetchSocialMediaMessages(messageSliceCount);
       } catch (error) {
         console.warn("Failed to fetch social media messages:", error);
         // Continue with article generation even if social media fetch fails
       }
 
       // Format social media messages for the prompt
-      const socialMediaContext = AIResponseUtils.formatSocialMediaContext(
-        socialMediaMessages
-      );
+      const socialMediaContext =
+        AIResponseUtils.formatSocialMediaContext(socialMediaMessages);
 
       const config = AIPrompts.generateArticlesFromEventsPrompts(
         reporter,

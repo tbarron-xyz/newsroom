@@ -34,7 +34,7 @@ export function withAuth(
         createdAt: Date.now(),
         hasReader: true,
         hasReporter: true,
-        hasEditor: true,
+        hasEditor: true
       };
       return handler(request, syntheticUser, dataStorage, context);
     }

@@ -3,32 +3,34 @@ import { withAuth } from "../../utils/auth";
 import { withDataStorage } from "../../utils/data-storage";
 
 // GET /api/editor - Get current editor data
-export const GET = withDataStorage(async (_request: NextRequest, dataStorage) => {
-  const editor = await dataStorage.getEditor();
+export const GET = withDataStorage(
+  async (_request: NextRequest, dataStorage) => {
+    const editor = await dataStorage.getEditor();
 
-  return NextResponse.json({
-    bio: editor?.bio || "",
-    prompt: editor?.prompt || "",
-    modelName: editor?.modelName || "gpt-5-nano",
-    articleModelName: editor?.articleModelName || "gpt-5-nano",
-    eventModelName: editor?.eventModelName || "gpt-5-nano",
-    storySelectionModelName: editor?.storySelectionModelName || "gpt-5-nano",
-    editionSelectionModelName:
-      editor?.editionSelectionModelName || "gpt-5-nano",
-    messageSliceCount: editor?.messageSliceCount || 200,
-    inputTokenCost: editor?.inputTokenCost || 0.05,
-    outputTokenCost: editor?.outputTokenCost || 0.4,
-    baseUrl: editor?.baseUrl || "",
-    articleGenerationPeriodMinutes:
-      editor?.articleGenerationPeriodMinutes || 15,
-    lastArticleGenerationTime: editor?.lastArticleGenerationTime || null,
-    eventGenerationPeriodMinutes: editor?.eventGenerationPeriodMinutes || 30,
-    lastEventGenerationTime: editor?.lastEventGenerationTime || null,
-    editionGenerationPeriodMinutes:
-      editor?.editionGenerationPeriodMinutes || 180,
-    lastEditionGenerationTime: editor?.lastEditionGenerationTime || null
-  });
-});
+    return NextResponse.json({
+      bio: editor?.bio || "",
+      prompt: editor?.prompt || "",
+      modelName: editor?.modelName || "gpt-5-nano",
+      articleModelName: editor?.articleModelName || "gpt-5-nano",
+      eventModelName: editor?.eventModelName || "gpt-5-nano",
+      storySelectionModelName: editor?.storySelectionModelName || "gpt-5-nano",
+      editionSelectionModelName:
+        editor?.editionSelectionModelName || "gpt-5-nano",
+      messageSliceCount: editor?.messageSliceCount || 200,
+      inputTokenCost: editor?.inputTokenCost || 0.05,
+      outputTokenCost: editor?.outputTokenCost || 0.4,
+      baseUrl: editor?.baseUrl || "",
+      articleGenerationPeriodMinutes:
+        editor?.articleGenerationPeriodMinutes || 15,
+      lastArticleGenerationTime: editor?.lastArticleGenerationTime || null,
+      eventGenerationPeriodMinutes: editor?.eventGenerationPeriodMinutes || 30,
+      lastEventGenerationTime: editor?.lastEventGenerationTime || null,
+      editionGenerationPeriodMinutes:
+        editor?.editionGenerationPeriodMinutes || 180,
+      lastEditionGenerationTime: editor?.lastEditionGenerationTime || null
+    });
+  }
+);
 
 // PUT /api/editor - Update editor data
 export const PUT = withAuth(

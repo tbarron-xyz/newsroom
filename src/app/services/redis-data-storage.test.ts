@@ -178,9 +178,21 @@ describe("RedisDataStorageService", () => {
     });
 
     it("getArticlesInTimeRange returns correct subset", async () => {
-      const a1 = makeArticle({ id: "a1", generationTime: 100, reporterId: "rep" });
-      const a2 = makeArticle({ id: "a2", generationTime: 200, reporterId: "rep" });
-      const a3 = makeArticle({ id: "a3", generationTime: 300, reporterId: "rep" });
+      const a1 = makeArticle({
+        id: "a1",
+        generationTime: 100,
+        reporterId: "rep"
+      });
+      const a2 = makeArticle({
+        id: "a2",
+        generationTime: 200,
+        reporterId: "rep"
+      });
+      const a3 = makeArticle({
+        id: "a3",
+        generationTime: 300,
+        reporterId: "rep"
+      });
       await storage.saveArticle(a1);
       await storage.saveArticle(a2);
       await storage.saveArticle(a3);
@@ -191,8 +203,16 @@ describe("RedisDataStorageService", () => {
     });
 
     it("getArticlesInTimeRangeGlobal returns articles across all reporters", async () => {
-      const a1 = makeArticle({ id: "a1", generationTime: 100, reporterId: "r1" });
-      const a2 = makeArticle({ id: "a2", generationTime: 200, reporterId: "r2" });
+      const a1 = makeArticle({
+        id: "a1",
+        generationTime: 100,
+        reporterId: "r1"
+      });
+      const a2 = makeArticle({
+        id: "a2",
+        generationTime: 200,
+        reporterId: "r2"
+      });
       await storage.saveArticle(a1);
       await storage.saveArticle(a2);
       const results = await storage.getArticlesInTimeRangeGlobal(50, 250);
