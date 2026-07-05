@@ -26,8 +26,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        yield { content: [{ type: "text", text: dec.decode(value) }] };
+        yield {
+          content: [{ type: "text", text: dec.decode(value, { stream: true }) }]
+        };
       }
+      dec.decode(); // flush any remaining bytes
     }
   };
 

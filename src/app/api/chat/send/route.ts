@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AIClient } from "../../../services/ai-client";
-import { AIModelOption } from "../../../schemas/types";
-import { RedisDataStorageService } from "../../../services/redis-data-storage.service";
+import { streamText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { ServiceContainer } from "../../../services/service-container";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   const { messages, sessionId } = await request.json();
@@ -13,12 +15,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const dataStorage = new RedisDataStorageService();
-  await dataStorage.connect();
+  const container = ServiceContainer.getInstance();
+  const dataStorage = await container.getDataStorageService();
 
   const editor = await dataStorage.getEditor();
   if (!editor) {
-    await dataStorage.disconnect();
     return NextResponse.json(
       { error: "Editor configuration not found" },
       { status: 500 }
@@ -29,7 +30,6 @@ export async function POST(request: NextRequest) {
   const edition =
     dailyEditions && dailyEditions.length > 0 ? dailyEditions[0] : null;
   if (!edition) {
-    await dataStorage.disconnect();
     return NextResponse.json(
       { error: "No daily edition available" },
       { status: 404 }
@@ -55,7 +55,6 @@ ${edition.topics
       ? existingSession.filter((m: any) => m.role === "user")
       : [];
   if (userMessages.length >= 3) {
-    await dataStorage.disconnect();
     return NextResponse.json({ error: "conversation_ended" }, { status: 403 });
   }
 
@@ -82,26 +81,34 @@ ${editionContext}`;
       ? latestUserMessage.content
       : latestUserMessage.content.map((c: any) => c.text || "").join("");
 
-  const aiClient = new AIClient(dataStorage);
+  const modelName = editor.chatModelName;
+  if (!modelName) {
+    return NextResponse.json(
+      { error: "Chat model not configured" },
+      { status: 500 }
+    );
+  }
 
-  const stream = await aiClient.createChatCompletionStream(AIModelOption.CHAT, {
-    messages: [
-      { role: "system", content: systemPrompt },
-      ...previousMessages,
-      { role: "user", content: latestContent }
-    ]
+  const openai = createOpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    baseURL: editor.baseUrl || undefined
+  });
+
+  const result = streamText({
+    model: openai(modelName),
+    system: systemPrompt,
+    messages: [...previousMessages, { role: "user", content: latestContent }]
   });
 
   const encoder = new TextEncoder();
+  let fullResponse = "";
   const readableStream = new ReadableStream({
     async start(controller) {
-      let fullResponse = "";
       try {
-        for await (const chunk of stream) {
-          const delta = chunk.choices?.[0]?.delta?.content || "";
-          if (delta) {
-            fullResponse += delta;
-            controller.enqueue(encoder.encode(delta));
+        for await (const chunk of result.stream) {
+          if (chunk.type === "text-delta") {
+            fullResponse += chunk.text;
+            controller.enqueue(encoder.encode(chunk.text));
           }
         }
       } catch (error) {
@@ -133,7 +140,6 @@ ${editionContext}`;
           ];
 
       await dataStorage.saveChatSession(sessionId, updatedMessages);
-      await dataStorage.disconnect();
     }
   });
 
