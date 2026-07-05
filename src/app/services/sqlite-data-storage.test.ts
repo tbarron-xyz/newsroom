@@ -8,7 +8,9 @@ import {
   makeEvent,
   makeUserInput,
   makeNewspaperEdition,
-  makeDailyEdition
+  makeDailyEdition,
+  makeTicker,
+  makeOpinionArticle
 } from "./test-data-factories";
 
 describe("SQLiteDataStorageService", () => {
@@ -425,6 +427,28 @@ describe("SQLiteDataStorageService", () => {
     it("getJobRunning returns false for unknown job", async () => {
       assert.equal(await storage.getJobRunning("unknown"), false);
     });
+
+    it("preserves all job_status fields when setting individually", async () => {
+      const runTs = Date.now();
+      const successTs = runTs + 1000;
+      await storage.setJobRunning("reporter", true);
+      await storage.setJobLastRun("reporter", runTs);
+      await storage.setJobLastSuccess("reporter", successTs);
+      assert.equal(await storage.getJobRunning("reporter"), true);
+      assert.equal(await storage.getJobLastRun("reporter"), runTs);
+      assert.equal(await storage.getJobLastSuccess("reporter"), successTs);
+      // Change running to false — lastRun and lastSuccess must survive
+      await storage.setJobRunning("reporter", false);
+      assert.equal(await storage.getJobRunning("reporter"), false);
+      assert.equal(await storage.getJobLastRun("reporter"), runTs);
+      assert.equal(await storage.getJobLastSuccess("reporter"), successTs);
+      // Update lastRun — running and lastSuccess must survive
+      const newRunTs = runTs + 500;
+      await storage.setJobLastRun("reporter", newRunTs);
+      assert.equal(await storage.getJobRunning("reporter"), false);
+      assert.equal(await storage.getJobLastRun("reporter"), newRunTs);
+      assert.equal(await storage.getJobLastSuccess("reporter"), successTs);
+    });
   });
 
   describe("KPI", () => {
@@ -462,6 +486,8 @@ describe("SQLiteDataStorageService", () => {
       await storage.saveNewspaperEdition(makeNewspaperEdition());
       await storage.saveDailyEdition(makeDailyEdition());
       await storage.createUser(makeUserInput());
+      await storage.saveTicker(makeTicker());
+      await storage.saveOpinionArticle(makeOpinionArticle());
 
       await storage.clearAllData();
 
@@ -472,6 +498,8 @@ describe("SQLiteDataStorageService", () => {
       assert.deepEqual(await storage.getNewspaperEditions(), []);
       assert.deepEqual(await storage.getDailyEditions(), []);
       assert.deepEqual(await storage.getAllUsers(), []);
+      assert.equal(await storage.getLatestTicker(), null);
+      assert.deepEqual(await storage.getLatestOpinionArticles(), []);
     });
   });
 });

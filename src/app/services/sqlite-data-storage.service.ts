@@ -249,6 +249,14 @@ export class SQLiteDataStorageService implements IDataStorageService {
       );
       CREATE INDEX IF NOT EXISTS idx_artifacts_reporter ON artifacts(reporterId);
       CREATE INDEX IF NOT EXISTS idx_artifacts_type_created ON artifacts(type, createdAt DESC);
+
+      -- Prism Daily Edition Pairs
+      CREATE TABLE IF NOT EXISTS prism_daily_edition_pairs (
+        id TEXT PRIMARY KEY,
+        data TEXT,  -- JSON serialized PrismDailyEditionPair
+        generationTime INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS idx_prism_daily_edition_pairs_time ON prism_daily_edition_pairs(generationTime DESC);
     `);
   }
 
@@ -849,7 +857,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
   async setJobRunning(jobName: string, running: boolean): Promise<void> {
     const db = this.getDb();
     db.prepare(
-      "INSERT OR REPLACE INTO job_status (name, running) VALUES (?, ?)"
+      "INSERT INTO job_status (name, running) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET running = excluded.running"
     ).run(jobName, running ? 1 : 0);
   }
 
@@ -864,7 +872,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
   async setJobLastRun(jobName: string, timestamp: number): Promise<void> {
     const db = this.getDb();
     db.prepare(
-      "INSERT OR REPLACE INTO job_status (name, lastRun) VALUES (?, ?)"
+      "INSERT INTO job_status (name, lastRun) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET lastRun = excluded.lastRun"
     ).run(jobName, timestamp);
   }
 
@@ -879,7 +887,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
   async setJobLastSuccess(jobName: string, timestamp: number): Promise<void> {
     const db = this.getDb();
     db.prepare(
-      "INSERT OR REPLACE INTO job_status (name, lastSuccess) VALUES (?, ?)"
+      "INSERT INTO job_status (name, lastSuccess) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET lastSuccess = excluded.lastSuccess"
     ).run(jobName, timestamp);
   }
 
@@ -1146,7 +1154,10 @@ export class SQLiteDataStorageService implements IDataStorageService {
       "forum_posts",
       "forum_counters",
       "dynamic_personas",
-      "artifacts"
+      "artifacts",
+      "ticker",
+      "opinion_articles",
+      "prism_daily_edition_pairs"
     ];
     for (const table of tables) {
       db.prepare(`DELETE FROM ${table}`).run();
@@ -1320,13 +1331,26 @@ export class SQLiteDataStorageService implements IDataStorageService {
     };
   }
 
-  async savePrismDailyEditionPair(_pair: PrismDailyEditionPair): Promise<void> {
-    throw new Error("Not implemented in SQLite");
+  async savePrismDailyEditionPair(pair: PrismDailyEditionPair): Promise<void> {
+    const db = this.getDb();
+    db.prepare(
+      "INSERT OR REPLACE INTO prism_daily_edition_pairs (id, data, generationTime) VALUES (?, ?, ?)"
+    ).run(pair.id, JSON.stringify(pair), pair.generationTime);
+    // Keep only the 10 most recent pairs (matching Redis behavior)
+    db.prepare(
+      "DELETE FROM prism_daily_edition_pairs WHERE id NOT IN (SELECT id FROM prism_daily_edition_pairs ORDER BY generationTime DESC LIMIT 10)"
+    ).run();
   }
 
   async getPrismDailyEditionPairs(
-    _limit?: number
+    limit?: number
   ): Promise<PrismDailyEditionPair[]> {
-    return [];
+    const db = this.getDb();
+    const rows = db
+      .prepare(
+        "SELECT data FROM prism_daily_edition_pairs ORDER BY generationTime DESC LIMIT ?"
+      )
+      .all(limit || 3) as any[];
+    return rows.map((row) => JSON.parse(row.data));
   }
 }

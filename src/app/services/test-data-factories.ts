@@ -5,7 +5,10 @@ import type {
   Reporter,
   User,
   NewspaperEdition,
-  DailyEdition
+  DailyEdition,
+  Ticker,
+  OpinionArticle,
+  OpinionPersona
 } from "../schemas/types";
 
 export function makeEditor(overrides: Partial<Editor> = {}): Editor {
@@ -123,6 +126,32 @@ export function makeDailyEdition(
       }
     ],
     prompt: "Compile a daily edition",
+    modelName: "gpt-4",
+    ...overrides
+  };
+}
+
+export function makeTicker(overrides: Partial<Ticker> = {}): Ticker {
+  return {
+    id: "ticker_test_1",
+    text: "Breaking news: test event occurred",
+    generationTime: Date.now(),
+    dailyEditionId: "daily_test_1",
+    modelName: "gpt-4",
+    ...overrides
+  };
+}
+
+export function makeOpinionArticle(
+  overrides: Partial<OpinionArticle> = {}
+): OpinionArticle {
+  return {
+    id: "opinion_test_1",
+    persona: "US liberal" as OpinionPersona,
+    headline: "A Liberal Perspective on Test Events",
+    content: "This is the opinion article content.",
+    generationTime: Date.now(),
+    articleIds: ["article_1"],
     modelName: "gpt-4",
     ...overrides
   };
