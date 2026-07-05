@@ -86,7 +86,7 @@ ${editionContext}`;
   });
 
   const result = streamText({
-    model: openai(modelName),
+    model: openai.chat(modelName),
     system: systemPrompt,
     messages: [...previousMessages, { role: "user", content }]
   });
