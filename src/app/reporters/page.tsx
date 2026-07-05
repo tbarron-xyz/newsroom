@@ -181,6 +181,30 @@ export default function ReportersPage() {
     }
   };
 
+  const generateArticle = async (reporterId: string) => {
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setMessage("Not authenticated");
+        setSaving(false);
+        return;
+      }
+      const data = await apiService.post<any>(
+        `/api/reporters/${reporterId}/generate-article`
+      );
+      setMessage(data.message);
+      setTimeout(() => setMessage(""), 6000);
+    } catch (error) {
+      setMessage("Error generating article");
+      console.error("Error generating article:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Check permissions
   const hasReporterPermission = user?.hasReporter === true;
   const hasEditorPermission = user?.hasEditor === true;
@@ -499,6 +523,32 @@ export default function ReportersPage() {
                         </svg>
                       </button>
                     ) : null}
+                    {hasReporterPermission ? (
+                      <button
+                        onClick={() => generateArticle(reporter.id)}
+                        disabled={saving}
+                        className="tui-btn-primary px-4 py-2 flex items-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <span>Generate Article</span>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </button>
+                    ) : (
+                      <div className="tui-btn opacity-50 cursor-not-allowed px-4 py-2">
+                        Generate Article (Requires Reporter Permission)
+                      </div>
+                    )}
                     {hasReporterPermission ? (
                       <button
                         onClick={() =>
