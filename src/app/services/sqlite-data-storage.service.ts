@@ -279,10 +279,10 @@ export class SQLiteDataStorageService implements IDataStorageService {
       `
       INSERT OR REPLACE INTO editors (
         id, bio, prompt, modelName, articleModelName, eventModelName, storySelectionModelName,
-        editionSelectionModelName, messageSliceCount, inputTokenCost, outputTokenCost, baseUrl,
+        editionSelectionModelName, chatModelName, messageSliceCount, inputTokenCost, outputTokenCost, baseUrl,
         articleGenerationPeriodMinutes, lastArticleGenerationTime, eventGenerationPeriodMinutes,
         lastEventGenerationTime, editionGenerationPeriodMinutes, lastEditionGenerationTime
-      ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
     ).run(
       editor.bio,
@@ -292,6 +292,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
       editor.eventModelName,
       editor.storySelectionModelName,
       editor.editionSelectionModelName,
+      editor.chatModelName,
       editor.messageSliceCount,
       editor.inputTokenCost,
       editor.outputTokenCost,

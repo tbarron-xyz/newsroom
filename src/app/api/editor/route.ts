@@ -16,6 +16,7 @@ export const GET = withDataStorage(
       storySelectionModelName: editor?.storySelectionModelName || "gpt-5-nano",
       editionSelectionModelName:
         editor?.editionSelectionModelName || "gpt-5-nano",
+      chatModelName: editor?.chatModelName || "gpt-5-nano",
       messageSliceCount: editor?.messageSliceCount || 200,
       inputTokenCost: editor?.inputTokenCost || 0.05,
       outputTokenCost: editor?.outputTokenCost || 0.4,
@@ -44,6 +45,7 @@ export const PUT = withAuth(
       eventModelName,
       storySelectionModelName,
       editionSelectionModelName,
+      chatModelName,
       messageSliceCount,
       inputTokenCost,
       outputTokenCost,
@@ -60,7 +62,8 @@ export const PUT = withAuth(
       typeof articleModelName !== "string" ||
       typeof eventModelName !== "string" ||
       typeof storySelectionModelName !== "string" ||
-      typeof editionSelectionModelName !== "string"
+      typeof editionSelectionModelName !== "string" ||
+      typeof chatModelName !== "string"
     ) {
       return NextResponse.json(
         {
@@ -152,6 +155,7 @@ export const PUT = withAuth(
       eventModelName,
       storySelectionModelName,
       editionSelectionModelName,
+      chatModelName,
       messageSliceCount,
       inputTokenCost,
       outputTokenCost,
@@ -169,6 +173,7 @@ export const PUT = withAuth(
       eventModelName,
       storySelectionModelName,
       editionSelectionModelName,
+      chatModelName,
       messageSliceCount,
       inputTokenCost,
       outputTokenCost,

@@ -13,6 +13,7 @@ interface EditorData {
   eventModelName: string;
   storySelectionModelName: string;
   editionSelectionModelName: string;
+  chatModelName: string;
   messageSliceCount: number;
   inputTokenCost: number;
   outputTokenCost: number;
@@ -65,6 +66,7 @@ export default function EditorPage() {
     eventModelName: "",
     storySelectionModelName: "",
     editionSelectionModelName: "",
+    chatModelName: "",
     messageSliceCount: 200,
     inputTokenCost: 0.05,
     outputTokenCost: 0.4,
@@ -504,6 +506,27 @@ export default function EditorPage() {
                 <p className="tui-muted mt-2">
                   AI model used for selecting and compiling newspaper editions
                   into daily editions.
+                </p>
+              </div>
+
+              {/* Chat Agent Model */}
+              <div>
+                <label className="tui-label block mb-2">Chat Agent Model</label>
+                <input
+                  type="text"
+                  value={editorData.chatModelName}
+                  onChange={(e) =>
+                    setEditorData({
+                      ...editorData,
+                      chatModelName: e.target.value
+                    })
+                  }
+                  placeholder="Enter AI model name (e.g., gpt-5-nano)"
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+                  readOnly={!isAdmin}
+                />
+                <p className="tui-muted mt-2">
+                  AI model used for the chat agent on the home page.
                 </p>
               </div>
 

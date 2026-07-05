@@ -20,7 +20,8 @@ export enum AIModelOption {
   ARTICLE_GENERATION = "articleModelName",
   EVENT_GENERATION = "eventModelName",
   STORY_SELECTION = "storySelectionModelName",
-  EDITION_SELECTION = "editionSelectionModelName"
+  EDITION_SELECTION = "editionSelectionModelName",
+  CHAT = "chatModelName"
 }
 
 export interface Editor {
@@ -31,6 +32,7 @@ export interface Editor {
   eventModelName: string;
   storySelectionModelName: string;
   editionSelectionModelName: string;
+  chatModelName: string;
   messageSliceCount: number;
   inputTokenCost: number;
   outputTokenCost: number;
@@ -184,6 +186,7 @@ export const REDIS_KEYS = {
   EDITOR_EVENT_MODEL_NAME: "editor:event_model_name",
   EDITOR_STORY_SELECTION_MODEL_NAME: "editor:story_selection_model_name",
   EDITOR_EDITION_SELECTION_MODEL_NAME: "editor:edition_selection_model_name",
+  EDITOR_CHAT_MODEL_NAME: "editor:chat_model_name",
   EDITOR_MESSAGE_SLICE_COUNT: "editor:message_slice_count",
   INPUT_TOKEN_COST: "editor:input_token_cost",
   OUTPUT_TOKEN_COST: "editor:output_token_cost",

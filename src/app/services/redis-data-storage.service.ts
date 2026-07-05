@@ -93,6 +93,12 @@ export class RedisDataStorageService implements IDataStorageService {
     );
     console.log(
       "Redis Write: SET",
+      REDIS_KEYS.EDITOR_CHAT_MODEL_NAME,
+      editor.chatModelName
+    );
+    multi.set(REDIS_KEYS.EDITOR_CHAT_MODEL_NAME, editor.chatModelName);
+    console.log(
+      "Redis Write: SET",
       REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT,
       editor.messageSliceCount.toString()
     );
@@ -188,6 +194,7 @@ export class RedisDataStorageService implements IDataStorageService {
       eventModelName,
       storySelectionModelName,
       editionSelectionModelName,
+      chatModelName,
       messageSliceCountStr,
       inputTokenCostStr,
       outputTokenCostStr,
@@ -206,6 +213,7 @@ export class RedisDataStorageService implements IDataStorageService {
       this.client.get(REDIS_KEYS.EDITOR_EVENT_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_STORY_SELECTION_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_EDITION_SELECTION_MODEL_NAME),
+      this.client.get(REDIS_KEYS.EDITOR_CHAT_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT),
       this.client.get(REDIS_KEYS.INPUT_TOKEN_COST),
       this.client.get(REDIS_KEYS.OUTPUT_TOKEN_COST),
@@ -228,6 +236,7 @@ export class RedisDataStorageService implements IDataStorageService {
       eventModelName: eventModelName || "gpt-5-nano", // Default fallback
       storySelectionModelName: storySelectionModelName || "gpt-5-nano", // Default fallback
       editionSelectionModelName: editionSelectionModelName || "gpt-5-nano", // Default fallback
+      chatModelName: chatModelName || "gpt-5-nano", // Default fallback
       messageSliceCount: messageSliceCountStr
         ? parseInt(messageSliceCountStr)
         : 200, // Default fallback

@@ -21,6 +21,7 @@ export function makeEditor(overrides: Partial<Editor> = {}): Editor {
     eventModelName: "gpt-4",
     storySelectionModelName: "gpt-4",
     editionSelectionModelName: "gpt-4",
+    chatModelName: "gpt-4",
     messageSliceCount: 10,
     inputTokenCost: 2.5,
     outputTokenCost: 10,

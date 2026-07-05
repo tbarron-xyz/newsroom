@@ -262,11 +262,11 @@ export class PostgreSQLDataStorageService {
       const query = `
         INSERT INTO editors (
           bio, prompt, model_name, article_model_name, event_model_name, story_selection_model_name, edition_selection_model_name,
-          message_slice_count, input_token_cost, output_token_cost,
+          chat_model_name, message_slice_count, input_token_cost, output_token_cost,
           article_generation_period_minutes, last_article_generation_time,
           event_generation_period_minutes, last_event_generation_time,
           edition_generation_period_minutes, last_edition_generation_time
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         ON CONFLICT (id) DO UPDATE SET
           bio = EXCLUDED.bio,
           prompt = EXCLUDED.prompt,
@@ -275,6 +275,7 @@ export class PostgreSQLDataStorageService {
           event_model_name = EXCLUDED.event_model_name,
           story_selection_model_name = EXCLUDED.story_selection_model_name,
           edition_selection_model_name = EXCLUDED.edition_selection_model_name,
+          chat_model_name = EXCLUDED.chat_model_name,
           message_slice_count = EXCLUDED.message_slice_count,
           input_token_cost = EXCLUDED.input_token_cost,
           output_token_cost = EXCLUDED.output_token_cost,
@@ -295,6 +296,7 @@ export class PostgreSQLDataStorageService {
         editor.eventModelName,
         editor.storySelectionModelName,
         editor.editionSelectionModelName,
+        editor.chatModelName,
         editor.messageSliceCount,
         editor.inputTokenCost,
         editor.outputTokenCost,
@@ -328,6 +330,7 @@ export class PostgreSQLDataStorageService {
         eventModelName: row.event_model_name,
         storySelectionModelName: row.story_selection_model_name,
         editionSelectionModelName: row.edition_selection_model_name,
+        chatModelName: row.chat_model_name || "gpt-5-nano",
         messageSliceCount: row.message_slice_count,
         inputTokenCost: row.input_token_cost,
         outputTokenCost: row.output_token_cost,
