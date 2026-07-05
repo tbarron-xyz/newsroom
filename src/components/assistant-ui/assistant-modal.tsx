@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { AssistantModalPrimitive } from "@assistant-ui/react";
 import { Thread } from "./thread";
 
 export function AssistantModal() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <AssistantModalPrimitive.Root>
+    <AssistantModalPrimitive.Root open={open} onOpenChange={setOpen}>
       <AssistantModalPrimitive.Trigger asChild>
         <button
           className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 text-white/90 hover:bg-white/20 transition-colors flex items-center justify-center shadow-lg"
@@ -27,19 +31,20 @@ export function AssistantModal() {
         </button>
       </AssistantModalPrimitive.Trigger>
 
-      <AssistantModalPrimitive.Content
-        sideOffset={0}
-        className="fixed bottom-24 right-6 z-50 w-[400px] h-[560px] max-w-[calc(100vw-3rem)] max-h-[calc(100vh-8rem)] backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-          <h3 className="text-white/90 text-sm font-semibold">
-            Ask about today's edition
-          </h3>
-        </div>
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <Thread />
-        </div>
-      </AssistantModalPrimitive.Content>
+      {open &&
+        createPortal(
+          <div className="fixed bottom-24 right-6 z-50 w-[400px] h-[560px] max-w-[calc(100vw-3rem)] max-h-[calc(100vh-8rem)] backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+              <h3 className="text-white/90 text-sm font-semibold">
+                Ask about today's edition
+              </h3>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <Thread />
+            </div>
+          </div>,
+          document.body
+        )}
     </AssistantModalPrimitive.Root>
   );
 }

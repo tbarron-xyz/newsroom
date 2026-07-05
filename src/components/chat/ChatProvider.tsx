@@ -9,10 +9,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const adapter: ChatModelAdapter = {
     async *run({ messages, abortSignal }) {
+      const text = messages[messages.length - 1].content
+        .map((p: any) => p.text)
+        .join("");
       const res = await fetch("/api/chat/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages, sessionId }),
+        body: JSON.stringify({ content: text, sessionId }),
         signal: abortSignal
       });
 

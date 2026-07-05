@@ -10,8 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write --list-different .",
     "format:check": "prettier --check .",
-    "test": "node --import tsx --test",
-    "test:watch": "node --import tsx --test --watch",
+    "test": "node --import tsx --experimental-test-module-mocks --test",
+    "test:watch": "node --import tsx --experimental-test-module-mocks --test --watch",
     "workers": "tsx watch src/app/workers/worker.ts",
     "bull-board": "node -r tsx ./node_modules/@bull-board/fastify/dist/main.js --port 8081 --queues artifact_generate"
   },

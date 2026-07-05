@@ -6,7 +6,7 @@ import { ServiceContainer } from "../../../services/service-container";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const { messages, sessionId } = await request.json();
+  const { content, sessionId } = await request.json();
 
   if (!sessionId) {
     return NextResponse.json(
@@ -68,18 +68,9 @@ ${editionContext}`;
   const previousMessages = existingSession
     ? existingSession.map((m: any) => ({
         role: m.role,
-        content:
-          typeof m.content === "string"
-            ? m.content
-            : m.content.map((c: any) => c.text || "").join("")
+        content: m.content.map((c: any) => c.text || "").join("")
       }))
     : [];
-
-  const latestUserMessage = messages[messages.length - 1];
-  const latestContent =
-    typeof latestUserMessage.content === "string"
-      ? latestUserMessage.content
-      : latestUserMessage.content.map((c: any) => c.text || "").join("");
 
   const modelName = editor.chatModelName;
   if (!modelName) {
@@ -97,7 +88,7 @@ ${editionContext}`;
   const result = streamText({
     model: openai(modelName),
     system: systemPrompt,
-    messages: [...previousMessages, { role: "user", content: latestContent }]
+    messages: [...previousMessages, { role: "user", content }]
   });
 
   const encoder = new TextEncoder();
@@ -127,14 +118,14 @@ ${editionContext}`;
             ...existingSession,
             {
               role: "user",
-              content: [{ type: "text", text: latestContent }]
+              content: [{ type: "text", text: content }]
             },
             assistantMessage
           ]
         : [
             {
               role: "user",
-              content: [{ type: "text", text: latestContent }]
+              content: [{ type: "text", text: content }]
             },
             assistantMessage
           ];
