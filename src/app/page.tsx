@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import PageContainer from "../components/PageContainer";
 import ContentCard from "../components/ContentCard";
+import CollapsibleSection from "../components/CollapsibleSection";
 import { apiService } from "@/app/services/api.service";
 import type { DailyEdition, OpinionArticle, Article } from "./schemas/types";
 
@@ -81,47 +82,45 @@ export default function Home() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
         <aside className="space-y-6 lg:order-last">
           <ContentCard variant="tui" className="p-6">
-            <h2 className="text-lg font-bold text-[var(--tui-primary)] mb-4">
-              Opinion
-            </h2>
-            {opinions.length === 0 ? (
-              <p className="tui-muted text-sm">No opinion articles yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {opinions.map((opinion) => (
-                  <Link
-                    key={opinion.id}
-                    href={`/opinion/${opinion.id}`}
-                    className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
-                  >
-                    <span className="tui-muted mr-2 select-none">❯</span>
-                    {opinion.headline}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <CollapsibleSection title="Opinion">
+              {opinions.length === 0 ? (
+                <p className="tui-muted text-sm">No opinion articles yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {opinions.map((opinion) => (
+                    <Link
+                      key={opinion.id}
+                      href={`/opinion/${opinion.id}`}
+                      className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
+                    >
+                      <span className="tui-muted mr-2 select-none">❯</span>
+                      {opinion.headline}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CollapsibleSection>
           </ContentCard>
 
           <ContentCard variant="tui" className="p-6">
-            <h2 className="text-lg font-bold text-[var(--tui-primary)] mb-4">
-              Latest Articles
-            </h2>
-            {latestArticles.length === 0 ? (
-              <p className="tui-muted text-sm">No articles yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {latestArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/articles/${article.id}`}
-                    className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
-                  >
-                    <span className="tui-muted mr-2 select-none">❯</span>
-                    {article.headline}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <CollapsibleSection title="Latest Articles">
+              {latestArticles.length === 0 ? (
+                <p className="tui-muted text-sm">No articles yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {latestArticles.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/articles/${article.id}`}
+                      className="block tui-muted hover:text-[var(--tui-primary)] transition-colors text-sm leading-snug"
+                    >
+                      <span className="tui-muted mr-2 select-none">❯</span>
+                      {article.headline}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CollapsibleSection>
           </ContentCard>
         </aside>
 
