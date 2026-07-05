@@ -25,54 +25,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const [pairs] = await Promise.all([dataStorage.getPrismDailyEditionPairs(1)]);
+  const [dailyEditions] = await Promise.all([dataStorage.getDailyEditions(1)]);
+  const edition =
+    dailyEditions && dailyEditions.length > 0 ? dailyEditions[0] : null;
+  if (!edition) {
+    await dataStorage.disconnect();
+    return NextResponse.json(
+      { error: "No daily edition available" },
+      { status: 404 }
+    );
+  }
 
-  let editionContext: string;
-  if (pairs && pairs.length > 0) {
-    const pair = pairs[0];
-    const left = pair.left;
-    const right = pair.right;
-    editionContext = `Today's Prism Edition: ${pair.leftLabel} vs ${pair.rightLabel}
-
---- ${pair.leftLabel} ---
-Headline: ${left.frontPageHeadline}
-Front Page: ${left.frontPageArticle}
-
-Topics:
-${left.topics
-  .map(
-    (t, i) => `  ${i + 1}. ${t.name}: ${t.headline} — ${t.oneLineSummary}
-     ${t.newsStoryFirstParagraph}
-     ${t.newsStorySecondParagraph}`
-  )
-  .join("\n")}
-
---- ${pair.rightLabel} ---
-Headline: ${right.frontPageHeadline}
-Front Page: ${right.frontPageArticle}
-
-Topics:
-${right.topics
-  .map(
-    (t, i) => `  ${i + 1}. ${t.name}: ${t.headline} — ${t.oneLineSummary}
-     ${t.newsStoryFirstParagraph}
-     ${t.newsStorySecondParagraph}`
-  )
-  .join("\n")}`;
-  } else {
-    const [dailyEditions] = await Promise.all([
-      dataStorage.getDailyEditions(1)
-    ]);
-    const edition =
-      dailyEditions && dailyEditions.length > 0 ? dailyEditions[0] : null;
-    if (!edition) {
-      await dataStorage.disconnect();
-      return NextResponse.json(
-        { error: "No daily edition available" },
-        { status: 404 }
-      );
-    }
-    editionContext = `Today's Daily Edition
+  const editionContext = `Today's Daily Edition
 Headline: ${edition.frontPageHeadline}
 Front Page: ${edition.frontPageArticle}
 
@@ -84,7 +48,6 @@ ${edition.topics
      ${t.newsStorySecondParagraph}`
   )
   .join("\n")}`;
-  }
 
   const existingSession = await dataStorage.getChatSession(sessionId);
   const userMessages =
@@ -96,7 +59,7 @@ ${edition.topics
     return NextResponse.json({ error: "conversation_ended" }, { status: 403 });
   }
 
-  const systemPrompt = `You are a helpful news assistant answering questions about today's Daily Prism Edition.
+  const systemPrompt = `You are a helpful news assistant answering questions about today's Daily Edition.
 Answer concisely using only the content provided below. If the answer is not in the edition,
 say you don't have that information.
 

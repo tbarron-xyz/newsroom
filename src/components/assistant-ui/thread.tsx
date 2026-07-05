@@ -15,17 +15,28 @@ export function Thread() {
   const isEnded = userCount >= 3;
 
   return (
-    <ThreadPrimitive.Root className="flex flex-col h-full">
-      <ThreadPrimitive.Viewport className="flex-1 overflow-y-auto p-4 space-y-4">
+    <ThreadPrimitive.Root className="flex flex-col h-full min-h-0">
+      <ThreadPrimitive.Viewport className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
         <ThreadPrimitive.Messages>
           {(msg) => {
             if (
               msg.message.role === "user" ||
               msg.message.role === "assistant"
             ) {
+              const isUser = msg.message.role === "user";
               return (
-                <MessagePrimitive.Root>
-                  <MessagePrimitive.Content />
+                <MessagePrimitive.Root
+                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                      isUser
+                        ? "bg-blue-500/20 text-white"
+                        : "bg-white/10 text-white/90"
+                    }`}
+                  >
+                    <MessagePrimitive.Content />
+                  </div>
                 </MessagePrimitive.Root>
               );
             }
