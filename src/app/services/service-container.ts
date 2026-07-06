@@ -8,7 +8,6 @@ import { EditorService } from "./editor.service";
 import { KpiService } from "./kpi.service";
 import { AIService } from "./ai.service";
 import { AbilitiesService } from "./abilities.service";
-import { ConfigService } from "./config.service";
 import { ArtifactService } from "./artifact.service";
 import { JobQueueService } from "./job-queue.service";
 
@@ -21,7 +20,6 @@ export class ServiceContainer {
   private kpiService: KpiService | null = null;
   private aiService: AIService | null = null;
   private abilitiesService: AbilitiesService | null = null;
-  private configService: ConfigService | null = null;
   private artifactService: ArtifactService | null = null;
   private jobQueueService: JobQueueService | null = null;
 
@@ -112,13 +110,6 @@ export class ServiceContainer {
     return this.abilitiesService;
   }
 
-  async getConfigService(): Promise<ConfigService> {
-    if (!this.configService) {
-      this.configService = new ConfigService();
-    }
-    return this.configService;
-  }
-
   async getArtifactService(): Promise<ArtifactService> {
     if (!this.artifactService) {
       const dataStorage = await this.getDataStorageService();
@@ -151,7 +142,6 @@ export class ServiceContainer {
     this.kpiService = null;
     this.aiService = null;
     this.abilitiesService = null;
-    this.configService = null;
     this.artifactService = null;
     this.jobQueueService = null;
   }

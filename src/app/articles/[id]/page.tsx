@@ -34,7 +34,7 @@ export default function ArticlePage() {
   const [error, setError] = useState("");
   const [showPrompt, setShowPrompt] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
-  const [appName, setAppName] = useState("Newsroom");
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
   const [deleting, setDeleting] = useState(false);
 
   const hasEditorPermission = user?.hasEditor === true;
@@ -60,21 +60,6 @@ export default function ArticlePage() {
       fetchArticle();
     }
   }, [articleId, fetchArticle]);
-
-  // Load app configuration
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await apiService.get<{ app: { name: string } }>(
-          "/api/config"
-        );
-        setAppName(config.app.name);
-      } catch (error) {
-        console.error("Failed to load config:", error);
-      }
-    };
-    loadConfig();
-  }, []);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {

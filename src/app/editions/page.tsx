@@ -25,24 +25,10 @@ export default function EditionsPage() {
   const [editions, setEditions] = useState<NewspaperEdition[]>([]);
   const [loadingEditions, setLoadingEditions] = useState(false);
   const [message, setMessage] = useState("");
-  const [appName, setAppName] = useState("Newsroom");
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
   const [expandedEdition, setExpandedEdition] = useState<string | null>(null);
   const [loadingArticles, setLoadingArticles] = useState<string | null>(null);
   const [showAllArticles, setShowAllArticles] = useState(true);
-
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await apiService.get<{ app: { name: string } }>(
-          "/api/config"
-        );
-        setAppName(config.app.name);
-      } catch (error) {
-        console.error("Failed to load config:", error);
-      }
-    };
-    loadConfig();
-  }, []);
 
   useEffect(() => {
     const loadEditions = async () => {

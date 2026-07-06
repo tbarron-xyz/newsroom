@@ -86,7 +86,7 @@ export default function EditorPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
   const [memoryInfo, setMemoryInfo] = useState<MemoryInfo | null>(null);
-  const [appName, setAppName] = useState("Newsroom");
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
   const [numComments, setNumComments] = useState(1);
   const router = useRouter();
 
@@ -114,21 +114,6 @@ export default function EditorPage() {
       setJobTriggering(null);
     }
   }, [jobStatus, jobTriggering]);
-
-  // Load app configuration
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await apiService.get<{ app: { name: string } }>(
-          "/api/config"
-        );
-        setAppName(config.app.name);
-      } catch (error) {
-        console.error("Failed to load config:", error);
-      }
-    };
-    loadConfig();
-  }, []);
 
   const checkAdminStatus = async () => {
     try {

@@ -68,24 +68,10 @@ export default function DailyEditionPage() {
   );
   const [message, setMessage] = useState("");
 
-  const [appFullName, setAppFullName] = useState("");
+  const appFullName = process.env.NEXT_PUBLIC_APP_FULL_NAME || "attonews";
 
   useEffect(() => {
     fetchEditions();
-  }, []);
-
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await apiService.get<{
-          app: { name: string; fullName: string };
-        }>("/api/config");
-        setAppFullName(config.app.fullName);
-      } catch (error) {
-        console.error("Failed to load config:", error);
-      }
-    };
-    loadConfig();
   }, []);
 
   useEffect(() => {
