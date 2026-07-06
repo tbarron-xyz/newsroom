@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AssistantModalPrimitive } from "@assistant-ui/react";
 import { Thread } from "./thread";
 
 export function AssistantModal() {
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
 
   return (
     <AssistantModalPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -40,7 +47,7 @@ export function AssistantModal() {
               </h3>
             </div>
             <div className="flex-1 min-h-0 overflow-hidden">
-              <Thread />
+              <Thread textareaRef={inputRef} />
             </div>
           </div>,
           document.body
