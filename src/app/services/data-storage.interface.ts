@@ -46,6 +46,7 @@ export interface IDataStorageService {
     endTime: number
   ): Promise<Article[]>;
   getArticle(articleId: string): Promise<Article | null>;
+  deleteArticle(articleId: string): Promise<boolean>;
 
   // Event operations
   saveEvent(event: Event): Promise<void>;

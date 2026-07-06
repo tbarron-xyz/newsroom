@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import PageContainer from "@/components/PageContainer";
 import ContentCard from "@/components/ContentCard";
@@ -9,6 +9,7 @@ import PageHeader from "@/components/PageHeader";
 import ExpandableSection from "@/components/ExpandableSection";
 import SourceMessageCard from "@/components/SourceMessageCard";
 import { apiService } from "@/app/services/api.service";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Article {
   id: string;
@@ -25,13 +26,18 @@ interface Article {
 
 export default function ArticlePage() {
   const params = useParams();
+  const router = useRouter();
   const articleId = params.id as string;
+  const { user } = useAuth();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showPrompt, setShowPrompt] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
   const [appName, setAppName] = useState("Newsroom");
+  const [deleting, setDeleting] = useState(false);
+
+  const hasEditorPermission = user?.hasEditor === true;
 
   const fetchArticle = useCallback(async () => {
     try {
@@ -80,6 +86,17 @@ export default function ArticlePage() {
     });
   };
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await apiService.delete(`/api/articles/${articleId}`);
+      router.push("/articles");
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
@@ -124,6 +141,15 @@ export default function ArticlePage() {
           >
             ← Back to Articles
           </Link>
+          {hasEditorPermission && (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="tui-btn-danger px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </button>
+          )}
         </PageHeader>
       </ContentCard>
 

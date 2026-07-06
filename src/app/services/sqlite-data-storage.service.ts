@@ -460,6 +460,14 @@ export class SQLiteDataStorageService implements IDataStorageService {
     return row ? this.mapArticleRow(row) : null;
   }
 
+  async deleteArticle(articleId: string): Promise<boolean> {
+    const db = this.getDb();
+    const result = db
+      .prepare("DELETE FROM articles WHERE id = ?")
+      .run(articleId);
+    return result.changes > 0;
+  }
+
   private mapArticleRow(row: any): Article {
     return {
       ...row,

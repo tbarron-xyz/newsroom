@@ -603,6 +603,19 @@ export class PostgreSQLDataStorageService {
     }
   }
 
+  async deleteArticle(articleId: string): Promise<boolean> {
+    const client = await this.pool.connect();
+
+    try {
+      const result = await client.query("DELETE FROM articles WHERE id = $1", [
+        articleId
+      ]);
+      return (result.rowCount ?? 0) > 0;
+    } finally {
+      client.release();
+    }
+  }
+
   // Event operations
   async saveEvent(event: Event): Promise<void> {
     const client = await this.pool.connect();

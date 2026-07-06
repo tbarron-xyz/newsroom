@@ -771,6 +771,21 @@ export class RedisDataStorageService implements IDataStorageService {
     return null;
   }
 
+  async deleteArticle(articleId: string): Promise<boolean> {
+    const article = await this.getArticle(articleId);
+    if (!article) return false;
+
+    await this.deleteArticleKeys(articleId);
+
+    await this.client.zRem(REDIS_KEYS.ARTICLES_LATEST, articleId);
+    await this.client.zRem(
+      REDIS_KEYS.ARTICLES_BY_REPORTER(article.reporterId),
+      articleId
+    );
+
+    return true;
+  }
+
   // Event operations
   async saveEvent(event: Event): Promise<void> {
     const eventId = event.id;
