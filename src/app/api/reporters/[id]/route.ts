@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "../../../utils/auth";
 import { withDataStorage } from "../../../utils/data-storage";
 import { ServiceContainer } from "../../../services/service-container";
+import type { Reporter } from "../../../schemas/types";
 
 let container: ServiceContainer | null = null;
 
@@ -51,11 +52,15 @@ export const PUT = withAuth(
       );
     }
 
-    const updatedReporter = await reporterService.updateReporter(reporterId, {
-      beats,
-      prompt,
-      enabled
-    });
+    const updates: Partial<Omit<Reporter, "id">> = { beats, prompt };
+    if (typeof enabled === "boolean") {
+      updates.enabled = enabled;
+    }
+
+    const updatedReporter = await reporterService.updateReporter(
+      reporterId,
+      updates
+    );
 
     if (!updatedReporter) {
       return NextResponse.json(
