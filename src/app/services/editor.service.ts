@@ -1,3 +1,5 @@
+import { execFile } from "child_process";
+import path from "path";
 import {
   NewspaperEdition,
   DailyEdition,
@@ -21,7 +23,8 @@ export type JobType =
   | "events"
   | "prism-daily"
   | "ticker"
-  | "opinion";
+  | "opinion"
+  | "youtube-transcript";
 
 export interface JobResult {
   message: string;
@@ -532,7 +535,12 @@ export class EditorService {
 
   async runJob(
     jobType: JobType,
-    options: { enforceTimeConstraint?: boolean; count?: number } = {}
+    options: {
+      enforceTimeConstraint?: boolean;
+      count?: number;
+      videoUrl?: string;
+      reporterId?: string;
+    } = {}
   ): Promise<JobResult> {
     const { enforceTimeConstraint = false } = options;
     const currentTime = Date.now();
@@ -656,7 +664,7 @@ export class EditorService {
     jobType: JobType,
     currentTime: number,
     editor: Editor | null,
-    options: { count?: number }
+    options: { count?: number; videoUrl?: string; reporterId?: string }
   ): Promise<JobResult> {
     switch (jobType) {
       case "events": {
@@ -794,6 +802,98 @@ export class EditorService {
       case "opinion": {
         return await this.generateOpinionArticle();
       }
+
+      case "youtube-transcript": {
+        const { videoUrl, reporterId } = options;
+        if (!videoUrl) {
+          throw new Error("Video URL is required for youtube-transcript job");
+        }
+
+        const videoId = extractYouTubeVideoId(videoUrl);
+        if (!videoId) {
+          throw new Error(`Invalid YouTube URL: ${videoUrl}`);
+        }
+
+        const transcriptText = await fetchYouTubeTranscript(videoId);
+
+        const aiService = await ServiceContainer.getInstance().getAIService();
+        const result = await aiService.generateArticleFromTranscript(
+          transcriptText,
+          videoId,
+          reporterId || "youtube-reporter"
+        );
+
+        await this.dataStorageService.saveArticle(result.article);
+
+        console.log(
+          `[${new Date().toISOString()}] YouTube transcript article "${result.article.headline}" saved (video: ${videoId})`
+        );
+
+        return {
+          message: `YouTube transcript article generated: "${result.article.headline}"`,
+          jobType
+        };
+      }
     }
   }
+}
+
+function extractYouTubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+async function fetchYouTubeTranscript(videoId: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const scriptPath = path.join(
+      process.cwd(),
+      "src",
+      "scripts",
+      "youtube_transcript.py"
+    );
+    const pythonPath = path.join(
+      process.cwd(),
+      "..",
+      "yt-transcript",
+      ".venv",
+      "bin",
+      "python3"
+    );
+
+    execFile(
+      pythonPath,
+      [scriptPath, videoId],
+      { timeout: 30000, maxBuffer: 1024 * 1024 },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(
+            new Error(
+              `Python script failed: ${error.message}${stderr ? ` (${stderr})` : ""}`
+            )
+          );
+          return;
+        }
+
+        try {
+          const data = JSON.parse(stdout);
+          if (data.error) {
+            reject(new Error(data.error));
+            return;
+          }
+
+          const fullText = data.snippets.map((s: any) => s.text).join(" ");
+          resolve(fullText);
+        } catch (parseError) {
+          reject(new Error(`Failed to parse transcript output: ${parseError}`));
+        }
+      }
+    );
+  });
 }

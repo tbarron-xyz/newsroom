@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import { KpiName } from "../schemas/types";
 import { apiService } from "../services/api.service";
 
+interface ReporterInfo {
+  id: string;
+  beats: string[];
+  prompt: string;
+  enabled: boolean;
+}
+
 interface EditorData {
   bio: string;
   prompt: string;
@@ -88,6 +95,9 @@ export default function EditorPage() {
   const [memoryInfo, setMemoryInfo] = useState<MemoryInfo | null>(null);
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
   const [numComments, setNumComments] = useState(1);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [selectedReporterId, setSelectedReporterId] = useState("");
+  const [reporters, setReporters] = useState<ReporterInfo[]>([]);
   const router = useRouter();
 
   // Check admin status and fetch data on component mount
@@ -97,7 +107,17 @@ export default function EditorPage() {
     fetchJobStatus();
     fetchKpiData();
     fetchMemoryInfo();
+    fetchReporters();
   }, []);
+
+  const fetchReporters = async () => {
+    try {
+      const data = await apiService.get<ReporterInfo[]>("/api/reporters");
+      setReporters(data);
+    } catch (error) {
+      console.error("Error fetching reporters:", error);
+    }
+  };
 
   // Continuous poll job status every 3s
   useEffect(() => {
@@ -170,33 +190,22 @@ export default function EditorPage() {
     setMessage("");
 
     try {
-      const requestBody = {
+      const requestBody: Record<string, any> = {
         jobType,
-        ...(count && { count })
+        ...(count && { count }),
+        ...(jobType === "youtube-transcript" &&
+          youtubeUrl && { videoUrl: youtubeUrl }),
+        ...(jobType === "youtube-transcript" &&
+          selectedReporterId && { reporterId: selectedReporterId })
       };
 
-      if (jobType === "daily") {
-        const result = await apiService.post<{ message: string }>(
-          "/api/editor/jobs",
-          requestBody
-        );
-        setMessage(result.message);
-        setTimeout(() => setMessage(""), 5000);
-      } else if (jobType === "reporter") {
-        const result = await apiService.post<{ message: string }>(
-          "/api/editor/jobs",
-          requestBody
-        );
-        setMessage(result.message);
-        setTimeout(() => setMessage(""), 5000);
-      } else {
-        const result = await apiService.post<{ message: string }>(
-          "/api/editor/jobs",
-          requestBody
-        );
-        setMessage(result.message);
-        setTimeout(() => setMessage(""), 5000);
-      }
+      const result = await apiService.post<{ message: string }>(
+        "/api/editor/jobs",
+        requestBody
+      );
+      setMessage(result.message);
+      setJobTriggering(null);
+      setTimeout(() => setMessage(""), 5000);
     } catch (error: any) {
       setMessage(error.error || `Error triggering ${jobType} job`);
       setJobTriggering(null);
@@ -1560,6 +1569,83 @@ export default function EditorPage() {
                   {jobTriggering === "opinion"
                     ? "Generating..."
                     : "Generate Opinion"}
+                </button>
+              </div>
+
+              {/* YouTube Transcript Article Job */}
+              <div className="border border-[var(--tui-border)] p-4 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-[var(--tui-primary)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                      YouTube Transcript
+                    </h3>
+                    <p className="tui-muted">On demand</p>
+                  </div>
+                </div>
+                <p className="tui-muted">
+                  Fetches a YouTube video transcript and generates a news
+                  article from it.
+                </p>
+                <div>
+                  <label className="tui-label block mb-1">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="text"
+                    value={youtubeUrl}
+                    onChange={(e) => setYoutubeUrl(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="tui-input"
+                  />
+                </div>
+                <div>
+                  <label className="tui-label block mb-1">Reporter</label>
+                  <select
+                    value={selectedReporterId}
+                    onChange={(e) => setSelectedReporterId(e.target.value)}
+                    className="tui-input"
+                  >
+                    <option value="">youtube-reporter (default)</option>
+                    {reporters.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.id} {r.enabled ? "" : "(disabled)"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => triggerJob("youtube-transcript")}
+                  disabled={
+                    jobTriggering === "youtube-transcript" ||
+                    !youtubeUrl.trim() ||
+                    !isAdmin
+                  }
+                  className={`tui-btn w-full text-center ${!isAdmin || !youtubeUrl.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {jobTriggering === "youtube-transcript"
+                    ? "Generating..."
+                    : "Generate Article"}
                 </button>
               </div>
             </div>

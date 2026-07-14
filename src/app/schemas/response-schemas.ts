@@ -101,3 +101,8 @@ export const opinionArticleSchema = z.object({
   content: z.string().nullable(),
   topicIndexes: z.array(z.number()).nullable()
 });
+
+export const youtubeTranscriptArticleSchema = z.object({
+  headline: z.string(),
+  body: z.string()
+});

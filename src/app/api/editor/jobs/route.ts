@@ -20,7 +20,8 @@ const VALID_JOB_TYPES: JobType[] = [
   "events",
   "prism-daily",
   "ticker",
-  "opinion"
+  "opinion",
+  "youtube-transcript"
 ];
 
 export const POST = withAuth(
@@ -29,7 +30,7 @@ export const POST = withAuth(
     const editorService = await container.getEditorService();
 
     const body = await request.json();
-    const { jobType, count } = body;
+    const { jobType, count, videoUrl, reporterId } = body;
 
     if (!jobType || typeof jobType !== "string") {
       return NextResponse.json(
@@ -64,7 +65,9 @@ export const POST = withAuth(
     } else {
       const result = await editorService.runJob(jobType as JobType, {
         enforceTimeConstraint: false,
-        ...(count && { count })
+        ...(count && { count }),
+        ...(videoUrl && { videoUrl }),
+        ...(reporterId && { reporterId })
       });
       return NextResponse.json({ message: result.message });
     }

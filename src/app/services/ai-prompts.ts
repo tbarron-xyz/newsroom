@@ -15,7 +15,8 @@ import {
   threadRepliesSchema,
   prismPerspectivesSchema,
   tickerSchema,
-  opinionArticleSchema
+  opinionArticleSchema,
+  youtubeTranscriptArticleSchema
 } from "../schemas/response-schemas";
 
 interface PromptConfig {
@@ -751,6 +752,29 @@ Return a JSON object with a single "text" field containing the ticker string.`;
       systemPrompt,
       userPrompt,
       responseFormat: zodResponseFormat(tickerSchema, "ticker")
+    };
+  }
+
+  static generateTranscriptArticlePrompts(
+    transcriptText: string,
+    videoId: string
+  ): PromptConfig {
+    const systemPrompt = `You are a professional journalist. Based on the provided YouTube video transcript, write a compelling news article. Synthesize the key information, identify the main story, and structure it as a proper news article with a headline and body paragraphs. Write in a clear, objective journalistic tone. Do not simply list transcript segments — craft a coherent, well-written article.`;
+
+    const userPrompt = `Write a news article based on the following YouTube video transcript (video ID: ${videoId}).
+
+Transcript:
+${transcriptText}
+
+Return a JSON object with "headline" (string) and "body" (string, at least 3 paragraphs).`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        youtubeTranscriptArticleSchema,
+        "transcript_article"
+      )
     };
   }
 }

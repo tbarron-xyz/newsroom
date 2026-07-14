@@ -25,7 +25,8 @@ import {
   threadRepliesSchema,
   prismPerspectivesSchema,
   tickerSchema,
-  opinionArticleSchema
+  opinionArticleSchema,
+  youtubeTranscriptArticleSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -1307,6 +1308,81 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       await this.logOpenAIError(
         "Error generating ticker text",
         "Ticker text generation",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async generateArticleFromTranscript(
+    transcriptText: string,
+    videoId: string,
+    reporterId: string
+  ): Promise<{
+    article: Article;
+    fullPrompt: string;
+    modelName: string;
+  }> {
+    const generationTime = Date.now();
+    const articleId = `article_${generationTime}_${Math.random().toString(36).substring(2, 8)}`;
+
+    try {
+      const config = AIPrompts.generateTranscriptArticlePrompts(
+        transcriptText,
+        videoId
+      );
+      const fullPrompt = `System: ${config.systemPrompt}\n\nUser: ${config.userPrompt}`;
+
+      const completionResult = await this.aiClient.createChatCompletion(
+        AIModelOption.ARTICLE_GENERATION,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        }
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        completionResult.response,
+        this.dataStorageService
+      );
+
+      await this.logAIResponse(
+        "YouTube transcript article generation",
+        completionResult.response
+      );
+
+      const content =
+        completionResult.response.choices[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error("No response content from AI service");
+      }
+
+      const parsed = youtubeTranscriptArticleSchema.parse(JSON.parse(content));
+
+      const article: Article = {
+        id: articleId,
+        reporterId,
+        headline: parsed.headline,
+        body: parsed.body,
+        generationTime,
+        prompt: fullPrompt,
+        messageIds: [],
+        messageTexts: [],
+        messageDids: [],
+        messageRkeys: [],
+        modelName: completionResult.modelUsed,
+        inputTokenCount: completionResult.response.usage?.prompt_tokens,
+        outputTokenCount: completionResult.response.usage?.completion_tokens
+      };
+
+      return { article, fullPrompt, modelName: completionResult.modelUsed };
+    } catch (error) {
+      await this.logOpenAIError(
+        "Error generating article from transcript",
+        "YouTube transcript article generation",
         error
       );
       throw error;
