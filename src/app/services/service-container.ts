@@ -1,6 +1,7 @@
 import { RedisDataStorageService } from "./redis-data-storage.service";
 import { PostgreSQLDataStorageService } from "./postgresql-data-storage.service";
 import { SQLiteDataStorageService } from "./sqlite-data-storage.service";
+import { MongoDBDataStorageService } from "./mongodb-data-storage.service";
 import { IDataStorageService } from "./data-storage.interface";
 import { AuthService } from "./auth.service";
 import { ReporterService } from "./reporter.service";
@@ -40,6 +41,9 @@ export class ServiceContainer {
       if (storageBackend === "sqlite") {
         console.log("Using SQLite data storage backend");
         this.dataStorageService = new SQLiteDataStorageService();
+      } else if (storageBackend === "mongodb" || storageBackend === "mongo") {
+        console.log("Using MongoDB data storage backend");
+        this.dataStorageService = new MongoDBDataStorageService();
         // } else if (
         //   storageBackend === "postgres" ||
         //   storageBackend === "postgresql"
