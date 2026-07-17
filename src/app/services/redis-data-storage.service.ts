@@ -106,18 +106,6 @@ export class RedisDataStorageService implements IDataStorageService {
       REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT,
       editor.messageSliceCount.toString()
     );
-    console.log(
-      "Redis Write: SET",
-      REDIS_KEYS.INPUT_TOKEN_COST,
-      editor.inputTokenCost.toString()
-    );
-    multi.set(REDIS_KEYS.INPUT_TOKEN_COST, editor.inputTokenCost.toString());
-    console.log(
-      "Redis Write: SET",
-      REDIS_KEYS.OUTPUT_TOKEN_COST,
-      editor.outputTokenCost.toString()
-    );
-    multi.set(REDIS_KEYS.OUTPUT_TOKEN_COST, editor.outputTokenCost.toString());
     if (editor.baseUrl !== undefined) {
       console.log("Redis Write: SET", REDIS_KEYS.BASE_URL, editor.baseUrl);
       multi.set(REDIS_KEYS.BASE_URL, editor.baseUrl);
@@ -196,8 +184,6 @@ export class RedisDataStorageService implements IDataStorageService {
       editionSelectionModelName,
       chatModelName,
       messageSliceCountStr,
-      inputTokenCostStr,
-      outputTokenCostStr,
       baseUrl,
       articleGenerationPeriodMinutesStr,
       lastArticleGenerationTimeStr,
@@ -215,8 +201,6 @@ export class RedisDataStorageService implements IDataStorageService {
       this.client.get(REDIS_KEYS.EDITOR_EDITION_SELECTION_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_CHAT_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT),
-      this.client.get(REDIS_KEYS.INPUT_TOKEN_COST),
-      this.client.get(REDIS_KEYS.OUTPUT_TOKEN_COST),
       this.client.get(REDIS_KEYS.BASE_URL),
       this.client.get(REDIS_KEYS.ARTICLE_GENERATION_PERIOD_MINUTES),
       this.client.get(REDIS_KEYS.LAST_ARTICLE_GENERATION_TIME),
@@ -240,10 +224,6 @@ export class RedisDataStorageService implements IDataStorageService {
       messageSliceCount: messageSliceCountStr
         ? parseInt(messageSliceCountStr)
         : 200, // Default fallback
-      inputTokenCost: inputTokenCostStr ? parseFloat(inputTokenCostStr) : 0.05, // Default to $0.050 per 1M tokens
-      outputTokenCost: outputTokenCostStr
-        ? parseFloat(outputTokenCostStr)
-        : 0.4, // Default to $0.400 per 1M tokens
       baseUrl: baseUrl || undefined, // Optional field
       articleGenerationPeriodMinutes: articleGenerationPeriodMinutesStr
         ? parseInt(articleGenerationPeriodMinutesStr)

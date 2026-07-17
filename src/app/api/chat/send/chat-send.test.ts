@@ -52,8 +52,6 @@ const mockEditor = {
   editionSelectionModelName: "gpt-4",
   chatModelName: "gpt-4",
   messageSliceCount: 10,
-  inputTokenCost: 2.5,
-  outputTokenCost: 10,
   baseUrl: "https://api.openai.com/v1",
   articleGenerationPeriodMinutes: 15,
   lastArticleGenerationTime: Date.now(),

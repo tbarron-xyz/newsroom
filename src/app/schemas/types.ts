@@ -34,8 +34,6 @@ export interface Editor {
   editionSelectionModelName: string;
   chatModelName: string;
   messageSliceCount: number;
-  inputTokenCost: number;
-  outputTokenCost: number;
   baseUrl?: string; // Optional base URL for OpenAI API requests
   articleGenerationPeriodMinutes: number;
   lastArticleGenerationTime?: number; // milliseconds since epoch, optional for backward compatibility
@@ -169,7 +167,6 @@ export interface User {
 
 // KPI Names enum
 export enum KpiName {
-  TOTAL_AI_API_SPEND = "Total AI API spend",
   TOTAL_TEXT_INPUT_TOKENS = "Total text input tokens",
   TOTAL_TEXT_OUTPUT_TOKENS = "Total text output tokens"
 }
@@ -188,8 +185,6 @@ export const REDIS_KEYS = {
   EDITOR_EDITION_SELECTION_MODEL_NAME: "editor:edition_selection_model_name",
   EDITOR_CHAT_MODEL_NAME: "editor:chat_model_name",
   EDITOR_MESSAGE_SLICE_COUNT: "editor:message_slice_count",
-  INPUT_TOKEN_COST: "editor:input_token_cost",
-  OUTPUT_TOKEN_COST: "editor:output_token_cost",
   BASE_URL: "editor:base_url",
   ARTICLE_GENERATION_PERIOD_MINUTES: "article_generation:period_minutes",
   LAST_ARTICLE_GENERATION_TIME: "article_generation:last_time",

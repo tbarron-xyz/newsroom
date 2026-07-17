@@ -24,15 +24,13 @@ export class KpiService {
     const kpiService = new KpiService(dataStorageService);
     await kpiService.incrementKpis({
       promptTokens: response.usage.prompt_tokens,
-      completionTokens: response.usage.completion_tokens,
-      totalTokens: response.usage.total_tokens
+      completionTokens: response.usage.completion_tokens
     });
   }
 
   async incrementKpis(usage: {
     promptTokens: number;
     completionTokens: number;
-    totalTokens: number;
   }): Promise<void> {
     try {
       // Increment input tokens
@@ -46,13 +44,6 @@ export class KpiService {
         KpiName.TOTAL_TEXT_OUTPUT_TOKENS,
         usage.completionTokens
       );
-
-      // Calculate and increment spend
-      const spendIncrement = await this.calculateSpend(
-        usage.promptTokens,
-        usage.completionTokens
-      );
-      await this.incrementKpi(KpiName.TOTAL_AI_API_SPEND, spendIncrement);
     } catch (error) {
       console.error("Error incrementing KPIs:", error);
       // Don't throw - KPI tracking should not break the main functionality
@@ -84,19 +75,6 @@ export class KpiService {
       console.error(`Error setting KPI value for ${kpiName}:`, error);
       throw error;
     }
-  }
-
-  private async calculateSpend(
-    inputTokens: number,
-    outputTokens: number
-  ): Promise<number> {
-    const editor = await this.dataStorageService.getEditor();
-    const inputTokenCost = editor?.inputTokenCost || 0.05; // Fallback to default
-    const outputTokenCost = editor?.outputTokenCost || 0.4; // Fallback to default
-
-    const inputCost = (inputTokens / 1000000) * inputTokenCost;
-    const outputCost = (outputTokens / 1000000) * outputTokenCost;
-    return inputCost + outputCost;
   }
 
   async getAllKpis(): Promise<Record<KpiName, number>> {

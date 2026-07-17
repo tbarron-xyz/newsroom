@@ -12,6 +12,9 @@
     "format:check": "prettier --check .",
     "test": "node --import tsx --experimental-test-module-mocks --test",
     "test:watch": "node --import tsx --experimental-test-module-mocks --test --watch",
+    "test:unit": "node --import tsx --experimental-test-module-mocks --test src/app/services/sqlite-data-storage.test.ts src/app/services/article-generation.test.ts src/app/api/chat/send/chat-send.test.ts",
+    "test:redis": "node --import tsx --experimental-test-module-mocks --test src/app/services/redis-data-storage.test.ts",
+    "test:mongo": "node --import tsx --experimental-test-module-mocks --test src/app/services/mongodb-data-storage.test.ts",
     "workers": "tsx watch src/app/workers/worker.ts",
     "bull-board": "node -r tsx ./node_modules/@bull-board/fastify/dist/main.js --port 8081 --queues artifact_generate"
   },

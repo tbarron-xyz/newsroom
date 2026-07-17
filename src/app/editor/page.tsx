@@ -22,8 +22,6 @@ interface EditorData {
   editionSelectionModelName: string;
   chatModelName: string;
   messageSliceCount: number;
-  inputTokenCost: number;
-  outputTokenCost: number;
   baseUrl: string;
   articleGenerationPeriodMinutes: number;
   lastArticleGenerationTime: number | null;
@@ -34,7 +32,6 @@ interface EditorData {
 }
 
 interface KpiData {
-  [KpiName.TOTAL_AI_API_SPEND]: number;
   [KpiName.TOTAL_TEXT_INPUT_TOKENS]: number;
   [KpiName.TOTAL_TEXT_OUTPUT_TOKENS]: number;
 }
@@ -75,8 +72,6 @@ export default function EditorPage() {
     editionSelectionModelName: "",
     chatModelName: "",
     messageSliceCount: 200,
-    inputTokenCost: 0.05,
-    outputTokenCost: 0.4,
     baseUrl: "",
     articleGenerationPeriodMinutes: 15,
     lastArticleGenerationTime: null,
@@ -545,58 +540,6 @@ export default function EditorPage() {
                   proxies.
                 </p>
               </div>
-
-              {/* Input Token Cost */}
-              <div>
-                <label className="tui-label block mb-2">
-                  Input Token Cost ($ per 1M tokens)
-                </label>
-                <input
-                  type="number"
-                  value={editorData.inputTokenCost}
-                  onChange={(e) =>
-                    setEditorData({
-                      ...editorData,
-                      inputTokenCost: parseFloat(e.target.value) || 0
-                    })
-                  }
-                  placeholder="0.050"
-                  min="0"
-                  step="0.001"
-                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
-                  readOnly={!isAdmin}
-                />
-                <p className="tui-muted mt-2">
-                  Cost per million input tokens for AI API calls. Used to
-                  calculate and track API spending.
-                </p>
-              </div>
-
-              {/* Output Token Cost */}
-              <div>
-                <label className="tui-label block mb-2">
-                  Output Token Cost ($ per 1M tokens)
-                </label>
-                <input
-                  type="number"
-                  value={editorData.outputTokenCost}
-                  onChange={(e) =>
-                    setEditorData({
-                      ...editorData,
-                      outputTokenCost: parseFloat(e.target.value) || 0
-                    })
-                  }
-                  placeholder="0.400"
-                  min="0"
-                  step="0.001"
-                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
-                  readOnly={!isAdmin}
-                />
-                <p className="tui-muted mt-2">
-                  Cost per million output tokens for AI API calls. Used to
-                  calculate and track API spending.
-                </p>
-              </div>
             </div>
           </div>
 
@@ -920,41 +863,11 @@ export default function EditorPage() {
             </div>
 
             <p className="tui-muted">
-              Track your AI API usage and costs across all newsroom operations.
+              Track your AI API token usage across all newsroom operations.
             </p>
 
             {kpiData ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Total AI API Spend */}
-                <div className="border border-[var(--tui-border)] p-4">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-[var(--tui-primary)]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-[var(--tui-primary)] font-mono text-sm">
-                        API Spend
-                      </h3>
-                      <p className="tui-muted">Total cost</p>
-                    </div>
-                  </div>
-                  <div className="tui-value">
-                    ${kpiData[KpiName.TOTAL_AI_API_SPEND].toFixed(4)}
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Total Input Tokens */}
                 <div className="border border-[var(--tui-border)] p-4">
                   <div className="flex items-center space-x-3 mb-4">

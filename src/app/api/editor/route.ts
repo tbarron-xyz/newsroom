@@ -18,8 +18,6 @@ export const GET = withDataStorage(
         editor?.editionSelectionModelName || "gpt-5-nano",
       chatModelName: editor?.chatModelName || "gpt-5-nano",
       messageSliceCount: editor?.messageSliceCount || 200,
-      inputTokenCost: editor?.inputTokenCost || 0.05,
-      outputTokenCost: editor?.outputTokenCost || 0.4,
       baseUrl: editor?.baseUrl || "",
       articleGenerationPeriodMinutes:
         editor?.articleGenerationPeriodMinutes || 15,
@@ -47,8 +45,6 @@ export const PUT = withAuth(
       editionSelectionModelName,
       chatModelName,
       messageSliceCount,
-      inputTokenCost,
-      outputTokenCost,
       baseUrl,
       articleGenerationPeriodMinutes,
       eventGenerationPeriodMinutes,
@@ -133,20 +129,6 @@ export const PUT = withAuth(
       );
     }
 
-    if (typeof inputTokenCost !== "number" || inputTokenCost < 0) {
-      return NextResponse.json(
-        { error: "inputTokenCost must be a non-negative number" },
-        { status: 400 }
-      );
-    }
-
-    if (typeof outputTokenCost !== "number" || outputTokenCost < 0) {
-      return NextResponse.json(
-        { error: "outputTokenCost must be a non-negative number" },
-        { status: 400 }
-      );
-    }
-
     await dataStorage.saveEditor({
       bio,
       prompt,
@@ -157,8 +139,6 @@ export const PUT = withAuth(
       editionSelectionModelName,
       chatModelName,
       messageSliceCount,
-      inputTokenCost,
-      outputTokenCost,
       baseUrl: baseUrl || undefined,
       articleGenerationPeriodMinutes,
       eventGenerationPeriodMinutes,
@@ -175,8 +155,6 @@ export const PUT = withAuth(
       editionSelectionModelName,
       chatModelName,
       messageSliceCount,
-      inputTokenCost,
-      outputTokenCost,
       baseUrl: baseUrl || "",
       articleGenerationPeriodMinutes,
       eventGenerationPeriodMinutes,

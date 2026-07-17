@@ -55,8 +55,6 @@ describe("SQLiteDataStorageService", () => {
         editor.editionSelectionModelName
       );
       assert.equal(retrieved!.messageSliceCount, editor.messageSliceCount);
-      assert.equal(retrieved!.inputTokenCost, editor.inputTokenCost);
-      assert.equal(retrieved!.outputTokenCost, editor.outputTokenCost);
       assert.equal(retrieved!.baseUrl, editor.baseUrl);
       assert.equal(
         retrieved!.articleGenerationPeriodMinutes,
