@@ -16,7 +16,8 @@ import {
   DynamicPersona,
   Artifact,
   PrismDailyEditionPair,
-  Ticker
+  Ticker,
+  HomepageChatMessage
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -2460,6 +2461,59 @@ export class RedisDataStorageService implements IDataStorageService {
       }
     }
     return pairs;
+  }
+
+  async saveHomepageChatMessage(message: HomepageChatMessage): Promise<void> {
+    const { id, senderName, content, timestamp, type } = message;
+    const multi = this.client.multi();
+
+    multi.zAdd(REDIS_KEYS.HOMEPAGE_CHAT_MESSAGES, {
+      score: timestamp,
+      value: id
+    });
+
+    multi.zRemRangeByRank(
+      REDIS_KEYS.HOMEPAGE_CHAT_MESSAGES,
+      0,
+      -(REDIS_KEYS.HOMEPAGE_CHAT_MAX_LENGTH + 1)
+    );
+
+    multi.set(REDIS_KEYS.HOMEPAGE_CHAT_SENDER_NAME(id), senderName);
+    multi.set(REDIS_KEYS.HOMEPAGE_CHAT_CONTENT(id), content);
+    multi.set(REDIS_KEYS.HOMEPAGE_CHAT_TIMESTAMP(id), timestamp.toString());
+    multi.set(REDIS_KEYS.HOMEPAGE_CHAT_TYPE(id), type);
+
+    await multi.exec();
+  }
+
+  async getHomepageChatMessages(limit = 50): Promise<HomepageChatMessage[]> {
+    const messageIds = await this.client.zRange(
+      REDIS_KEYS.HOMEPAGE_CHAT_MESSAGES,
+      -limit,
+      -1
+    );
+
+    const messages: HomepageChatMessage[] = [];
+    for (const id of messageIds) {
+      const [senderName, content, timestampStr, type] = await Promise.all([
+        this.client.get(REDIS_KEYS.HOMEPAGE_CHAT_SENDER_NAME(id)),
+        this.client.get(REDIS_KEYS.HOMEPAGE_CHAT_CONTENT(id)),
+        this.client.get(REDIS_KEYS.HOMEPAGE_CHAT_TIMESTAMP(id)),
+        this.client.get(REDIS_KEYS.HOMEPAGE_CHAT_TYPE(id))
+      ]);
+
+      if (!senderName || !content) continue;
+
+      messages.push({
+        id,
+        senderName,
+        content,
+        timestamp: parseInt(timestampStr || "0"),
+        type: (type as "user" | "assistant") || "user"
+      });
+    }
+
+    return messages;
   }
 
   async saveChatSession(

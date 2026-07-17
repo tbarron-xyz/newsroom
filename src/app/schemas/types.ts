@@ -311,6 +311,14 @@ export const REDIS_KEYS = {
   // Ticker
   TICKER_LATEST: "ticker:latest",
 
+  // Homepage Chat
+  HOMEPAGE_CHAT_MESSAGES: "homepage_chat:messages",
+  HOMEPAGE_CHAT_MAX_LENGTH: 100,
+  HOMEPAGE_CHAT_SENDER_NAME: (id: string) => `homepage_chat:${id}:sender_name`,
+  HOMEPAGE_CHAT_CONTENT: (id: string) => `homepage_chat:${id}:content`,
+  HOMEPAGE_CHAT_TIMESTAMP: (id: string) => `homepage_chat:${id}:timestamp`,
+  HOMEPAGE_CHAT_TYPE: (id: string) => `homepage_chat:${id}:type`,
+
   // Opinion Articles
   OPINIONS_LATEST: "opinions:latest",
   OPINIONS_LATEST_MAX_LENGTH: 50,
@@ -444,6 +452,14 @@ export interface Ticker {
   modelName: string;
   inputTokenCount?: number;
   outputTokenCount?: number;
+}
+
+export interface HomepageChatMessage {
+  id: string;
+  senderName: string;
+  content: string;
+  timestamp: number;
+  type: "user" | "assistant";
 }
 
 export interface PrismDailyEditionPair {

@@ -106,3 +106,12 @@ export const youtubeTranscriptArticleSchema = z.object({
   headline: z.string(),
   body: z.string()
 });
+
+export const homepageChatSafetyAndReplySchema = z.object({
+  isSafe: z.boolean(),
+  reply: z.string().nullable()
+});
+
+export const homepageChatVisitorMessageSchema = z.object({
+  content: z.string()
+});

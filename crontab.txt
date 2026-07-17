@@ -12,6 +12,8 @@
 
 */30 * * * * wget http://localhost:8080/api/cron/comments
 
+*/15 * * * * wget http://localhost:8080/api/cron/homepage-chat
+
 0 * * * * wget http://localhost:8080/api/cron/events
 
 0 0 * * * redis-cli -n 0 save

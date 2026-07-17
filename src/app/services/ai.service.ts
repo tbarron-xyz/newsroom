@@ -26,7 +26,9 @@ import {
   prismPerspectivesSchema,
   tickerSchema,
   opinionArticleSchema,
-  youtubeTranscriptArticleSchema
+  youtubeTranscriptArticleSchema,
+  homepageChatSafetyAndReplySchema,
+  homepageChatVisitorMessageSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -1506,6 +1508,102 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         error
       );
       throw error;
+    }
+  }
+
+  async checkAndReplyToChatMessage(
+    userMessage: string,
+    pastMessages?: { role: "user" | "assistant"; content: string }[]
+  ): Promise<{ isSafe: boolean; reply: string | null }> {
+    try {
+      const editions = await this.dataStorageService.getDailyEditions(1);
+      const dailyEdition = editions.length > 0 ? editions[0] : undefined;
+
+      const config = AIPrompts.generateHomepageChatSafetyAndReplyPrompts(
+        userMessage,
+        pastMessages,
+        dailyEdition
+      );
+
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.GENERAL,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        }
+      );
+
+      const content = result.response.choices[0]?.message?.content;
+      if (!content) {
+        return { isSafe: true, reply: "..." };
+      }
+
+      const parsed = homepageChatSafetyAndReplySchema.parse(
+        JSON.parse(content)
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      return parsed;
+    } catch (error) {
+      console.error("Error in chat safety/reply:", error);
+      return { isSafe: true, reply: "..." };
+    }
+  }
+
+  async generateHomepageChatVisitorMessage(
+    pastMessages: { role: "user" | "assistant"; content: string }[]
+  ): Promise<{ content: string }> {
+    try {
+      const editions = await this.dataStorageService.getDailyEditions(1);
+      const dailyEdition = editions.length > 0 ? editions[0] : undefined;
+
+      const conversationHistory = pastMessages
+        .map(
+          (m) => `${m.role === "user" ? "User" : "Assistant"}: "${m.content}"`
+        )
+        .join("\n");
+
+      const config = AIPrompts.generateHomepageChatVisitorMessagePrompts(
+        conversationHistory,
+        dailyEdition
+      );
+
+      const result = await this.aiClient.createChatCompletion(
+        AIModelOption.GENERAL,
+        {
+          messages: [
+            { role: "system", content: config.systemPrompt },
+            { role: "user", content: config.userPrompt }
+          ],
+          response_format: config.responseFormat
+        }
+      );
+
+      const content = result.response.choices[0]?.message?.content;
+      if (!content) {
+        return { content: "..." };
+      }
+
+      const parsed = homepageChatVisitorMessageSchema.parse(
+        JSON.parse(content)
+      );
+
+      await KpiService.incrementKpisFromOpenAIResponse(
+        result.response,
+        this.dataStorageService
+      );
+
+      return parsed;
+    } catch (error) {
+      console.error("Error generating homepage chat visitor message:", error);
+      return { content: "..." };
     }
   }
 }

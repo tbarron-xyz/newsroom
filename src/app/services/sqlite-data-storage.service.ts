@@ -16,7 +16,8 @@ import {
   DynamicPersona,
   Artifact,
   PrismDailyEditionPair,
-  Ticker
+  Ticker,
+  HomepageChatMessage
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -263,6 +264,15 @@ export class SQLiteDataStorageService implements IDataStorageService {
         expiresAt INTEGER
       );
       CREATE INDEX IF NOT EXISTS idx_chat_sessions_expires ON chat_sessions(expiresAt);
+
+      CREATE TABLE IF NOT EXISTS homepage_chat_messages (
+        id TEXT PRIMARY KEY,
+        senderName TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp INTEGER NOT NULL,
+        type TEXT NOT NULL DEFAULT 'user'
+      );
+      CREATE INDEX IF NOT EXISTS idx_homepage_chat_messages_time ON homepage_chat_messages(timestamp DESC);
     `);
   }
 
@@ -1145,6 +1155,37 @@ export class SQLiteDataStorageService implements IDataStorageService {
   }
 
   // Utility methods
+
+  async saveHomepageChatMessage(message: HomepageChatMessage): Promise<void> {
+    const db = this.getDb();
+    db.prepare(
+      `INSERT INTO homepage_chat_messages (id, senderName, content, timestamp, type)
+       VALUES (?, ?, ?, ?, ?)`
+    ).run(
+      message.id,
+      message.senderName,
+      message.content,
+      message.timestamp,
+      message.type
+    );
+  }
+
+  async getHomepageChatMessages(limit = 50): Promise<HomepageChatMessage[]> {
+    const db = this.getDb();
+    const rows = db
+      .prepare(
+        "SELECT * FROM homepage_chat_messages ORDER BY timestamp DESC LIMIT ?"
+      )
+      .all(limit) as any[];
+    return rows.reverse().map((row: any) => ({
+      id: row.id,
+      senderName: row.senderName,
+      content: row.content,
+      timestamp: row.timestamp,
+      type: row.type as "user" | "assistant"
+    }));
+  }
+
   async generateId(prefix: string): Promise<string> {
     return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
   }
@@ -1170,7 +1211,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       "artifacts",
       "ticker",
       "opinion_articles",
-      "prism_daily_edition_pairs"
+      "prism_daily_edition_pairs",
+      "homepage_chat_messages"
     ];
     for (const table of tables) {
       db.prepare(`DELETE FROM ${table}`).run();

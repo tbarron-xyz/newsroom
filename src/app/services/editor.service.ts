@@ -24,7 +24,8 @@ export type JobType =
   | "prism-daily"
   | "ticker"
   | "opinion"
-  | "youtube-transcript";
+  | "youtube-transcript"
+  | "homepage-chat";
 
 export interface JobResult {
   message: string;
@@ -831,6 +832,71 @@ export class EditorService {
 
         return {
           message: `YouTube transcript article generated: "${result.article.headline}"`,
+          jobType
+        };
+      }
+
+      case "homepage-chat": {
+        const dataStorage = this.dataStorageService;
+        const aiSvc = await ServiceContainer.getInstance().getAIService();
+
+        const recentMessages = await dataStorage.getHomepageChatMessages(10);
+        const pastMessages = recentMessages.map(
+          (m) =>
+            ({
+              role: m.type === "user" ? "user" : "assistant",
+              content: m.content
+            }) as { role: "user" | "assistant"; content: string }
+        );
+
+        const { content } =
+          await aiSvc.generateHomepageChatVisitorMessage(pastMessages);
+
+        const hexDigits = Math.floor(Math.random() * 0xfff)
+          .toString(16)
+          .padStart(3, "0");
+        const senderName = `visitor-${hexDigits}`;
+
+        const visitorMessage = {
+          id: await dataStorage.generateId("chat"),
+          senderName,
+          content,
+          timestamp: Date.now(),
+          type: "user" as const
+        };
+        await dataStorage.saveHomepageChatMessage(visitorMessage);
+
+        const replyContext = await dataStorage.getHomepageChatMessages(10);
+        const replyPastMessages = replyContext.map(
+          (m) =>
+            ({
+              role: m.type === "user" ? "user" : "assistant",
+              content: m.content
+            }) as { role: "user" | "assistant"; content: string }
+        );
+
+        const { reply } = await aiSvc.checkAndReplyToChatMessage(
+          content,
+          replyPastMessages
+        );
+
+        if (reply) {
+          const assistantMessage = {
+            id: await dataStorage.generateId("chat"),
+            senderName: "chatbot",
+            content: reply,
+            timestamp: Date.now(),
+            type: "assistant" as const
+          };
+          await dataStorage.saveHomepageChatMessage(assistantMessage);
+        }
+
+        console.log(
+          `[${new Date().toISOString()}] Homepage chat visitor message generated: "${content}"${reply ? ` -> "${reply}"` : ""}`
+        );
+
+        return {
+          message: `Homepage chat visitor message generated${reply ? " with chatbot reply" : ""}`,
           jobType
         };
       }

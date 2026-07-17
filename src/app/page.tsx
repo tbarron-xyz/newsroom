@@ -9,6 +9,7 @@ import { apiService } from "@/app/services/api.service";
 import type { DailyEdition, OpinionArticle, Article } from "./schemas/types";
 import { ChatProvider } from "../components/chat/ChatProvider";
 import { AssistantModal } from "../components/assistant-ui/assistant-modal";
+import HomepageChat from "../components/HomepageChat";
 
 export default function Home() {
   const [edition, setEdition] = useState<DailyEdition | null>(null);
@@ -84,6 +85,8 @@ export default function Home() {
       <PageContainer variant="tui" maxWidth="max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
           <aside className="space-y-6 lg:order-last">
+            <HomepageChat />
+
             <ContentCard variant="tui" className="p-6">
               <CollapsibleSection title="Opinion">
                 {opinions.length === 0 ? (

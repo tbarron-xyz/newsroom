@@ -14,7 +14,8 @@ import {
   Artifact,
   ArtifactJob,
   PrismDailyEditionPair,
-  Ticker
+  Ticker,
+  HomepageChatMessage
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 
@@ -152,6 +153,10 @@ export interface IDataStorageService {
   // Prism Daily Edition Pair operations
   savePrismDailyEditionPair(pair: PrismDailyEditionPair): Promise<void>;
   getPrismDailyEditionPairs(limit?: number): Promise<PrismDailyEditionPair[]>;
+
+  // Homepage Chat operations
+  saveHomepageChatMessage(message: HomepageChatMessage): Promise<void>;
+  getHomepageChatMessages(limit?: number): Promise<HomepageChatMessage[]>;
 
   // Chat session operations
   saveChatSession(

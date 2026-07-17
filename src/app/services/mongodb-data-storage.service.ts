@@ -15,7 +15,8 @@ import {
   DynamicPersona,
   Artifact,
   PrismDailyEditionPair,
-  Ticker
+  Ticker,
+  HomepageChatMessage
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -87,6 +88,9 @@ export class MongoDBDataStorageService implements IDataStorageService {
     await db
       .collection("dynamic_personas")
       .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    await db
+      .collection("homepage_chat_messages")
+      .createIndex({ timestamp: -1 });
   }
 
   private getDb(): Db {
@@ -359,6 +363,26 @@ export class MongoDBDataStorageService implements IDataStorageService {
       inputTokenCount: data.inputTokenCount || undefined,
       outputTokenCount: data.outputTokenCount || undefined
     } as Ticker;
+  }
+
+  // Homepage Chat operations
+  async saveHomepageChatMessage(message: HomepageChatMessage): Promise<void> {
+    await this.coll("homepage_chat_messages").insertOne({
+      _id: message.id,
+      ...message
+    });
+  }
+
+  async getHomepageChatMessages(limit = 50): Promise<HomepageChatMessage[]> {
+    const docs = await this.coll("homepage_chat_messages")
+      .find()
+      .sort({ timestamp: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.reverse().map((d) => {
+      const { _id, ...data } = d;
+      return data as HomepageChatMessage;
+    });
   }
 
   // Opinion Article operations

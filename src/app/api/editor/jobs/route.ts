@@ -21,7 +21,8 @@ const VALID_JOB_TYPES: JobType[] = [
   "prism-daily",
   "ticker",
   "opinion",
-  "youtube-transcript"
+  "youtube-transcript",
+  "homepage-chat"
 ];
 
 export const POST = withAuth(

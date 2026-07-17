@@ -2,7 +2,8 @@ import {
   Persona,
   OpinionPersona,
   Reporter,
-  DynamicPersona
+  DynamicPersona,
+  DailyEdition
 } from "../schemas/types";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
@@ -16,13 +17,23 @@ import {
   prismPerspectivesSchema,
   tickerSchema,
   opinionArticleSchema,
-  youtubeTranscriptArticleSchema
+  youtubeTranscriptArticleSchema,
+  homepageChatSafetyAndReplySchema,
+  homepageChatVisitorMessageSchema
 } from "../schemas/response-schemas";
 
 interface PromptConfig {
   systemPrompt: string;
   userPrompt: string;
   responseFormat?: any;
+}
+
+function formatDailyEditionForContext(dailyEdition: DailyEdition): string {
+  const lines = dailyEdition.topics.map(
+    (t) =>
+      `- ${t.name}: ${t.headline} — ${t.newsStoryFirstParagraph.slice(0, 250)}`
+  );
+  return `Latest news headlines:\n${lines.join("\n")}`;
 }
 
 export const PERSONA_SYSTEM_PROMPTS: Record<Persona, string> = {
@@ -774,6 +785,67 @@ Return a JSON object with "headline" (string) and "body" (string, at least 3 par
       responseFormat: zodResponseFormat(
         youtubeTranscriptArticleSchema,
         "transcript_article"
+      )
+    };
+  }
+
+  static generateHomepageChatSafetyAndReplyPrompts(
+    userMessage: string,
+    pastMessages?: { role: "user" | "assistant"; content: string }[],
+    dailyEdition?: DailyEdition
+  ): PromptConfig {
+    const systemPrompt = `You are a chat moderator and conversationalist. Your task is to determine if the user's new message (the last one in the conversation) contains profanity or inappropriate content. Past messages are provided only for conversational context — only the new message matters for the safety judgement. If the message is safe and appropriate, also generate a short IRC-style reply (1-2 sentences, casual vibe, like a chat room user). If the user asked a question, answer it using the latest news headlines provided below. If there's no question, just make casual chat. If the message is unsafe, set reply to null.`;
+
+    let userPrompt = "";
+    if (dailyEdition) {
+      userPrompt += `Latest news headlines (for optional reference):\n${formatDailyEditionForContext(dailyEdition)}\n\n`;
+    }
+    if (pastMessages && pastMessages.length > 0) {
+      userPrompt += "Conversation history:\n";
+      for (const msg of pastMessages) {
+        userPrompt += `${msg.role === "user" ? "User" : "Assistant"}: "${msg.content}"\n`;
+      }
+      userPrompt += "\n";
+    }
+    userPrompt += `New user message: "${userMessage}"
+
+Return a JSON object with:
+- isSafe: boolean (true if the new message contains no profanity or inappropriate content)
+- reply: string or null (a short trivial IRC-style response if safe, null if unsafe)`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        homepageChatSafetyAndReplySchema,
+        "safety_reply"
+      )
+    };
+  }
+
+  static generateHomepageChatVisitorMessagePrompts(
+    conversationHistory: string,
+    dailyEdition?: DailyEdition
+  ): PromptConfig {
+    const systemPrompt = `You are a visitor in a public IRC-style chat room. Generate a short, casual message (1-2 sentences) that a random visitor might say. The message should fit naturally into the current conversation flow. Never mention that you are an AI. Use lowercase, mild abbreviations, and write like a casual IRC chatter — for example: "anyone else following the council thing", "lol yeah that tracks", "fair enough", "huh didn't know that".`;
+
+    let contextBlock = "";
+    if (dailyEdition) {
+      contextBlock = `Latest news headlines (for optional reference):\n${formatDailyEditionForContext(dailyEdition)}\n\n`;
+    }
+
+    const userPrompt = `${contextBlock}Conversation history:
+${conversationHistory}
+
+Generate a new visitor message that continues this conversation naturally. Return a JSON object with:
+- content: the visitor's message text (1-2 sentences)`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        homepageChatVisitorMessageSchema,
+        "visitor_message"
       )
     };
   }
