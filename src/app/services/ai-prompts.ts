@@ -798,7 +798,12 @@ Return a JSON object with "headline" (string) and "body" (string, at least 3 par
 
   static generateHomepageChatSafetyAndReplyPrompts(
     userMessage: string,
-    pastMessages?: { role: "user" | "assistant"; content: string }[],
+    senderName: string,
+    pastMessages?: {
+      role: "user" | "assistant";
+      content: string;
+      senderName: string;
+    }[],
     dailyEdition?: DailyEdition
   ): PromptConfig {
     const systemPrompt = `You are a chat moderator and conversationalist. Your task is to determine if the user's new message (the last one in the conversation) contains profanity or inappropriate content. Past messages are provided only for conversational context — only the new message matters for the safety judgement. If the message is safe and appropriate, also generate a short IRC-style reply (1-2 sentences, casual vibe, like a chat room user). If the user asked a question, answer it using the latest news headlines provided below. If there's no question, just make casual chat. If the message is unsafe, set reply to null.`;
@@ -810,11 +815,11 @@ Return a JSON object with "headline" (string) and "body" (string, at least 3 par
     if (pastMessages && pastMessages.length > 0) {
       userPrompt += "Conversation history:\n";
       for (const msg of pastMessages) {
-        userPrompt += `${msg.role === "user" ? "User" : "Assistant"}: "${msg.content}"\n`;
+        userPrompt += `${msg.role === "user" ? "User" : "Assistant"} (${msg.senderName}): "${msg.content}"\n`;
       }
       userPrompt += "\n";
     }
-    userPrompt += `New user message: "${userMessage}"
+    userPrompt += `New user message (${senderName}): "${userMessage}"
 
 Return a JSON object with:
 - isSafe: boolean (true if the new message contains no profanity or inappropriate content)

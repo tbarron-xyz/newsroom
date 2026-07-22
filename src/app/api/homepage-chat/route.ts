@@ -38,12 +38,19 @@ export async function POST(request: NextRequest) {
     (m) =>
       ({
         role: m.type === "user" ? "user" : "assistant",
-        content: m.content
-      }) as { role: "user" | "assistant"; content: string }
+        content: m.content,
+        senderName: m.senderName
+      }) as { role: "user" | "assistant"; content: string; senderName: string }
   );
+
+  const hexDigits = Math.floor(Math.random() * 0xfff)
+    .toString(16)
+    .padStart(3, "0");
+  const senderName = `visitor-${hexDigits}`;
 
   const { isSafe, reply } = await aiService.checkAndReplyToChatMessage(
     trimmedContent,
+    senderName,
     pastMessages
   );
 
@@ -55,10 +62,6 @@ export async function POST(request: NextRequest) {
   }
 
   const now = Date.now();
-  const hexDigits = Math.floor(Math.random() * 0xfff)
-    .toString(16)
-    .padStart(3, "0");
-  const senderName = `visitor-${hexDigits}`;
 
   const userMessage = {
     id: await dataStorage.generateId("chat"),

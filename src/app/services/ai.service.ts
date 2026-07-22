@@ -1513,7 +1513,12 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
 
   async checkAndReplyToChatMessage(
     userMessage: string,
-    pastMessages?: { role: "user" | "assistant"; content: string }[]
+    senderName: string,
+    pastMessages?: {
+      role: "user" | "assistant";
+      content: string;
+      senderName: string;
+    }[]
   ): Promise<{ isSafe: boolean; reply: string | null }> {
     try {
       const editions = await this.dataStorageService.getDailyEditions(1);
@@ -1521,6 +1526,7 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
 
       const config = AIPrompts.generateHomepageChatSafetyAndReplyPrompts(
         userMessage,
+        senderName,
         pastMessages,
         dailyEdition
       );
@@ -1558,7 +1564,11 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
   }
 
   async generateHomepageChatVisitorMessage(
-    pastMessages: { role: "user" | "assistant"; content: string }[]
+    pastMessages: {
+      role: "user" | "assistant";
+      content: string;
+      senderName: string;
+    }[]
   ): Promise<{ content: string }> {
     try {
       const editions = await this.dataStorageService.getDailyEditions(1);
@@ -1566,7 +1576,8 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
 
       const conversationHistory = pastMessages
         .map(
-          (m) => `${m.role === "user" ? "User" : "Assistant"}: "${m.content}"`
+          (m) =>
+            `${m.role === "user" ? "User" : "Assistant"} (${m.senderName}): "${m.content}"`
         )
         .join("\n");
 

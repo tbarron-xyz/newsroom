@@ -845,8 +845,13 @@ export class EditorService {
           (m) =>
             ({
               role: m.type === "user" ? "user" : "assistant",
-              content: m.content
-            }) as { role: "user" | "assistant"; content: string }
+              content: m.content,
+              senderName: m.senderName
+            }) as {
+              role: "user" | "assistant";
+              content: string;
+              senderName: string;
+            }
         );
 
         const { content } =
@@ -871,12 +876,18 @@ export class EditorService {
           (m) =>
             ({
               role: m.type === "user" ? "user" : "assistant",
-              content: m.content
-            }) as { role: "user" | "assistant"; content: string }
+              content: m.content,
+              senderName: m.senderName
+            }) as {
+              role: "user" | "assistant";
+              content: string;
+              senderName: string;
+            }
         );
 
         const { reply } = await aiSvc.checkAndReplyToChatMessage(
           content,
+          senderName,
           replyPastMessages
         );
 
