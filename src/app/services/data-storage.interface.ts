@@ -15,7 +15,8 @@ import {
   ArtifactJob,
   PrismDailyEditionPair,
   Ticker,
-  HomepageChatMessage
+  HomepageChatMessage,
+  ResearchEntry
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 
@@ -75,6 +76,11 @@ export interface IDataStorageService {
   saveOpinionArticle(opinion: OpinionArticle): Promise<void>;
   getOpinionArticle(opinionId: string): Promise<OpinionArticle | null>;
   getLatestOpinionArticles(limit?: number): Promise<OpinionArticle[]>;
+
+  // Research operations
+  saveResearchEntry(entry: ResearchEntry): Promise<void>;
+  getLatestResearchEntries(limit?: number): Promise<ResearchEntry[]>;
+  getResearchEntry(id: string): Promise<ResearchEntry | null>;
 
   // User operations
   createUser(

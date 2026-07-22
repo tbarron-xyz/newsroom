@@ -8,7 +8,8 @@ import {
   EventGenerationMetadata,
   DynamicPersona,
   AIModelOption,
-  DailyEdition
+  DailyEdition,
+  NextArticleSuggestion
 } from "../schemas/types";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -28,7 +29,10 @@ import {
   opinionArticleSchema,
   youtubeTranscriptArticleSchema,
   homepageChatSafetyAndReplySchema,
-  homepageChatVisitorMessageSchema
+  homepageChatVisitorMessageSchema,
+  nextArticleSuggestionsSchema,
+  articleSummarySchema,
+  researchFindingsSchema
 } from "../schemas/response-schemas";
 import { IDataStorageService } from "./data-storage.interface";
 import { KpiService } from "./kpi.service";
@@ -1616,5 +1620,152 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
       console.error("Error generating homepage chat visitor message:", error);
       return { content: "..." };
     }
+  }
+
+  async suggestNextArticles(
+    topic: string,
+    goal: string,
+    existingSuggestions?: string
+  ): Promise<{
+    recommendations: NextArticleSuggestion[];
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    const config = AIPrompts.generateNextArticleSuggestionsPrompts(
+      topic,
+      goal,
+      existingSuggestions
+    );
+
+    const result = await this.aiClient.createChatCompletion(
+      AIModelOption.RESEARCH,
+      {
+        messages: [
+          { role: "system", content: config.systemPrompt },
+          { role: "user", content: config.userPrompt }
+        ],
+        response_format: config.responseFormat,
+        reasoning_effort: "minimal"
+      }
+    );
+
+    await KpiService.incrementKpisFromOpenAIResponse(
+      result.response,
+      this.dataStorageService
+    );
+
+    await this.logAIResponse("Next article suggestions", result.response);
+
+    const content = result.response.choices[0]?.message?.content?.trim();
+    if (!content) throw new Error("No response content from AI service");
+
+    const parsed = nextArticleSuggestionsSchema.parse(JSON.parse(content));
+
+    const recommendations = parsed.recommendations.map((r) => ({
+      ...r,
+      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, "_"))}`
+    }));
+
+    return {
+      recommendations,
+      modelName: result.modelUsed,
+      inputTokenCount: result.response.usage?.prompt_tokens,
+      outputTokenCount: result.response.usage?.completion_tokens
+    };
+  }
+
+  async summarizeArticleForGoal(
+    articleTitle: string,
+    wikitext: string,
+    goal: string
+  ): Promise<{
+    summaryParagraphs: string[];
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    const config = AIPrompts.generateArticleSummaryPrompts(
+      articleTitle,
+      wikitext,
+      goal
+    );
+
+    const result = await this.aiClient.createChatCompletion(
+      AIModelOption.RESEARCH,
+      {
+        messages: [
+          { role: "system", content: config.systemPrompt },
+          { role: "user", content: config.userPrompt }
+        ],
+        response_format: config.responseFormat,
+        reasoning_effort: "minimal"
+      }
+    );
+
+    await KpiService.incrementKpisFromOpenAIResponse(
+      result.response,
+      this.dataStorageService
+    );
+
+    await this.logAIResponse("Article summary for research", result.response);
+
+    const content = result.response.choices[0]?.message?.content?.trim();
+    if (!content) throw new Error("No response content from AI service");
+
+    const parsed = articleSummarySchema.parse(JSON.parse(content));
+
+    return {
+      summaryParagraphs: parsed.summaryParagraphs,
+      modelName: result.modelUsed,
+      inputTokenCount: result.response.usage?.prompt_tokens,
+      outputTokenCount: result.response.usage?.completion_tokens
+    };
+  }
+
+  async synthesizeFindings(
+    summariesText: string,
+    goal: string
+  ): Promise<{
+    findingsDocument: string;
+    modelName: string;
+    inputTokenCount?: number;
+    outputTokenCount?: number;
+  }> {
+    const config = AIPrompts.generateFindingsDocumentPrompts(
+      summariesText,
+      goal
+    );
+
+    const result = await this.aiClient.createChatCompletion(
+      AIModelOption.RESEARCH,
+      {
+        messages: [
+          { role: "system", content: config.systemPrompt },
+          { role: "user", content: config.userPrompt }
+        ],
+        response_format: config.responseFormat,
+        reasoning_effort: "minimal"
+      }
+    );
+
+    await KpiService.incrementKpisFromOpenAIResponse(
+      result.response,
+      this.dataStorageService
+    );
+
+    await this.logAIResponse("Research findings synthesis", result.response);
+
+    const content = result.response.choices[0]?.message?.content?.trim();
+    if (!content) throw new Error("No response content from AI service");
+
+    const parsed = researchFindingsSchema.parse(JSON.parse(content));
+
+    return {
+      findingsDocument: parsed.findingsDocument,
+      modelName: result.modelUsed,
+      inputTokenCount: result.response.usage?.prompt_tokens,
+      outputTokenCount: result.response.usage?.completion_tokens
+    };
   }
 }

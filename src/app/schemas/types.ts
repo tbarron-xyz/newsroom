@@ -21,7 +21,8 @@ export enum AIModelOption {
   EVENT_GENERATION = "eventModelName",
   STORY_SELECTION = "storySelectionModelName",
   EDITION_SELECTION = "editionSelectionModelName",
-  CHAT = "chatModelName"
+  CHAT = "chatModelName",
+  RESEARCH = "researchModelName"
 }
 
 export interface Editor {
@@ -33,6 +34,7 @@ export interface Editor {
   storySelectionModelName: string;
   editionSelectionModelName: string;
   chatModelName: string;
+  researchModelName: string;
   messageSliceCount: number;
   baseUrl?: string; // Optional base URL for OpenAI API requests
   articleGenerationPeriodMinutes: number;
@@ -92,6 +94,54 @@ export interface OpinionArticle {
   modelName: string;
   inputTokenCount?: number;
   outputTokenCount?: number;
+}
+
+export type RecommendationType =
+  | "natural-continuation"
+  | "foundational-concept"
+  | "historical-context"
+  | "causal-explanation"
+  | "cross-disciplinary"
+  | "surprising-trivia"
+  | "goal-advancement"
+  | "perspective-broadening";
+
+export interface NextArticleSuggestion {
+  title: string;
+  url: string;
+  score: number;
+  recommendationType: RecommendationType;
+  reason: string;
+}
+
+export interface ArticleSummary {
+  articleTitle: string;
+  summaryParagraphs: string[];
+}
+
+export interface ResearchLLMCall {
+  step: string;
+  modelName: string;
+  inputTokens: number;
+  outputTokens: number;
+  articleTitle?: string;
+}
+
+export interface ResearchEntry {
+  id: string;
+  topic: string;
+  goal: string;
+  suggestions: NextArticleSuggestion[];
+  summaries: ArticleSummary[];
+  findingsDocument: string;
+  generationTime: number;
+  status: "pending" | "completed" | "failed";
+  errorMessage?: string;
+  modelName: string;
+  inputTokenCount?: number;
+  outputTokenCount?: number;
+  llmCalls?: ResearchLLMCall[];
+  currentPhase?: string;
 }
 
 export interface NewspaperEdition {
@@ -184,6 +234,7 @@ export const REDIS_KEYS = {
   EDITOR_STORY_SELECTION_MODEL_NAME: "editor:story_selection_model_name",
   EDITOR_EDITION_SELECTION_MODEL_NAME: "editor:edition_selection_model_name",
   EDITOR_CHAT_MODEL_NAME: "editor:chat_model_name",
+  EDITOR_RESEARCH_MODEL_NAME: "editor:research_model_name",
   EDITOR_MESSAGE_SLICE_COUNT: "editor:message_slice_count",
   BASE_URL: "editor:base_url",
   ARTICLE_GENERATION_PERIOD_MINUTES: "article_generation:period_minutes",
@@ -340,7 +391,24 @@ export const REDIS_KEYS = {
   ARTIFACT_PROMPT_USER_TEMPLATE: (artifactId: string) =>
     `artifact:${artifactId}:prompt_user_template`,
   ARTIFACT_OUTPUT: (artifactId: string) => `artifact:${artifactId}:output`,
-  ARTIFACT_METADATA: (artifactId: string) => `artifact:${artifactId}:metadata`
+  ARTIFACT_METADATA: (artifactId: string) => `artifact:${artifactId}:metadata`,
+
+  // Research
+  RESEARCH_LATEST: "research:latest",
+  RESEARCH_LATEST_MAX_LENGTH: 50,
+  RESEARCH_TOPIC: (id: string) => `research:${id}:topic`,
+  RESEARCH_GOAL: (id: string) => `research:${id}:goal`,
+  RESEARCH_SUGGESTIONS: (id: string) => `research:${id}:suggestions`,
+  RESEARCH_SUMMARIES: (id: string) => `research:${id}:summaries`,
+  RESEARCH_FINDINGS: (id: string) => `research:${id}:findings`,
+  RESEARCH_TIME: (id: string) => `research:${id}:time`,
+  RESEARCH_STATUS: (id: string) => `research:${id}:status`,
+  RESEARCH_ERROR: (id: string) => `research:${id}:error`,
+  RESEARCH_MODEL_NAME: (id: string) => `research:${id}:model_name`,
+  RESEARCH_INPUT_TOKENS: (id: string) => `research:${id}:input_tokens`,
+  RESEARCH_OUTPUT_TOKENS: (id: string) => `research:${id}:output_tokens`,
+  RESEARCH_LLM_CALLS: (id: string) => `research:${id}:llm_calls`,
+  RESEARCH_CURRENT_PHASE: (id: string) => `research:${id}:current_phase`
 } as const;
 
 export interface ForumPost {

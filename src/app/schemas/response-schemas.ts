@@ -115,3 +115,34 @@ export const homepageChatSafetyAndReplySchema = z.object({
 export const homepageChatVisitorMessageSchema = z.object({
   content: z.string()
 });
+
+export const nextArticleSuggestionsSchema = z.object({
+  recommendations: z
+    .array(
+      z.object({
+        title: z.string(),
+        score: z.number().int().min(0).max(100),
+        recommendationType: z.enum([
+          "natural-continuation",
+          "foundational-concept",
+          "historical-context",
+          "causal-explanation",
+          "cross-disciplinary",
+          "surprising-trivia",
+          "goal-advancement",
+          "perspective-broadening"
+        ]),
+        reason: z.string().max(500)
+      })
+    )
+    .min(3)
+    .max(8)
+});
+
+export const articleSummarySchema = z.object({
+  summaryParagraphs: z.array(z.string()).length(3)
+});
+
+export const researchFindingsSchema = z.object({
+  findingsDocument: z.string()
+});

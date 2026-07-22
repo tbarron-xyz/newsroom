@@ -19,7 +19,10 @@ import {
   opinionArticleSchema,
   youtubeTranscriptArticleSchema,
   homepageChatSafetyAndReplySchema,
-  homepageChatVisitorMessageSchema
+  homepageChatVisitorMessageSchema,
+  nextArticleSuggestionsSchema,
+  articleSummarySchema,
+  researchFindingsSchema
 } from "../schemas/response-schemas";
 
 interface PromptConfig {
@@ -859,6 +862,80 @@ Generate a new visitor message that continues this conversation naturally. Retur
         homepageChatVisitorMessageSchema,
         "visitor_message"
       )
+    };
+  }
+
+  static generateNextArticleSuggestionsPrompts(
+    topic: string,
+    goal: string,
+    history?: string
+  ): PromptConfig {
+    const systemPrompt = `You are a Wikipedia research curator. Given a starting topic and a research goal, suggest exactly 3 Wikipedia articles to explore next. Each suggestion must include a relevance score (0-100), a recommendation type, and a brief reason.`;
+
+    let historyBlock = "";
+    if (history) {
+      historyBlock = `\nAlready explored articles:\n${history}\n`;
+    }
+
+    const userPrompt = `Starting topic: ${topic}
+Research goal: ${goal}${historyBlock}
+
+Suggest exactly 3 Wikipedia articles that would be most valuable to explore next for this research goal. For each article, provide:
+- title: the exact Wikipedia article title
+- score: relevance score 0-100
+- recommendationType: one of natural-continuation, foundational-concept, historical-context, causal-explanation, cross-disciplinary, surprising-trivia, goal-advancement, perspective-broadening
+- reason: why this article is relevant (max 500 chars)`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        nextArticleSuggestionsSchema,
+        "suggestions"
+      )
+    };
+  }
+
+  static generateArticleSummaryPrompts(
+    articleTitle: string,
+    wikitext: string,
+    goal: string
+  ): PromptConfig {
+    const systemPrompt = `You are a research analyst. Given a Wikipedia article and a research goal, write exactly 3 paragraphs explaining how the article content is relevant to the user's goal. Each paragraph should be substantive and specific.`;
+
+    const userPrompt = `Wikipedia article: ${articleTitle}
+
+Research goal: ${goal}
+
+Article content:
+${wikitext.slice(0, 15000)}
+
+Write exactly 3 paragraphs summarizing how this article is relevant to the research goal. Focus on specific facts, connections, and insights.`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(articleSummarySchema, "summary")
+    };
+  }
+
+  static generateFindingsDocumentPrompts(
+    summariesText: string,
+    goal: string
+  ): PromptConfig {
+    const systemPrompt = `You are a research synthesis expert. Given multiple article summaries and a research goal, synthesize them into a coherent findings document. The document should connect insights across articles, highlight key themes, and draw conclusions relevant to the goal.`;
+
+    const userPrompt = `Research goal: ${goal}
+
+Article summaries:
+${summariesText}
+
+Synthesize these summaries into a comprehensive findings document. Connect ideas across articles, identify key themes, and provide actionable insights related to the research goal.`;
+
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(researchFindingsSchema, "findings")
     };
   }
 }

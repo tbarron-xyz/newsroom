@@ -9,7 +9,7 @@ Four cron pipelines drive content generation: events → articles → editions �
 
 After making any code changes to typescript files (.ts/.tsx), run `npx tsc --noEmit` to check the typescript build
 Then run the Prettier formatter: `npm run format`
-- Run `docker compose run --rm test` or `npm test` to run the test suite (uses `node:test` framework)
+- If the user explicitly asks to run tests, `docker compose run --rm test` to run the test suite (uses `node:test` framework). This matches the github CI.
 
 # Code Style Guidelines
 - When patterns repeat, extract to a shared location.

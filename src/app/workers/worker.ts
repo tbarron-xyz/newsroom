@@ -4,7 +4,8 @@ import { ServiceContainer } from "../services/service-container";
 const QUEUE_CONFIGS: Record<string, { concurrency: number }> = {
   artifact_generate: { concurrency: 2 },
   daily_edition: { concurrency: 1 },
-  reporter_articles: { concurrency: 1 }
+  reporter_articles: { concurrency: 1 },
+  research: { concurrency: 1 }
 };
 
 async function processJob(job: Job): Promise<void> {

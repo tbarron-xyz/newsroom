@@ -16,7 +16,8 @@ import {
   Artifact,
   PrismDailyEditionPair,
   Ticker,
-  HomepageChatMessage
+  HomepageChatMessage,
+  ResearchEntry
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -91,6 +92,7 @@ export class MongoDBDataStorageService implements IDataStorageService {
     await db
       .collection("homepage_chat_messages")
       .createIndex({ timestamp: -1 });
+    await db.collection("research").createIndex({ generationTime: -1 });
   }
 
   private getDb(): Db {
@@ -434,6 +436,50 @@ export class MongoDBDataStorageService implements IDataStorageService {
         inputTokenCount: data.inputTokenCount || undefined,
         outputTokenCount: data.outputTokenCount || undefined
       } as OpinionArticle;
+    });
+  }
+
+  // Research operations
+  async saveResearchEntry(entry: ResearchEntry): Promise<void> {
+    await this.coll("research").replaceOne(
+      { _id: entry.id },
+      { _id: entry.id, ...entry },
+      { upsert: true }
+    );
+  }
+
+  async getResearchEntry(id: string): Promise<ResearchEntry | null> {
+    const doc = await this.coll("research").findOne({ _id: id });
+    if (!doc) return null;
+    const { _id, ...data } = doc;
+    return {
+      ...data,
+      status: data.status || "pending",
+      modelName: data.modelName || "",
+      inputTokenCount: data.inputTokenCount || undefined,
+      outputTokenCount: data.outputTokenCount || undefined,
+      llmCalls: data.llmCalls || undefined,
+      currentPhase: data.currentPhase || undefined
+    } as ResearchEntry;
+  }
+
+  async getLatestResearchEntries(limit = 50): Promise<ResearchEntry[]> {
+    const docs = await this.coll("research")
+      .find()
+      .sort({ generationTime: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map((d) => {
+      const { _id, ...data } = d;
+      return {
+        ...data,
+        status: data.status || "pending",
+        modelName: data.modelName || "",
+        inputTokenCount: data.inputTokenCount || undefined,
+        outputTokenCount: data.outputTokenCount || undefined,
+        llmCalls: data.llmCalls || undefined,
+        currentPhase: data.currentPhase || undefined
+      } as ResearchEntry;
     });
   }
 

@@ -21,6 +21,7 @@ interface EditorData {
   storySelectionModelName: string;
   editionSelectionModelName: string;
   chatModelName: string;
+  researchModelName: string;
   messageSliceCount: number;
   baseUrl: string;
   articleGenerationPeriodMinutes: number;
@@ -71,6 +72,7 @@ export default function EditorPage() {
     storySelectionModelName: "",
     editionSelectionModelName: "",
     chatModelName: "",
+    researchModelName: "",
     messageSliceCount: 200,
     baseUrl: "",
     articleGenerationPeriodMinutes: 15,
@@ -92,6 +94,12 @@ export default function EditorPage() {
   const [numComments, setNumComments] = useState(1);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [selectedReporterId, setSelectedReporterId] = useState("");
+  const [researchTopic, setResearchTopic] = useState("");
+  const [researchGoal, setResearchGoal] = useState("");
+  const [researchStarting, setResearchStarting] = useState(false);
+  const [researchRecent, setResearchRecent] = useState<
+    { id: string; topic: string }[]
+  >([]);
   const [reporters, setReporters] = useState<ReporterInfo[]>([]);
   const router = useRouter();
 
@@ -205,6 +213,32 @@ export default function EditorPage() {
       setMessage(error.error || `Error triggering ${jobType} job`);
       setJobTriggering(null);
       console.error(`Error triggering ${jobType} job:`, error);
+    }
+  };
+
+  const startResearch = async () => {
+    if (!researchTopic.trim() || !researchGoal.trim()) return;
+    setResearchStarting(true);
+    setMessage("");
+
+    try {
+      const result = await apiService.post<{ researchId: string }>(
+        "/api/research/run",
+        { topic: researchTopic, goal: researchGoal }
+      );
+      setMessage(`Research started: ${result.researchId}`);
+      setResearchRecent((prev) => [
+        { id: result.researchId, topic: researchTopic },
+        ...prev.slice(0, 4)
+      ]);
+      setResearchTopic("");
+      setResearchGoal("");
+    } catch (error: any) {
+      setMessage(error.error || "Error starting research");
+      console.error("Error starting research:", error);
+    } finally {
+      setResearchStarting(false);
+      setTimeout(() => setMessage(""), 5000);
     }
   };
 
@@ -516,6 +550,29 @@ export default function EditorPage() {
                 />
                 <p className="tui-muted mt-2">
                   AI model used for the chat agent on the home page.
+                </p>
+              </div>
+
+              {/* Wikipedia Research Model */}
+              <div>
+                <label className="tui-label block mb-2">
+                  Wikipedia Research Model
+                </label>
+                <input
+                  type="text"
+                  value={editorData.researchModelName}
+                  onChange={(e) =>
+                    setEditorData({
+                      ...editorData,
+                      researchModelName: e.target.value
+                    })
+                  }
+                  placeholder="Enter AI model name (e.g., gpt-5-nano)"
+                  className={`tui-input ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+                  readOnly={!isAdmin}
+                />
+                <p className="tui-muted mt-2">
+                  AI model used for the Wikipedia research pipeline.
                 </p>
               </div>
 
@@ -1561,6 +1618,88 @@ export default function EditorPage() {
                     : "Generate Article"}
                 </button>
               </div>
+            </div>
+
+            {/* Wikipedia Research */}
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-[var(--tui-primary)]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                    Wikipedia Research
+                  </h3>
+                  <p className="tui-muted">On demand</p>
+                </div>
+              </div>
+              <p className="tui-muted">
+                Explores Wikipedia articles as part of a structured research
+                workflow. Suggests next articles, summarizes each, and
+                synthesizes findings.
+              </p>
+              <div>
+                <label className="tui-label block mb-1">
+                  Starting Wikipedia article topic
+                </label>
+                <input
+                  type="text"
+                  value={researchTopic}
+                  onChange={(e) => setResearchTopic(e.target.value)}
+                  placeholder="e.g., Coffee"
+                  className="tui-input"
+                />
+              </div>
+              <div>
+                <label className="tui-label block mb-1">
+                  Research goal / context
+                </label>
+                <textarea
+                  value={researchGoal}
+                  onChange={(e) => setResearchGoal(e.target.value)}
+                  placeholder="e.g., Understand how a single commodity shaped global trade"
+                  className="tui-input"
+                  rows={3}
+                />
+              </div>
+              <button
+                onClick={startResearch}
+                disabled={
+                  researchStarting ||
+                  !researchTopic.trim() ||
+                  !researchGoal.trim() ||
+                  !isAdmin
+                }
+                className={`tui-btn w-full text-center ${!isAdmin || !researchTopic.trim() || !researchGoal.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {researchStarting ? "Starting..." : "Start Research"}
+              </button>
+              {researchRecent.length > 0 && (
+                <div className="space-y-1">
+                  <p className="tui-muted text-xs">Recent research:</p>
+                  {researchRecent.map((r) => (
+                    <a
+                      key={r.id}
+                      href={`/research/${r.id}`}
+                      className="block text-xs font-mono text-[var(--tui-primary)] hover:underline"
+                    >
+                      {r.topic} ({r.id})
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Homepage Chat Message */}

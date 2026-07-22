@@ -17,7 +17,8 @@ import {
   Artifact,
   PrismDailyEditionPair,
   Ticker,
-  HomepageChatMessage
+  HomepageChatMessage,
+  ResearchEntry
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -98,6 +99,12 @@ export class RedisDataStorageService implements IDataStorageService {
       editor.chatModelName
     );
     multi.set(REDIS_KEYS.EDITOR_CHAT_MODEL_NAME, editor.chatModelName);
+    console.log(
+      "Redis Write: SET",
+      REDIS_KEYS.EDITOR_RESEARCH_MODEL_NAME,
+      editor.researchModelName
+    );
+    multi.set(REDIS_KEYS.EDITOR_RESEARCH_MODEL_NAME, editor.researchModelName);
     console.log(
       "Redis Write: SET",
       REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT,
@@ -184,6 +191,7 @@ export class RedisDataStorageService implements IDataStorageService {
       storySelectionModelName,
       editionSelectionModelName,
       chatModelName,
+      researchModelName,
       messageSliceCountStr,
       baseUrl,
       articleGenerationPeriodMinutesStr,
@@ -201,6 +209,7 @@ export class RedisDataStorageService implements IDataStorageService {
       this.client.get(REDIS_KEYS.EDITOR_STORY_SELECTION_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_EDITION_SELECTION_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_CHAT_MODEL_NAME),
+      this.client.get(REDIS_KEYS.EDITOR_RESEARCH_MODEL_NAME),
       this.client.get(REDIS_KEYS.EDITOR_MESSAGE_SLICE_COUNT),
       this.client.get(REDIS_KEYS.BASE_URL),
       this.client.get(REDIS_KEYS.ARTICLE_GENERATION_PERIOD_MINUTES),
@@ -222,6 +231,7 @@ export class RedisDataStorageService implements IDataStorageService {
       storySelectionModelName: storySelectionModelName || "gpt-5-nano", // Default fallback
       editionSelectionModelName: editionSelectionModelName || "gpt-5-nano", // Default fallback
       chatModelName: chatModelName || "gpt-5-nano", // Default fallback
+      researchModelName: researchModelName || "gpt-5-nano", // Default fallback
       messageSliceCount: messageSliceCountStr
         ? parseInt(messageSliceCountStr)
         : 200, // Default fallback
@@ -1733,6 +1743,132 @@ export class RedisDataStorageService implements IDataStorageService {
     }
 
     return opinions;
+  }
+
+  // Research operations
+  async saveResearchEntry(entry: ResearchEntry): Promise<void> {
+    const {
+      id,
+      topic,
+      goal,
+      suggestions,
+      summaries,
+      findingsDocument,
+      generationTime,
+      status,
+      errorMessage,
+      modelName,
+      inputTokenCount,
+      outputTokenCount,
+      llmCalls,
+      currentPhase
+    } = entry;
+    const multi = this.client.multi();
+
+    multi.zAdd(REDIS_KEYS.RESEARCH_LATEST, {
+      score: generationTime,
+      value: id
+    });
+
+    multi.zRemRangeByRank(
+      REDIS_KEYS.RESEARCH_LATEST,
+      0,
+      -(REDIS_KEYS.RESEARCH_LATEST_MAX_LENGTH + 1)
+    );
+
+    multi.set(REDIS_KEYS.RESEARCH_TOPIC(id), topic);
+    multi.set(REDIS_KEYS.RESEARCH_GOAL(id), goal);
+    multi.set(REDIS_KEYS.RESEARCH_SUGGESTIONS(id), JSON.stringify(suggestions));
+    multi.set(REDIS_KEYS.RESEARCH_SUMMARIES(id), JSON.stringify(summaries));
+    multi.set(REDIS_KEYS.RESEARCH_FINDINGS(id), findingsDocument);
+    multi.set(REDIS_KEYS.RESEARCH_TIME(id), generationTime.toString());
+    multi.set(REDIS_KEYS.RESEARCH_STATUS(id), status);
+    if (errorMessage) multi.set(REDIS_KEYS.RESEARCH_ERROR(id), errorMessage);
+    multi.set(REDIS_KEYS.RESEARCH_MODEL_NAME(id), modelName);
+    if (inputTokenCount !== undefined)
+      multi.set(
+        REDIS_KEYS.RESEARCH_INPUT_TOKENS(id),
+        inputTokenCount.toString()
+      );
+    if (outputTokenCount !== undefined)
+      multi.set(
+        REDIS_KEYS.RESEARCH_OUTPUT_TOKENS(id),
+        outputTokenCount.toString()
+      );
+    if (llmCalls)
+      multi.set(REDIS_KEYS.RESEARCH_LLM_CALLS(id), JSON.stringify(llmCalls));
+    if (currentPhase)
+      multi.set(REDIS_KEYS.RESEARCH_CURRENT_PHASE(id), currentPhase);
+
+    await multi.exec();
+  }
+
+  async getResearchEntry(id: string): Promise<ResearchEntry | null> {
+    const [
+      topic,
+      goal,
+      suggestionsStr,
+      summariesStr,
+      findingsDocument,
+      timeStr,
+      status,
+      errorMessage,
+      modelName,
+      inputTokensStr,
+      outputTokensStr,
+      llmCallsStr,
+      currentPhase
+    ] = await Promise.all([
+      this.client.get(REDIS_KEYS.RESEARCH_TOPIC(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_GOAL(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_SUGGESTIONS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_SUMMARIES(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_FINDINGS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_TIME(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_STATUS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_ERROR(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_MODEL_NAME(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_INPUT_TOKENS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_OUTPUT_TOKENS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_LLM_CALLS(id)),
+      this.client.get(REDIS_KEYS.RESEARCH_CURRENT_PHASE(id))
+    ]);
+
+    if (!topic || !goal) return null;
+
+    return {
+      id,
+      topic,
+      goal,
+      suggestions: suggestionsStr ? JSON.parse(suggestionsStr) : [],
+      summaries: summariesStr ? JSON.parse(summariesStr) : [],
+      findingsDocument: findingsDocument || "",
+      generationTime: parseInt(timeStr || "0"),
+      status: (status as "pending" | "completed" | "failed") || "pending",
+      errorMessage: errorMessage || undefined,
+      modelName: modelName || "",
+      inputTokenCount: inputTokensStr ? parseInt(inputTokensStr) : undefined,
+      outputTokenCount: outputTokensStr ? parseInt(outputTokensStr) : undefined,
+      llmCalls: llmCallsStr ? JSON.parse(llmCallsStr) : undefined,
+      currentPhase: currentPhase || undefined
+    };
+  }
+
+  async getLatestResearchEntries(limit?: number): Promise<ResearchEntry[]> {
+    const count = limit || 50;
+    const ids = await this.client.zRange(
+      REDIS_KEYS.RESEARCH_LATEST,
+      0,
+      count - 1,
+      { REV: true }
+    );
+
+    const entries: ResearchEntry[] = [];
+    for (const id of ids) {
+      const entry = await this.getResearchEntry(id);
+      if (entry) entries.push(entry);
+    }
+    return entries;
   }
 
   // User operations

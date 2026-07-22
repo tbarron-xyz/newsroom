@@ -17,7 +17,8 @@ import {
   Artifact,
   PrismDailyEditionPair,
   Ticker,
-  HomepageChatMessage
+  HomepageChatMessage,
+  ResearchEntry
 } from "../schemas/types";
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
@@ -48,6 +49,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
         storySelectionModelName TEXT,
         editionSelectionModelName TEXT,
         chatModelName TEXT,
+        researchModelName TEXT,
         messageSliceCount INTEGER,
         baseUrl TEXT,
         articleGenerationPeriodMinutes INTEGER,
@@ -236,6 +238,40 @@ export class SQLiteDataStorageService implements IDataStorageService {
       );
       CREATE INDEX IF NOT EXISTS idx_opinion_articles_time ON opinion_articles(generationTime DESC);
 
+      -- Research
+      CREATE TABLE IF NOT EXISTS research (
+        id TEXT PRIMARY KEY,
+        topic TEXT NOT NULL,
+        goal TEXT NOT NULL,
+        suggestions TEXT,  -- JSON arr
+        summaries TEXT,  -- JSON arr
+        findingsDocument TEXT,
+        generationTime INTEGER,
+        status TEXT NOT NULL DEFAULT 'pending',
+        errorMessage TEXT,
+        modelName TEXT,
+        inputTokenCount INTEGER,
+        outputTokenCount INTEGER,
+        llmCalls TEXT,  -- JSON arr
+        currentPhase TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_research_time ON research(generationTime DESC);
+    `);
+
+    // Migrate existing research table if needed
+    try {
+      db.exec("ALTER TABLE research ADD COLUMN llmCalls TEXT");
+    } catch (e) {
+      // column already exists
+    }
+    try {
+      db.exec("ALTER TABLE research ADD COLUMN currentPhase TEXT");
+    } catch (e) {
+      // column already exists
+    }
+
+    db.exec(`
+
       -- Artifacts
       CREATE TABLE IF NOT EXISTS artifacts (
         id TEXT PRIMARY KEY,
@@ -295,10 +331,10 @@ export class SQLiteDataStorageService implements IDataStorageService {
       `
       INSERT OR REPLACE INTO editors (
         id, bio, prompt, modelName, articleModelName, eventModelName, storySelectionModelName,
-        editionSelectionModelName, chatModelName, messageSliceCount, baseUrl,
+        editionSelectionModelName, chatModelName, researchModelName, messageSliceCount, baseUrl,
         articleGenerationPeriodMinutes, lastArticleGenerationTime, eventGenerationPeriodMinutes,
         lastEventGenerationTime, editionGenerationPeriodMinutes, lastEditionGenerationTime
-      ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
     ).run(
       editor.bio,
@@ -309,6 +345,7 @@ export class SQLiteDataStorageService implements IDataStorageService {
       editor.storySelectionModelName,
       editor.editionSelectionModelName,
       editor.chatModelName,
+      editor.researchModelName,
       editor.messageSliceCount,
       editor.baseUrl,
       editor.articleGenerationPeriodMinutes,
@@ -799,6 +836,81 @@ export class SQLiteDataStorageService implements IDataStorageService {
       modelName: row.modelName || "",
       inputTokenCount: row.inputTokenCount || undefined,
       outputTokenCount: row.outputTokenCount || undefined
+    }));
+  }
+
+  // Research operations
+  async saveResearchEntry(entry: ResearchEntry): Promise<void> {
+    const db = this.getDb();
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO research (id, topic, goal, suggestions, summaries, findingsDocument, generationTime, status, errorMessage, modelName, inputTokenCount, outputTokenCount, llmCalls, currentPhase)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `
+    ).run(
+      entry.id,
+      entry.topic,
+      entry.goal,
+      JSON.stringify(entry.suggestions),
+      JSON.stringify(entry.summaries),
+      entry.findingsDocument,
+      entry.generationTime,
+      entry.status,
+      entry.errorMessage ?? null,
+      entry.modelName,
+      entry.inputTokenCount ?? null,
+      entry.outputTokenCount ?? null,
+      entry.llmCalls ? JSON.stringify(entry.llmCalls) : null,
+      entry.currentPhase ?? null
+    );
+  }
+
+  async getResearchEntry(id: string): Promise<ResearchEntry | null> {
+    const db = this.getDb();
+    const row = db
+      .prepare("SELECT * FROM research WHERE id = ?")
+      .get(id) as any;
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      topic: row.topic,
+      goal: row.goal,
+      suggestions: row.suggestions ? JSON.parse(row.suggestions) : [],
+      summaries: row.summaries ? JSON.parse(row.summaries) : [],
+      findingsDocument: row.findingsDocument || "",
+      generationTime: row.generationTime,
+      status: row.status,
+      errorMessage: row.errorMessage || undefined,
+      modelName: row.modelName || "",
+      inputTokenCount: row.inputTokenCount || undefined,
+      outputTokenCount: row.outputTokenCount || undefined,
+      llmCalls: row.llmCalls ? JSON.parse(row.llmCalls) : undefined,
+      currentPhase: row.currentPhase || undefined
+    };
+  }
+
+  async getLatestResearchEntries(limit?: number): Promise<ResearchEntry[]> {
+    const db = this.getDb();
+    const rows = db
+      .prepare("SELECT * FROM research ORDER BY generationTime DESC LIMIT ?")
+      .all(limit || 50) as any[];
+    return rows.map((row: any) => ({
+      id: row.id,
+      topic: row.topic,
+      goal: row.goal,
+      suggestions: row.suggestions ? JSON.parse(row.suggestions) : [],
+      summaries: row.summaries ? JSON.parse(row.summaries) : [],
+      findingsDocument: row.findingsDocument || "",
+      generationTime: row.generationTime,
+      status: row.status,
+      errorMessage: row.errorMessage || undefined,
+      modelName: row.modelName || "",
+      inputTokenCount: row.inputTokenCount || undefined,
+      outputTokenCount: row.outputTokenCount || undefined,
+      llmCalls: row.llmCalls ? JSON.parse(row.llmCalls) : undefined,
+      currentPhase: row.currentPhase || undefined
     }));
   }
 

@@ -11,6 +11,7 @@ import { AIService } from "./ai.service";
 import { AbilitiesService } from "./abilities.service";
 import { ArtifactService } from "./artifact.service";
 import { JobQueueService } from "./job-queue.service";
+import { WikipediaService } from "./wikipedia.service";
 
 export class ServiceContainer {
   private static instance: ServiceContainer;
@@ -23,6 +24,7 @@ export class ServiceContainer {
   private abilitiesService: AbilitiesService | null = null;
   private artifactService: ArtifactService | null = null;
   private jobQueueService: JobQueueService | null = null;
+  private wikipediaService: WikipediaService | null = null;
 
   private constructor() {}
 
@@ -123,6 +125,13 @@ export class ServiceContainer {
     return this.artifactService;
   }
 
+  async getWikipediaService(): Promise<WikipediaService> {
+    if (!this.wikipediaService) {
+      this.wikipediaService = new WikipediaService();
+    }
+    return this.wikipediaService;
+  }
+
   async getJobQueueService(): Promise<JobQueueService> {
     if (!this.jobQueueService) {
       this.jobQueueService = new JobQueueService(this);
@@ -148,5 +157,6 @@ export class ServiceContainer {
     this.abilitiesService = null;
     this.artifactService = null;
     this.jobQueueService = null;
+    this.wikipediaService = null;
   }
 }

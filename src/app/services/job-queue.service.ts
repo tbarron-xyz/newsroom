@@ -1,5 +1,6 @@
 import { Queue, Job } from "bullmq";
 import { ServiceContainer } from "./service-container";
+import { processResearchJob as processResearchJobHandler } from "../workers/research-worker";
 
 interface QueueConfig {
   name: string;
@@ -22,6 +23,11 @@ const QUEUE_CONFIGS: Record<string, QueueConfig> = {
     name: "reporter_articles",
     concurrency: 1, // single reporter job at a time
     limiter: { max: 1, duration: 15 * 60 * 1000 } // 1 per 15min
+  },
+  research: {
+    name: "research",
+    concurrency: 1,
+    limiter: { max: 5, duration: 60 * 1000 } // 5 per minute
   }
 };
 
@@ -98,6 +104,9 @@ export class JobQueueService {
         break;
       case "reporter_articles":
         await this.processReporterJob(job);
+        break;
+      case "research":
+        await this.processResearchJob(job);
         break;
       default:
         throw new Error(`Unknown queue: ${job.queueName}`);
@@ -184,6 +193,11 @@ export class JobQueueService {
       await dataStorageService.setJobRunning("reporter", false);
       throw error;
     }
+  }
+
+  private async processResearchJob(job: Job): Promise<void> {
+    const container = this.container;
+    await processResearchJobHandler(job, container);
   }
 
   async close(): Promise<void> {

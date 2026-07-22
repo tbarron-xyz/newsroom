@@ -45,6 +45,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
     { href: "/users", text: "Users" },
     { href: "/admin/bluesky-messages", text: "Bluesky Messages" },
     { href: "/logs", text: "Logs" },
+    { href: "/research", text: "Research" },
     { href: "/editor", text: "Editor Settings", isEditorButton: true }
   ];
 

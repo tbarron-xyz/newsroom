@@ -17,6 +17,7 @@ export const GET = withDataStorage(
       editionSelectionModelName:
         editor?.editionSelectionModelName || "gpt-5-nano",
       chatModelName: editor?.chatModelName || "gpt-5-nano",
+      researchModelName: editor?.researchModelName || "gpt-5-nano",
       messageSliceCount: editor?.messageSliceCount || 200,
       baseUrl: editor?.baseUrl || "",
       articleGenerationPeriodMinutes:
@@ -44,6 +45,7 @@ export const PUT = withAuth(
       storySelectionModelName,
       editionSelectionModelName,
       chatModelName,
+      researchModelName,
       messageSliceCount,
       baseUrl,
       articleGenerationPeriodMinutes,
@@ -59,7 +61,8 @@ export const PUT = withAuth(
       typeof eventModelName !== "string" ||
       typeof storySelectionModelName !== "string" ||
       typeof editionSelectionModelName !== "string" ||
-      typeof chatModelName !== "string"
+      typeof chatModelName !== "string" ||
+      typeof researchModelName !== "string"
     ) {
       return NextResponse.json(
         {
@@ -138,6 +141,7 @@ export const PUT = withAuth(
       storySelectionModelName,
       editionSelectionModelName,
       chatModelName,
+      researchModelName,
       messageSliceCount,
       baseUrl: baseUrl || undefined,
       articleGenerationPeriodMinutes,
@@ -154,6 +158,7 @@ export const PUT = withAuth(
       storySelectionModelName,
       editionSelectionModelName,
       chatModelName,
+      researchModelName,
       messageSliceCount,
       baseUrl: baseUrl || "",
       articleGenerationPeriodMinutes,

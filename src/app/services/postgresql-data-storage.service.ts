@@ -73,6 +73,7 @@ export class PostgreSQLDataStorageService {
           story_selection_model_name TEXT NOT NULL DEFAULT 'gpt-5-nano',
           edition_selection_model_name TEXT NOT NULL DEFAULT 'gpt-5-nano',
           chat_model_name TEXT NOT NULL DEFAULT 'gpt-5-nano',
+          research_model_name TEXT NOT NULL DEFAULT 'gpt-5-nano',
           message_slice_count INTEGER NOT NULL,
           article_generation_period_minutes INTEGER NOT NULL,
           last_article_generation_time BIGINT,
@@ -261,11 +262,11 @@ export class PostgreSQLDataStorageService {
       const query = `
         INSERT INTO editors (
           bio, prompt, model_name, article_model_name, event_model_name, story_selection_model_name, edition_selection_model_name,
-          chat_model_name, message_slice_count,
+          chat_model_name, research_model_name, message_slice_count,
           article_generation_period_minutes, last_article_generation_time,
           event_generation_period_minutes, last_event_generation_time,
           edition_generation_period_minutes, last_edition_generation_time
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         ON CONFLICT (id) DO UPDATE SET
           bio = EXCLUDED.bio,
           prompt = EXCLUDED.prompt,
@@ -275,6 +276,7 @@ export class PostgreSQLDataStorageService {
           story_selection_model_name = EXCLUDED.story_selection_model_name,
           edition_selection_model_name = EXCLUDED.edition_selection_model_name,
           chat_model_name = EXCLUDED.chat_model_name,
+          research_model_name = EXCLUDED.research_model_name,
           message_slice_count = EXCLUDED.message_slice_count,
           article_generation_period_minutes = EXCLUDED.article_generation_period_minutes,
           last_article_generation_time = EXCLUDED.last_article_generation_time,
@@ -294,6 +296,7 @@ export class PostgreSQLDataStorageService {
         editor.storySelectionModelName,
         editor.editionSelectionModelName,
         editor.chatModelName,
+        editor.researchModelName,
         editor.messageSliceCount,
         editor.articleGenerationPeriodMinutes,
         editor.lastArticleGenerationTime,
@@ -326,6 +329,7 @@ export class PostgreSQLDataStorageService {
         storySelectionModelName: row.story_selection_model_name,
         editionSelectionModelName: row.edition_selection_model_name,
         chatModelName: row.chat_model_name || "gpt-5-nano",
+        researchModelName: row.research_model_name || "gpt-5-nano",
         messageSliceCount: row.message_slice_count,
         articleGenerationPeriodMinutes: row.article_generation_period_minutes,
         lastArticleGenerationTime: row.last_article_generation_time,

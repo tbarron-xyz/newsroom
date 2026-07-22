@@ -22,6 +22,7 @@ export function makeEditor(overrides: Partial<Editor> = {}): Editor {
     storySelectionModelName: "gpt-4",
     editionSelectionModelName: "gpt-4",
     chatModelName: "gpt-4",
+    researchModelName: "gpt-4",
     messageSliceCount: 10,
     baseUrl: "https://api.openai.com/v1",
     articleGenerationPeriodMinutes: 15,
