@@ -532,7 +532,14 @@ Make the article engaging, factual, and professionally written. Ensure all quote
 
 When generating the article, first review your recent articles to avoid repetition, then choose the most appropriate event from your list, and focus the entire article on that specific event to create a more targeted and impactful story. After writing the article, re-scan the social media messages for any that may be related to your chosen event; include their numeric indices in the "potentialMessageIds" field.`;
 
-    return { systemPrompt, userPrompt };
+    return {
+      systemPrompt,
+      userPrompt,
+      responseFormat: zodResponseFormat(
+        reporterArticleSchema,
+        "reporter_article"
+      )
+    };
   }
 
   static generateThreadReplyPrompts(

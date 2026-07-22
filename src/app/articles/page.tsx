@@ -141,13 +141,7 @@ function ArticlesContent() {
                 ? "Latest Articles"
                 : "All Articles"
           }
-          description={
-            reporterId
-              ? `Reporter ${reporterId.split("_")[2] || reporterId} (${articles.length} articles)`
-              : !hasReader
-                ? `Showing the ${articles.length} most recent articles (login with Reader access to see all articles)`
-                : `Chronological list of all published articles (${articles.length} articles)`
-          }
+          description={""}
         >
           {reporterId ? (
             <Link href="/reporters" className="tui-btn">

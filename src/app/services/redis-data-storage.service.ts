@@ -552,6 +552,35 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   /**
+   * O(n) where n = number of articles in the latest set.
+   */
+  async searchArticles(query: string, limit?: number): Promise<Article[]> {
+    const count = limit || 20;
+    const articleIds = await this.client.ZRANGE(
+      REDIS_KEYS.ARTICLES_LATEST,
+      0,
+      -1,
+      { REV: true }
+    );
+
+    const matching: Article[] = [];
+    const lowerQuery = query.toLowerCase();
+    for (const articleId of articleIds) {
+      if (matching.length >= count) break;
+      const article = await this.getArticle(articleId);
+      if (
+        article &&
+        (article.headline.toLowerCase().includes(lowerQuery) ||
+          article.body.toLowerCase().includes(lowerQuery))
+      ) {
+        matching.push(article);
+      }
+    }
+
+    return matching;
+  }
+
+  /**
    * O(m) where m = number of articles for this reporter.
    */
   async getArticlesByReporter(

@@ -459,6 +459,20 @@ export class SQLiteDataStorageService implements IDataStorageService {
     return rows.map((row) => this.mapArticleRow(row));
   }
 
+  async searchArticles(query: string, limit?: number): Promise<Article[]> {
+    const db = this.getDb();
+    const pattern = `%${query}%`;
+    const rows = db
+      .prepare(
+        `
+      SELECT * FROM articles WHERE headline LIKE ? OR body LIKE ?
+      ORDER BY generationTime DESC LIMIT ?
+    `
+      )
+      .all(pattern, pattern, limit || 20) as any[];
+    return rows.map((row) => this.mapArticleRow(row));
+  }
+
   async getArticle(articleId: string): Promise<Article | null> {
     const db = this.getDb();
     const row = db
@@ -1228,9 +1242,10 @@ export class SQLiteDataStorageService implements IDataStorageService {
   }> {
     const dbFileSize = statSync(this.dbPath).size;
 
-    const totalMemory = process.memoryUsage().heapTotal;
-    const usedMemory = process.memoryUsage().heapUsed;
-    const freeMemory = totalMemory - usedMemory;
+    const os = await import("os");
+    const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const usedMemory = totalMemory - freeMemory;
 
     return {
       redis: {

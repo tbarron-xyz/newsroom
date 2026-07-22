@@ -157,6 +157,20 @@ export class MongoDBDataStorageService implements IDataStorageService {
     );
   }
 
+  async searchArticles(query: string, limit = 20): Promise<Article[]> {
+    const docs = await this.coll("articles")
+      .find({
+        $or: [
+          { headline: { $regex: query, $options: "i" } },
+          { body: { $regex: query, $options: "i" } }
+        ]
+      })
+      .sort({ generationTime: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map((d) => this.mapArticle(d));
+  }
+
   async getLatestArticles(limit = 100): Promise<Article[]> {
     const docs = await this.coll("articles")
       .find()
@@ -730,9 +744,10 @@ export class MongoDBDataStorageService implements IDataStorageService {
       // stats may fail on some configurations
     }
 
-    const totalMemory = process.memoryUsage().heapTotal;
-    const usedMemory = process.memoryUsage().heapUsed;
-    const freeMemory = totalMemory - usedMemory;
+    const os = await import("os");
+    const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    const usedMemory = totalMemory - freeMemory;
 
     return {
       redis: {

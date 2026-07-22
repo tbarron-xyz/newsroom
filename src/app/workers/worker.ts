@@ -1,7 +1,11 @@
 import { Worker, Job } from "bullmq";
 import { ServiceContainer } from "../services/service-container";
 
-const QUEUES = ["artifact_generate", "daily_edition", "reporter_articles"];
+const QUEUE_CONFIGS: Record<string, { concurrency: number }> = {
+  artifact_generate: { concurrency: 2 },
+  daily_edition: { concurrency: 1 },
+  reporter_articles: { concurrency: 1 }
+};
 
 async function processJob(job: Job): Promise<void> {
   const container = ServiceContainer.getInstance();
@@ -10,23 +14,34 @@ async function processJob(job: Job): Promise<void> {
 }
 
 async function run() {
-  console.log("Starting unified BullMQ worker for all queues...");
+  console.log("Starting BullMQ workers for all queues...");
   const container = ServiceContainer.getInstance();
-  const jobQueueService = await container.getJobQueueService();
+  await container.getJobQueueService();
   const connection = {
     host: "localhost",
     port: 6379
   };
 
-  const worker = new Worker(QUEUES as any, processJob, {
-    connection,
-    concurrency: 4, // Total across queues
-    limiter: { max: 10, duration: 60000 } // Fallback
+  const workers = Object.entries(QUEUE_CONFIGS).map(([queueName, config]) => {
+    const worker = new Worker(queueName, processJob, {
+      connection,
+      concurrency: config.concurrency
+    });
+    worker.on("ready", () =>
+      console.log(`Worker ready for queue: ${queueName}`)
+    );
+    worker.on("error", (err) =>
+      console.error(`Worker error for queue ${queueName}:`, err)
+    );
+    worker.on("failed", (job, err) =>
+      console.error(`Job ${job?.id} failed on queue ${queueName}:`, err)
+    );
+    return worker;
   });
 
   process.on("SIGINT", async () => {
-    console.log("Shutting down unified worker...");
-    await worker.close();
+    console.log("Shutting down workers...");
+    await Promise.all(workers.map((w) => w.close()));
     await container.disconnect();
     process.exit(0);
   });

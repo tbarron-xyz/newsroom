@@ -451,6 +451,37 @@ export class PostgreSQLDataStorageService {
     return [];
   }
 
+  async searchArticles(query: string, limit = 20): Promise<Article[]> {
+    const client = await this.pool.connect();
+    try {
+      const sql = `
+        SELECT * FROM articles
+        WHERE headline ILIKE $1 OR body ILIKE $1
+        ORDER BY generation_time DESC
+        LIMIT $2
+      `;
+      const pattern = `%${query}%`;
+      const result = await client.query(sql, [pattern, limit]);
+      return result.rows.map((row: any) => ({
+        id: row.id,
+        reporterId: row.reporter_id,
+        headline: row.headline,
+        body: row.body,
+        generationTime: row.generation_time,
+        prompt: row.prompt,
+        messageIds: row.message_ids,
+        messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
+        modelName: row.model_name,
+        inputTokenCount: row.input_token_count,
+        outputTokenCount: row.output_token_count
+      }));
+    } finally {
+      client.release();
+    }
+  }
+
   async getAllArticles(_limit?: number): Promise<Article[]> {
     return [];
   }

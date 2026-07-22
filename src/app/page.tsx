@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import PageContainer from "../components/PageContainer";
 import ContentCard from "../components/ContentCard";
 import CollapsibleSection from "../components/CollapsibleSection";
@@ -12,10 +13,12 @@ import { AssistantModal } from "../components/assistant-ui/assistant-modal";
 import HomepageChat from "../components/HomepageChat";
 
 export default function Home() {
+  const router = useRouter();
   const [edition, setEdition] = useState<DailyEdition | null>(null);
   const [opinions, setOpinions] = useState<OpinionArticle[]>([]);
   const [latestArticles, setLatestArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,6 +177,35 @@ export default function Home() {
               </ContentCard>
             ))}
           </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-[var(--tui-border)]">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                router.push(
+                  `/search?q=${encodeURIComponent(searchQuery.trim())}`
+                );
+              }
+            }}
+            className="flex gap-3 max-w-xl mx-auto"
+          >
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search articles..."
+              className="tui-input flex-1"
+            />
+            <button
+              type="submit"
+              disabled={!searchQuery.trim()}
+              className="tui-btn"
+            >
+              Search
+            </button>
+          </form>
         </div>
       </PageContainer>
       <AssistantModal />

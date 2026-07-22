@@ -5,8 +5,8 @@ import { AIModelOption } from "../schemas/types";
 
 export class AIClient {
   private openai: OpenAI;
-
   private dataStorageService: IDataStorageService;
+  private currentBaseUrl: string | undefined;
 
   constructor(dataStorageService: IDataStorageService) {
     this.dataStorageService = dataStorageService;
@@ -15,33 +15,19 @@ export class AIClient {
       throw new Error("OPENAI_API_KEY environment variable is required");
     }
 
-    // Initialize OpenAI client synchronously first, then update with baseUrl if available
     this.openai = new OpenAI({
       apiKey: apiKey
     });
-
-    // Initialize OpenAI client with configurable base URL asynchronously
-    this.initializeOpenAIClient(apiKey);
   }
 
-  private async initializeOpenAIClient(apiKey: string): Promise<void> {
-    try {
-      const editor = await this.dataStorageService.getEditor();
-      const baseUrl = editor?.baseUrl;
-
-      if (baseUrl) {
-        // Re-initialize with baseUrl if available
-        this.openai = new OpenAI({
-          apiKey: apiKey,
-          baseURL: baseUrl
-        });
-      }
-    } catch (error) {
-      console.warn(
-        "Failed to fetch baseUrl from Redis, keeping default OpenAI API:",
-        error
-      );
-    }
+  private ensureClientBaseUrl(baseUrl?: string): void {
+    if (this.currentBaseUrl === baseUrl) return;
+    this.currentBaseUrl = baseUrl;
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) return;
+    this.openai = new OpenAI(
+      baseUrl ? { apiKey, baseURL: baseUrl } : { apiKey }
+    );
   }
 
   getClient(): OpenAI {
@@ -80,6 +66,8 @@ export class AIClient {
       throw new Error("No editor configuration found");
     }
 
+    this.ensureClientBaseUrl(editor.baseUrl);
+
     const model = modelOverride || editor[option];
     if (!model) {
       throw new Error(`Model not configured for option: ${option}`);
@@ -106,6 +94,8 @@ export class AIClient {
     if (!editor) {
       throw new Error("No editor configuration found");
     }
+
+    this.ensureClientBaseUrl(editor.baseUrl);
 
     const model = modelOverride || editor[option];
     if (!model) {
