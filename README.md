@@ -35,13 +35,19 @@ All users can freely access recent content without registration. Visit the follo
 - **Daily Editions**: Comprehensive newspaper editions compiled from recent articles
 - **Web Interface**: Next.js frontend for managing reporters, editor, articles
 - **Admin Authentication**: Secure login system for editorial control (can be disabled for development with `npm run dev:noauth`)
-- **Configurable Storage**: Redis/Sqlite data persistence for articles, reporters, and editions
+- **Configurable Storage**: Multiple backends (Redis, SQLite, MongoDB, PostgreSQL) for data persistence
 
 ## Prerequisites
 
 - Node.js 18+
-- Redis server running on `redis://localhost:6379` (default database)
-- PostgreSQL server (optional, for PostgreSQL backend)
+- One data storage backend (options: Redis, SQLite, MongoDB, or PostgreSQL)
+  - Redis: server on `redis://localhost:6379`
+  - SQLite: built-in, no external dependencies
+  - MongoDB: server with `MONGODB_URL` configured
+  - PostgreSQL: server with `DATABASE_URL` configured
+
+**Note on SQLite & PostgreSQL:** Neither backend uses a migration framework. SQLite auto-creates all tables at startup via `CREATE TABLE IF NOT EXISTS`. PostgreSQL assumes the schema is already set up (or will be created at startup when wired). Schema changes must be applied by editing the `createTables()` method directly or by running the standalone script at `src/scripts/create-postgres-schema.ts`.
+
 - Docker (optional, for Docker Compose testing)
 
 ## Getting Started
@@ -55,6 +61,7 @@ All users can freely access recent content without registration. Visit the follo
    Create a `.env.local` file with:
    ```
    OPENAI_API_KEY=your_openai_api_key
+   # Data storage backend: "redis", "sqlite", "mongodb", or "postgresql"
    DATA_STORAGE_BACKEND=redis
    ```
 
@@ -92,7 +99,7 @@ docker compose up app
 ## Project Structure
 
 - `src/app/` - Next.js app router pages and API routes
-- `src/services/` - Business logic services (AI, Redis, Editor, Reporter)
+- `src/services/` - Business logic services (AI, Data Storage, Editor, Reporter)
 - `src/models/` - TypeScript types and schemas
 - `crontab.txt` - System crontab for scheduling jobs
 
@@ -156,7 +163,7 @@ The production system uses a system crontab (`crontab.txt`) to trigger API endpo
 0 * * * * wget http://localhost:8080/api/cron/events
 0 */6 * * * wget http://localhost:8080/api/cron/edition
 0 8 * * * wget http://localhost:8080/api/cron/daily
-0 0 * * * redis-cli -n 0 save
+0 0 * * * redis-cli -n 0 save   # Redis: daily RDB snapshot (skip if using another backend)
 ```
 
 **Manual triggers**: Jobs can also be triggered manually via the Editor page (`/editor`).

@@ -14,6 +14,7 @@ async function getContainer(): Promise<ServiceContainer> {
 
 const VALID_JOB_TYPES: JobType[] = [
   "reporter",
+  "articles-from-sources",
   "newspaper",
   "daily",
   "comments",
@@ -31,7 +32,7 @@ export const POST = withAuth(
     const editorService = await container.getEditorService();
 
     const body = await request.json();
-    const { jobType, count, videoUrl, reporterId } = body;
+    const { jobType, count, videoUrl, reporterId, published, modelName } = body;
 
     if (!jobType || typeof jobType !== "string") {
       return NextResponse.json(
@@ -52,13 +53,19 @@ export const POST = withAuth(
     const jobQueueService = await container.getJobQueueService();
 
     if (jobType === "daily") {
-      const jobId = await jobQueueService.addJob("daily_edition", {});
+      const jobId = await jobQueueService.addJob("daily_edition", {
+        published,
+        modelName
+      });
       return NextResponse.json({
         jobId,
         message: "Queued daily edition generation"
       });
     } else if (jobType === "reporter") {
-      const jobId = await jobQueueService.addJob("reporter_articles", {});
+      const jobId = await jobQueueService.addJob("reporter_articles", {
+        published,
+        modelName
+      });
       return NextResponse.json({
         jobId,
         message: "Queued reporter article generation"
@@ -68,7 +75,9 @@ export const POST = withAuth(
         enforceTimeConstraint: false,
         ...(count && { count }),
         ...(videoUrl && { videoUrl }),
-        ...(reporterId && { reporterId })
+        ...(reporterId && { reporterId }),
+        ...(published !== undefined && { published }),
+        ...(modelName !== undefined && { modelName })
       });
       return NextResponse.json({ message: result.message });
     }

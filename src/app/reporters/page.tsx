@@ -14,6 +14,7 @@ interface Reporter {
   beats: string[];
   prompt: string;
   enabled: boolean;
+  displayName?: string;
 }
 
 export default function ReportersPage() {
@@ -24,7 +25,8 @@ export default function ReportersPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newReporter, setNewReporter] = useState({
     beats: [] as string[],
-    prompt: ""
+    prompt: "",
+    displayName: ""
   });
   const {
     data: reporters,
@@ -46,7 +48,8 @@ export default function ReportersPage() {
       }
       await apiService.put(`/api/reporters/${reporter.id}`, {
         beats: reporter.beats,
-        prompt: reporter.prompt
+        prompt: reporter.prompt,
+        displayName: reporter.displayName
       });
       setMessage("Reporter updated successfully!");
       setEditingReporter(null);
@@ -74,7 +77,7 @@ export default function ReportersPage() {
       await apiService.post("/api/reporters", newReporter);
       setMessage("Reporter created successfully!");
       setShowCreateForm(false);
-      setNewReporter({ beats: [], prompt: "" });
+      setNewReporter({ beats: [], prompt: "", displayName: "" });
       setTimeout(() => setMessage(""), 3000);
       refetch();
     } catch (error) {
@@ -328,6 +331,30 @@ export default function ReportersPage() {
               </div>
             </div>
 
+            {/* Display Name Section */}
+            <div className="space-y-4">
+              <h3 className="tui-section-title">Display Name</h3>
+
+              <div className="border border-[var(--tui-border)] p-4">
+                <input
+                  type="text"
+                  value={newReporter.displayName}
+                  onChange={(e) =>
+                    setNewReporter({
+                      ...newReporter,
+                      displayName: e.target.value
+                    })
+                  }
+                  placeholder="e.g., Tech Reporter, Politics Desk"
+                  className="tui-input w-full"
+                />
+                <p className="tui-muted mt-2">
+                  Optional human-readable name shown throughout the UI instead
+                  of the internal reporter ID.
+                </p>
+              </div>
+            </div>
+
             {/* Prompt Section */}
             <div className="space-y-4">
               <h3 className="tui-section-title">Writing Prompt</h3>
@@ -453,7 +480,7 @@ export default function ReportersPage() {
                               : "text-[var(--tui-muted)]"
                           }`}
                         >
-                          Reporter {reporter.id.split("_")[2] || reporter.id}
+                          {reporter.displayName || reporter.id}
                         </h3>
                         <span
                           className={`inline-flex items-center px-2 py-0.5 text-xs font-mono border ${
@@ -682,6 +709,25 @@ export default function ReportersPage() {
                           Add
                         </button>
                       </div>
+                    </div>
+
+                    {/* Edit Display Name */}
+                    <div>
+                      <label className="tui-label block mb-2">
+                        Display Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editingReporter.displayName || ""}
+                        onChange={(e) =>
+                          setEditingReporter({
+                            ...editingReporter,
+                            displayName: e.target.value
+                          })
+                        }
+                        placeholder="e.g., Tech Reporter, Politics Desk"
+                        className="tui-input w-full"
+                      />
                     </div>
 
                     {/* Edit Prompt */}

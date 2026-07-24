@@ -50,6 +50,7 @@ export interface Reporter {
   beats: string[];
   prompt: string;
   enabled: boolean;
+  displayName?: string;
 }
 
 export interface ArticleGenerationMetadata {
@@ -82,6 +83,7 @@ export interface Article {
   modelName: string; // The AI model used to generate this article
   inputTokenCount?: number; // Number of input tokens used in the API call
   outputTokenCount?: number; // Number of output tokens used in the API call
+  published?: boolean; // If false, treated as a draft; defaults to true
 }
 
 export interface OpinionArticle {
@@ -176,15 +178,12 @@ export interface DailyEdition {
     oneLineSummary: string;
     comments?: DailyEditionComment[];
   }>;
-  // modelFeedbackAboutThePrompt?: {
-  //   positive: string;
-  //   negative: string;
-  // };
   newspaperName?: string;
   prompt: string; // The full prompt used to generate this daily edition
   modelName: string; // The AI model used to generate this daily edition
   inputTokenCount?: number; // Number of input tokens used in the API call
   outputTokenCount?: number; // Number of output tokens used in the API call
+  published?: boolean; // If false, treated as a draft; defaults to true
 }
 
 export interface Event {
@@ -249,6 +248,7 @@ export const REDIS_KEYS = {
   REPORTER_BEATS: (id: string) => `reporter:${id}:beats`,
   REPORTER_PROMPT: (id: string) => `reporter:${id}:prompt`,
   REPORTER_ENABLED: (id: string) => `reporter:${id}:enabled`,
+  REPORTER_DISPLAY_NAME: (id: string) => `reporter:${id}:displayName`,
 
   // Articles
   ARTICLES_BY_REPORTER: (reporterId: string) => `articles:${reporterId}`,
@@ -272,6 +272,7 @@ export const REDIS_KEYS = {
   ARTICLE_OUTPUT_TOKEN_COUNT: (articleId: string) =>
     `article:${articleId}:output_token_count`,
   ARTICLE_REPORTER: (articleId: string) => `article:${articleId}:reporter_id`,
+  ARTICLE_PUBLISHED: (articleId: string) => `article:${articleId}:published`,
 
   // Newspaper Editions
   EDITIONS: "editions",
@@ -300,6 +301,8 @@ export const REDIS_KEYS = {
     `daily_edition:${dailyEditionId}:input_token_count`,
   DAILY_EDITION_OUTPUT_TOKEN_COUNT: (dailyEditionId: string) =>
     `daily_edition:${dailyEditionId}:output_token_count`,
+  DAILY_EDITION_PUBLISHED: (dailyEditionId: string) =>
+    `daily_edition:${dailyEditionId}:published`,
 
   // Events
   EVENTS_BY_REPORTER: (reporterId: string) => `events:${reporterId}`,

@@ -287,6 +287,23 @@ export class RedisDataStorageService implements IDataStorageService {
       REDIS_KEYS.REPORTER_ENABLED(reporter.id),
       reporter.enabled.toString()
     );
+    if (reporter.displayName) {
+      console.log(
+        "Redis Write: SET",
+        REDIS_KEYS.REPORTER_DISPLAY_NAME(reporter.id),
+        reporter.displayName
+      );
+      multi.set(
+        REDIS_KEYS.REPORTER_DISPLAY_NAME(reporter.id),
+        reporter.displayName
+      );
+    } else {
+      console.log(
+        "Redis Write: DEL",
+        REDIS_KEYS.REPORTER_DISPLAY_NAME(reporter.id)
+      );
+      multi.del(REDIS_KEYS.REPORTER_DISPLAY_NAME(reporter.id));
+    }
     await multi.exec();
   }
 
@@ -303,6 +320,7 @@ export class RedisDataStorageService implements IDataStorageService {
       multi.sMembers(REDIS_KEYS.REPORTER_BEATS(id));
       multi.get(REDIS_KEYS.REPORTER_PROMPT(id));
       multi.get(REDIS_KEYS.REPORTER_ENABLED(id));
+      multi.get(REDIS_KEYS.REPORTER_DISPLAY_NAME(id));
     }
 
     const results = await multi.exec();
@@ -310,17 +328,19 @@ export class RedisDataStorageService implements IDataStorageService {
 
     const reporters: Reporter[] = [];
     for (let i = 0; i < reporterIds.length; i++) {
-      const baseIdx = i * 3;
+      const baseIdx = i * 4;
       const beats = results[baseIdx] as unknown as string[] | null;
       const prompt = results[baseIdx + 1] as unknown as string | null;
       const enabledStr = results[baseIdx + 2] as unknown as string | null;
+      const displayName = results[baseIdx + 3] as unknown as string | null;
 
       if (prompt) {
         reporters.push({
           id: reporterIds[i],
           beats: beats || [],
           prompt,
-          enabled: enabledStr === null ? true : enabledStr === "true"
+          enabled: enabledStr === null ? true : enabledStr === "true",
+          ...(displayName ? { displayName } : {})
         });
       }
     }
@@ -332,10 +352,11 @@ export class RedisDataStorageService implements IDataStorageService {
    * O(1) - parallel GET for beats, prompt, enabled.
    */
   async getReporter(id: string): Promise<Reporter | null> {
-    const [beats, prompt, enabledStr] = await Promise.all([
+    const [beats, prompt, enabledStr, displayName] = await Promise.all([
       this.client.sMembers(REDIS_KEYS.REPORTER_BEATS(id)),
       this.client.get(REDIS_KEYS.REPORTER_PROMPT(id)),
-      this.client.get(REDIS_KEYS.REPORTER_ENABLED(id))
+      this.client.get(REDIS_KEYS.REPORTER_ENABLED(id)),
+      this.client.get(REDIS_KEYS.REPORTER_DISPLAY_NAME(id))
     ]);
 
     if (!prompt) return null;
@@ -347,7 +368,8 @@ export class RedisDataStorageService implements IDataStorageService {
       id,
       beats,
       prompt,
-      enabled
+      enabled,
+      ...(displayName ? { displayName } : {})
     };
   }
 
@@ -492,6 +514,16 @@ export class RedisDataStorageService implements IDataStorageService {
       article.reporterId
     );
     multi.set(REDIS_KEYS.ARTICLE_REPORTER(articleId), article.reporterId);
+
+    console.log(
+      "Redis Write: SET",
+      REDIS_KEYS.ARTICLE_PUBLISHED(articleId),
+      (article.published !== false).toString()
+    );
+    multi.set(
+      REDIS_KEYS.ARTICLE_PUBLISHED(articleId),
+      (article.published !== false).toString()
+    );
 
     await multi.exec();
 
@@ -679,7 +711,8 @@ export class RedisDataStorageService implements IDataStorageService {
       messageRkeysJson,
       modelName,
       inputTokenCountStr,
-      outputTokenCountStr
+      outputTokenCountStr,
+      publishedStr
     ] = await Promise.all([
       this.client.get(REDIS_KEYS.ARTICLE_HEADLINE(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_BODY(articleId)),
@@ -691,7 +724,8 @@ export class RedisDataStorageService implements IDataStorageService {
       this.client.get(REDIS_KEYS.ARTICLE_MESSAGE_RKEYS(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_MODEL_NAME(articleId)),
       this.client.get(REDIS_KEYS.ARTICLE_INPUT_TOKEN_COUNT(articleId)),
-      this.client.get(REDIS_KEYS.ARTICLE_OUTPUT_TOKEN_COUNT(articleId))
+      this.client.get(REDIS_KEYS.ARTICLE_OUTPUT_TOKEN_COUNT(articleId)),
+      this.client.get(REDIS_KEYS.ARTICLE_PUBLISHED(articleId))
     ]);
 
     if (!headline || !body || !timeStr) return null;
@@ -766,7 +800,8 @@ export class RedisDataStorageService implements IDataStorageService {
         : undefined,
       outputTokenCount: outputTokenCountStr
         ? parseInt(outputTokenCountStr)
-        : undefined
+        : undefined,
+      published: publishedStr === null ? true : publishedStr === "true"
     };
   }
 
@@ -1384,27 +1419,7 @@ export class RedisDataStorageService implements IDataStorageService {
       );
     }
 
-    // Store model feedback
-    // if (dailyEdition.modelFeedbackAboutThePrompt) {
-    //   console.log(
-    //     "Redis Write: SET",
-    //     `daily_edition:${dailyEditionId}:model_feedback_positive`,
-    //     dailyEdition.modelFeedbackAboutThePrompt.positive
-    //   );
-    //   multi.set(
-    //     `daily_edition:${dailyEditionId}:model_feedback_positive`,
-    //     dailyEdition.modelFeedbackAboutThePrompt.positive
-    //   );
-    //   console.log(
-    //     "Redis Write: SET",
-    //     `daily_edition:${dailyEditionId}:model_feedback_negative`,
-    //     dailyEdition.modelFeedbackAboutThePrompt.negative
-    //   );
-    //   multi.set(
-    //     `daily_edition:${dailyEditionId}:model_feedback_negative`,
-    //     dailyEdition.modelFeedbackAboutThePrompt.negative
-    //   );
-    // }
+    // Store model feedback (removed - columns no longer exist)
 
     // Store topics as JSON
     console.log(
@@ -1457,6 +1472,17 @@ export class RedisDataStorageService implements IDataStorageService {
       );
     }
 
+    // Store published flag (defaults to true)
+    console.log(
+      "Redis Write: SET",
+      REDIS_KEYS.DAILY_EDITION_PUBLISHED(dailyEditionId),
+      (dailyEdition.published !== false).toString()
+    );
+    multi.set(
+      REDIS_KEYS.DAILY_EDITION_PUBLISHED(dailyEditionId),
+      (dailyEdition.published !== false).toString()
+    );
+
     await multi.exec();
   }
 
@@ -1495,30 +1521,24 @@ export class RedisDataStorageService implements IDataStorageService {
       frontPageHeadline,
       frontPageArticle,
       newspaperName,
-      modelFeedbackPositive,
-      modelFeedbackNegative,
       topicsJson,
       prompt,
       modelName,
       inputTokenCountStr,
-      outputTokenCountStr
+      outputTokenCountStr,
+      publishedStr
     ] = await Promise.all([
       this.client.sMembers(REDIS_KEYS.DAILY_EDITION_EDITIONS(dailyEditionId)),
       this.client.get(REDIS_KEYS.DAILY_EDITION_TIME(dailyEditionId)),
       this.client.get(`daily_edition:${dailyEditionId}:front_page_headline`),
       this.client.get(`daily_edition:${dailyEditionId}:front_page_article`),
       this.client.get(`daily_edition:${dailyEditionId}:newspaper_name`),
-      this.client.get(
-        `daily_edition:${dailyEditionId}:model_feedback_positive`
-      ),
-      this.client.get(
-        `daily_edition:${dailyEditionId}:model_feedback_negative`
-      ),
       this.client.get(`daily_edition:${dailyEditionId}:topics`),
       this.client.get(REDIS_KEYS.DAILY_EDITION_PROMPT(dailyEditionId)),
       this.client.get(REDIS_KEYS.DAILY_EDITION_MODEL_NAME(dailyEditionId)),
       this.client.get(`daily_edition:${dailyEditionId}:input_token_count`),
-      this.client.get(`daily_edition:${dailyEditionId}:output_token_count`)
+      this.client.get(`daily_edition:${dailyEditionId}:output_token_count`),
+      this.client.get(REDIS_KEYS.DAILY_EDITION_PUBLISHED(dailyEditionId))
     ]);
 
     if (!timeStr) return null;
@@ -1541,13 +1561,6 @@ export class RedisDataStorageService implements IDataStorageService {
       frontPageHeadline: frontPageHeadline || "",
       frontPageArticle: frontPageArticle || "",
       newspaperName: newspaperName || undefined,
-      // modelFeedbackAboutThePrompt:
-      //   modelFeedbackPositive || modelFeedbackNegative
-      //     ? {
-      //         positive: modelFeedbackPositive || "",
-      //         negative: modelFeedbackNegative || ""
-      //       }
-      //     : undefined,
       topics,
       prompt:
         prompt ||
@@ -1558,7 +1571,8 @@ export class RedisDataStorageService implements IDataStorageService {
         : undefined,
       outputTokenCount: outputTokenCountStr
         ? parseInt(outputTokenCountStr)
-        : undefined
+        : undefined,
+      published: publishedStr === null ? true : publishedStr === "true"
     };
   }
 

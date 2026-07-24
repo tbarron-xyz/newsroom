@@ -1,34 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import PageContainer from "../../components/PageContainer";
 import ContentCard from "../../components/ContentCard";
 import PageHeader from "../../components/PageHeader";
-import SourceArticleCard from "../../components/SourceArticleCard";
+import EditionCard from "../../components/EditionCard";
+import type { EditionCardEdition } from "../../components/EditionCard";
 import { apiService } from "../services/api.service";
 import { useList } from "@/hooks/useList";
 import type { Article } from "../schemas/types";
 
-interface NewspaperEdition {
-  id: string;
-  stories: string[] | Article[];
-  generationTime: number;
-  prompt: string;
-}
+function EditionsContent() {
+  const searchParams = useSearchParams();
+  const editionId = searchParams.get("id");
+  const [singleEdition, setSingleEdition] = useState<EditionCardEdition | null>(
+    null
+  );
+  const [singleLoading, setSingleLoading] = useState(false);
+  const [singleError, setSingleError] = useState("");
 
-export default function EditionsPage() {
   const {
     data: editionsData,
     loading,
     refetch: refetchEditions
-  } = useList<NewspaperEdition>("/api/editions/latest");
-  const [editions, setEditions] = useState<NewspaperEdition[]>([]);
+  } = useList<EditionCardEdition>("/api/editions/latest");
+  const [editions, setEditions] = useState<EditionCardEdition[]>([]);
   const [loadingEditions, setLoadingEditions] = useState(false);
   const [message, setMessage] = useState("");
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
   const [expandedEdition, setExpandedEdition] = useState<string | null>(null);
   const [loadingArticles, setLoadingArticles] = useState<string | null>(null);
-  const [showAllArticles, setShowAllArticles] = useState(true);
+
+  useEffect(() => {
+    if (!editionId) return;
+    setSingleLoading(true);
+    setSingleError("");
+    apiService
+      .get<EditionCardEdition>(`/api/editions/${editionId}`)
+      .then((data) => setSingleEdition(data))
+      .catch((err) =>
+        setSingleError(
+          err instanceof Error ? err.message : "Failed to load edition"
+        )
+      )
+      .finally(() => setSingleLoading(false));
+  }, [editionId]);
 
   useEffect(() => {
     const loadEditions = async () => {
@@ -38,8 +56,8 @@ export default function EditionsPage() {
       try {
         const fullEditions = await Promise.all(
           editionsData.map(
-            async (edition: NewspaperEdition) =>
-              await apiService.get<NewspaperEdition>(
+            async (edition: EditionCardEdition) =>
+              await apiService.get<EditionCardEdition>(
                 `/api/editions/${edition.id}`
               )
           )
@@ -59,7 +77,7 @@ export default function EditionsPage() {
   const fetchEditionWithArticles = async (editionId: string) => {
     setLoadingArticles(editionId);
     try {
-      const data = await apiService.get<NewspaperEdition>(
+      const data = await apiService.get<EditionCardEdition>(
         `/api/editions/${editionId}`
       );
       setEditions((prev) => prev.map((e) => (e.id === editionId ? data : e)));
@@ -69,10 +87,6 @@ export default function EditionsPage() {
       setLoadingArticles(null);
       setExpandedEdition(editionId);
     }
-  };
-
-  const toggleEdition = (editionId: string) => {
-    setExpandedEdition((prev) => (prev === editionId ? null : editionId));
   };
 
   const formatDate = (timestamp: number) => {
@@ -85,6 +99,70 @@ export default function EditionsPage() {
       minute: "2-digit"
     });
   };
+
+  if (editionId) {
+    if (singleLoading) {
+      return (
+        <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+            <p className="mt-4 tui-muted">Loading edition...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (singleError) {
+      return (
+        <PageContainer variant="tui">
+          <ContentCard variant="tui" className="p-12 text-center">
+            <h2 className="text-xl font-semibold text-[var(--tui-primary)] font-mono mb-4">
+              Error Loading Edition
+            </h2>
+            <p className="tui-text-muted mb-6">{singleError}</p>
+            <Link href="/editions" className="tui-btn inline-block">
+              ← Back to Editions
+            </Link>
+          </ContentCard>
+        </PageContainer>
+      );
+    }
+
+    if (!singleEdition) return null;
+
+    const showArt = expandedEdition === singleEdition.id;
+    return (
+      <PageContainer variant="tui" maxWidth="max-w-7xl">
+        <ContentCard variant="tui" className="p-8 mb-8">
+          <PageHeader
+            variant="tui"
+            title="Newspaper Edition"
+            description={`Generated ${formatDate(singleEdition.generationTime)} — ${singleEdition.stories.length} stories`}
+          >
+            <Link href="/editions" className="tui-btn">
+              ← Back to Editions
+            </Link>
+          </PageHeader>
+        </ContentCard>
+
+        <EditionCard
+          edition={singleEdition}
+          showArticles={showArt}
+          onToggleArticles={() =>
+            setExpandedEdition(
+              expandedEdition === singleEdition.id ? null : singleEdition.id
+            )
+          }
+          articlesLoading={false}
+          collapsePrompt
+        />
+
+        <div className="text-center mt-12">
+          <p className="tui-text-muted">{appName} Edition</p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   if (loading || loadingEditions) {
     return (
@@ -122,89 +200,24 @@ export default function EditionsPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {editions.map((edition: NewspaperEdition) => {
+          {editions.map((edition: EditionCardEdition) => {
             const isExpanded = expandedEdition === edition.id;
-            const articles = edition.stories as Article[];
-            const hasFullArticles = articles[0] && "headline" in articles[0];
-
             return (
-              <ContentCard variant="tui" key={edition.id} className="p-6">
-                <div className="mb-4 flex justify-between items-start">
-                  <div>
-                    <h2 className="text-xl font-bold tui-text-primary mb-2">
-                      Newspaper Edition
-                    </h2>
-                    <p className="tui-text-muted mb-2">
-                      {formatDate(edition.generationTime)}
-                    </p>
-                    <p className="tui-text-muted">
-                      {edition.stories.length} stories included
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowAllArticles(!showAllArticles)}
-                    disabled={loadingArticles === edition.id}
-                    className="tui-btn"
-                  >
-                    {loadingArticles === edition.id
-                      ? "Loading..."
-                      : showAllArticles
-                        ? "Hide Articles"
-                        : "View Articles"}
-                  </button>
-                </div>
-
-                {showAllArticles && hasFullArticles && (
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold tui-text-primary mb-2">
-                      Articles
-                    </h4>
-                    <div className="space-y-4">
-                      {articles.map((article: Article) => (
-                        <SourceArticleCard
-                          key={article.id}
-                          article={article}
-                          variant="tui"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="text-center tui-text-muted">
-                  Edition ID: {edition.id.slice(0, 12)}...
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-[var(--tui-border)]">
-                  <div className="flex items-center gap-2 mb-2 relative group">
-                    <h4 className="text-sm font-semibold tui-text-primary">
-                      Generation Prompt
-                    </h4>
-                    <div className="relative group">
-                      <svg
-                        className="w-4 h-4 text-[var(--tui-primary)] cursor-help"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black border border-[var(--tui-border)] text-[var(--tui-primary)] text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 font-mono">
-                        To ensure full journalistic transparency, this is the
-                        exact prompt given to the AI model to generate this
-                        edition. This allows the user to verify that no funny
-                        business has taken place.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border border-[var(--tui-border)] bg-black p-3 text-xs text-[var(--tui-muted)] font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
-                    {edition.prompt}
-                  </div>
-                </div>
-              </ContentCard>
+              <EditionCard
+                key={edition.id}
+                edition={edition}
+                showArticles={isExpanded}
+                onToggleArticles={() => {
+                  if (isExpanded) {
+                    setExpandedEdition(null);
+                  } else {
+                    fetchEditionWithArticles(edition.id);
+                  }
+                }}
+                articlesLoading={loadingArticles === edition.id}
+                collapsePrompt={false}
+                showEditionId
+              />
             );
           })}
         </div>
@@ -214,5 +227,19 @@ export default function EditionsPage() {
         <p className="tui-text-muted">{appName} Edition Archive</p>
       </div>
     </PageContainer>
+  );
+}
+
+export default function EditionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="tui-theme min-h-screen bg-black flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 tui-spinner mx-auto"></div>
+        </div>
+      }
+    >
+      <EditionsContent />
+    </Suspense>
   );
 }

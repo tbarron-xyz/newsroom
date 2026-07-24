@@ -63,7 +63,7 @@ export const POST = withAuth(
     const reporterService = await container.getReporterService();
 
     const body = await request.json();
-    const { beats, prompt, enabled } = body;
+    const { beats, prompt, enabled, displayName } = body;
 
     if (!Array.isArray(beats) || typeof prompt !== "string") {
       return NextResponse.json(
@@ -75,6 +75,7 @@ export const POST = withAuth(
     const reporter = await reporterService.createReporter({
       beats,
       prompt,
+      displayName,
       enabled: enabled ?? true // Default to true if not specified
     });
 

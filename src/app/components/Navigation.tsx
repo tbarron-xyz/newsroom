@@ -42,6 +42,8 @@ export default function Navigation({ appFullName }: NavigationProps) {
   ];
 
   const adminItems = [
+    { href: "/all", text: "All Generations" },
+    { href: "/drafts", text: "Drafts" },
     { href: "/users", text: "Users" },
     { href: "/admin/bluesky-messages", text: "Bluesky Messages" },
     { href: "/logs", text: "Logs" },
@@ -170,7 +172,7 @@ export default function Navigation({ appFullName }: NavigationProps) {
               );
             })}
 
-            {isAdmin && (
+            {user?.hasEditor && (
               <>
                 {adminItems.map((item) => (
                   <Link

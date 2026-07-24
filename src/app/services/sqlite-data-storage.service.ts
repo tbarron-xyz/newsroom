@@ -23,6 +23,11 @@ import {
 import { CLASSIC_PERSONAS } from "./ai-prompts";
 import { IDataStorageService } from "./data-storage.interface";
 
+// NOTE: Schema migrations are out of scope. The app auto-creates tables
+// at startup via CREATE TABLE IF NOT EXISTS and assumes all schemas
+// are already up to date. Schema changes must be made by editing
+// createTables() directly.
+
 export class SQLiteDataStorageService implements IDataStorageService {
   private db: any = null;
   private readonly dbPath = "./db.sqlite";
@@ -65,7 +70,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
         id TEXT PRIMARY KEY,
         beats TEXT,  -- JSON stringify
         prompt TEXT,
-        enabled INTEGER DEFAULT 0  -- 0=falsy, 1=true
+        enabled INTEGER DEFAULT 0,  -- 0=falsy, 1=true
+        displayName TEXT
       );
 
       -- Articles
@@ -82,7 +88,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
         messageRkeys TEXT,  -- JSON arr strs
         modelName TEXT,
         inputTokenCount INTEGER,
-        outputTokenCount INTEGER
+        outputTokenCount INTEGER,
+        published INTEGER DEFAULT 1
       );
       CREATE INDEX IF NOT EXISTS idx_articles_reporter_time ON articles(reporterId, generationTime DESC);
       CREATE INDEX IF NOT EXISTS idx_articles_time ON articles(generationTime DESC);
@@ -132,7 +139,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
         prompt TEXT,
         modelName TEXT,
         inputTokenCount INTEGER,
-        outputTokenCount INTEGER
+        outputTokenCount INTEGER,
+        published INTEGER DEFAULT 1
       );
       CREATE INDEX IF NOT EXISTS idx_daily_editions_time ON daily_editions(generationTime DESC);
 
@@ -258,18 +266,6 @@ export class SQLiteDataStorageService implements IDataStorageService {
       CREATE INDEX IF NOT EXISTS idx_research_time ON research(generationTime DESC);
     `);
 
-    // Migrate existing research table if needed
-    try {
-      db.exec("ALTER TABLE research ADD COLUMN llmCalls TEXT");
-    } catch (e) {
-      // column already exists
-    }
-    try {
-      db.exec("ALTER TABLE research ADD COLUMN currentPhase TEXT");
-    } catch (e) {
-      // column already exists
-    }
-
     db.exec(`
 
       -- Artifacts
@@ -375,14 +371,15 @@ export class SQLiteDataStorageService implements IDataStorageService {
     const db = this.getDb();
     db.prepare(
       `
-      INSERT OR REPLACE INTO reporters (id, beats, prompt, enabled)
-      VALUES (?, ?, ?, ?)
+      INSERT OR REPLACE INTO reporters (id, beats, prompt, enabled, displayName)
+      VALUES (?, ?, ?, ?, ?)
     `
     ).run(
       reporter.id,
       JSON.stringify(reporter.beats),
       reporter.prompt,
-      reporter.enabled ? 1 : 0
+      reporter.enabled ? 1 : 0,
+      reporter.displayName ?? null
     );
   }
 
@@ -416,8 +413,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       `
       INSERT OR REPLACE INTO articles (
         id, reporterId, headline, body, generationTime, prompt, messageIds, messageTexts,
-        messageDids, messageRkeys, modelName, inputTokenCount, outputTokenCount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        messageDids, messageRkeys, modelName, inputTokenCount, outputTokenCount, published
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
     ).run(
       article.id,
@@ -432,7 +429,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       JSON.stringify(article.messageRkeys),
       article.modelName,
       article.inputTokenCount,
-      article.outputTokenCount
+      article.outputTokenCount,
+      article.published !== false ? 1 : 0
     );
   }
 
@@ -534,7 +532,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       messageDids: JSON.parse(row.messageDids || "[]"),
       messageRkeys: JSON.parse(row.messageRkeys || "[]"),
       inputTokenCount: row.inputTokenCount || undefined,
-      outputTokenCount: row.outputTokenCount || undefined
+      outputTokenCount: row.outputTokenCount || undefined,
+      published: row.published === null ? true : row.published === 1
     };
   }
 
@@ -676,8 +675,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       INSERT OR REPLACE INTO daily_editions (
         id, editions, generationTime, frontPageHeadline, frontPageArticle, newspaperName,
         modelFeedbackPositive, modelFeedbackNegative, topics, prompt, modelName,
-        inputTokenCount, outputTokenCount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        inputTokenCount, outputTokenCount, published
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
     ).run(
       dailyEdition.id,
@@ -692,7 +691,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
       dailyEdition.prompt,
       dailyEdition.modelName,
       dailyEdition.inputTokenCount,
-      dailyEdition.outputTokenCount
+      dailyEdition.outputTokenCount,
+      dailyEdition.published !== false ? 1 : 0
     );
   }
 
@@ -718,13 +718,6 @@ export class SQLiteDataStorageService implements IDataStorageService {
 
   private mapDailyEditionRow(row: any): DailyEdition {
     const topics = JSON.parse(row.topics || "[]");
-    // const modelFeedbackAboutThePrompt =
-    //   row.modelFeedbackPositive && row.modelFeedbackNegative
-    //     ? {
-    //         positive: row.modelFeedbackPositive,
-    //         negative: row.modelFeedbackNegative
-    //       }
-    //     : undefined;
     return {
       id: row.id,
       editions: JSON.parse(row.editions || "[]"),
@@ -733,11 +726,11 @@ export class SQLiteDataStorageService implements IDataStorageService {
       frontPageArticle: row.frontPageArticle,
       newspaperName: row.newspaperName,
       topics: topics,
-      // modelFeedbackAboutThePrompt,
       prompt: row.prompt,
       modelName: row.modelName,
       inputTokenCount: row.inputTokenCount || undefined,
-      outputTokenCount: row.outputTokenCount || undefined
+      outputTokenCount: row.outputTokenCount || undefined,
+      published: row.published === null ? true : row.published === 1
     };
   }
 

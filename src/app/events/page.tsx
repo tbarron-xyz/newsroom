@@ -9,6 +9,7 @@ import { Event } from "../schemas/types";
 import { apiService } from "@/app/services/api.service";
 import { useAuth } from "@/hooks/useAuth";
 import { useList } from "@/hooks/useList";
+import { useReporterLookup } from "@/hooks/useReporterLookup";
 
 interface SafeEvent {
   id: string;
@@ -25,6 +26,7 @@ interface SafeEvent {
 
 export default function EventsPage() {
   const { isAdmin } = useAuth();
+  const reporterLookup = useReporterLookup();
   const {
     data: publicEvents,
     loading,
@@ -244,7 +246,8 @@ export default function EventsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm tui-text-muted">
-                      Reporter: {event.reporterId}
+                      Reporter:{" "}
+                      {reporterLookup.get(event.reporterId) || event.reporterId}
                       <br />
                       Created: {formatDate(event.createdTime)}
                       <br />

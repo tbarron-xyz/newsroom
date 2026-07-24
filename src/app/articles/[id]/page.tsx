@@ -10,6 +10,7 @@ import ExpandableSection from "@/components/ExpandableSection";
 import SourceMessageCard from "@/components/SourceMessageCard";
 import { apiService } from "@/app/services/api.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { useReporterLookup } from "@/hooks/useReporterLookup";
 
 interface Article {
   id: string;
@@ -29,6 +30,7 @@ export default function ArticlePage() {
   const router = useRouter();
   const articleId = params.id as string;
   const { user } = useAuth();
+  const reporterLookup = useReporterLookup();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -118,7 +120,7 @@ export default function ArticlePage() {
         <PageHeader
           variant="tui"
           title="Article Details"
-          description={`Reporter ${article.reporterId.split("_")[2] || article.reporterId}`}
+          description={`Reporter ${reporterLookup.get(article.reporterId) || article.reporterId}`}
         >
           <Link
             href={`/articles?reporterId=${article.reporterId}`}
@@ -238,7 +240,10 @@ export default function ArticlePage() {
         <div className="mt-8 pt-8 border-t border-[var(--tui-border)]">
           <div className="flex items-center justify-between tui-text-muted">
             <span>Article ID: {article.id}</span>
-            <span>Reporter: {article.reporterId}</span>
+            <span>
+              Reporter:{" "}
+              {reporterLookup.get(article.reporterId) || article.reporterId}
+            </span>
           </div>
         </div>
       </ContentCard>

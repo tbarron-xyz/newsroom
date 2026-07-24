@@ -7,11 +7,13 @@ import type { Article } from "@/app/schemas/types";
 interface SourceArticleCardProps {
   article: Article;
   variant?: "glass" | "tui";
+  reporterName?: string;
 }
 
 export default function SourceArticleCard({
   article,
-  variant = "tui"
+  variant = "tui",
+  reporterName
 }: SourceArticleCardProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -44,7 +46,7 @@ export default function SourceArticleCard({
               isTui ? "tui-text-muted mt-1" : "text-xs text-white/60 mt-1"
             }
           >
-            Reporter: {article.reporterId} | Generated:{" "}
+            Reporter: {reporterName || article.reporterId} | Generated:{" "}
             {new Date(article.generationTime).toLocaleDateString()}
           </p>
         </div>

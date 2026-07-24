@@ -17,6 +17,11 @@ import {
 } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
 
+// NOTE: Schema migrations are out of scope. The app creates tables
+// at startup via CREATE TABLE IF NOT EXISTS and assumes all schemas
+// are already up to date. Schema changes must be made by editing
+// createTables() directly.
+
 export class PostgreSQLDataStorageService {
   //  implements IDataStorageService
   private pool: Pool;
@@ -90,7 +95,8 @@ export class PostgreSQLDataStorageService {
           id TEXT PRIMARY KEY,
           beats JSONB NOT NULL DEFAULT '[]',
           prompt TEXT NOT NULL,
-          enabled BOOLEAN NOT NULL DEFAULT true
+          enabled BOOLEAN NOT NULL DEFAULT true,
+          display_name TEXT
         )
       `);
 
@@ -109,7 +115,8 @@ export class PostgreSQLDataStorageService {
           message_rkeys JSONB NOT NULL DEFAULT '[]',
           model_name TEXT DEFAULT 'gpt-5-nano',
           input_token_count INTEGER,
-          output_token_count INTEGER
+          output_token_count INTEGER,
+          published BOOLEAN DEFAULT TRUE
         )
       `);
 
@@ -154,13 +161,12 @@ export class PostgreSQLDataStorageService {
           front_page_headline TEXT NOT NULL,
           front_page_article TEXT NOT NULL,
           newspaper_name TEXT NOT NULL,
-          model_feedback_positive TEXT NOT NULL,
-          model_feedback_negative TEXT NOT NULL,
           topics JSONB NOT NULL DEFAULT '[]',
           prompt TEXT NOT NULL,
           model_name TEXT DEFAULT 'gpt-5-nano',
           input_token_count INTEGER,
-          output_token_count INTEGER
+          output_token_count INTEGER,
+          published BOOLEAN DEFAULT TRUE
         )
       `);
 
@@ -349,19 +355,21 @@ export class PostgreSQLDataStorageService {
 
     try {
       const query = `
-        INSERT INTO reporters (id, beats, prompt, enabled)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO reporters (id, beats, prompt, enabled, display_name)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (id) DO UPDATE SET
           beats = EXCLUDED.beats,
           prompt = EXCLUDED.prompt,
-          enabled = EXCLUDED.enabled
+          enabled = EXCLUDED.enabled,
+          display_name = EXCLUDED.display_name
       `;
 
       await client.query(query, [
         reporter.id,
         JSON.stringify(reporter.beats),
         reporter.prompt,
-        reporter.enabled
+        reporter.enabled,
+        reporter.displayName ?? null
       ]);
     } finally {
       client.release();
@@ -377,7 +385,8 @@ export class PostgreSQLDataStorageService {
         id: row.id,
         beats: row.beats,
         prompt: row.prompt,
-        enabled: row.enabled
+        enabled: row.enabled,
+        displayName: row.display_name ?? undefined
       }));
     } finally {
       client.release();
@@ -399,7 +408,8 @@ export class PostgreSQLDataStorageService {
         id: row.id,
         beats: row.beats,
         prompt: row.prompt,
-        enabled: row.enabled
+        enabled: row.enabled,
+        displayName: row.display_name ?? undefined
       };
     } finally {
       client.release();
@@ -412,8 +422,8 @@ export class PostgreSQLDataStorageService {
 
     try {
       const query = `
-        INSERT INTO articles (id, reporter_id, headline, body, generation_time, prompt, message_ids, message_texts, message_dids, message_rkeys, model_name, input_token_count, output_token_count)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        INSERT INTO articles (id, reporter_id, headline, body, generation_time, prompt, message_ids, message_texts, message_dids, message_rkeys, model_name, input_token_count, output_token_count, published)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         ON CONFLICT (id) DO UPDATE SET
           reporter_id = EXCLUDED.reporter_id,
           headline = EXCLUDED.headline,
@@ -426,7 +436,8 @@ export class PostgreSQLDataStorageService {
           message_rkeys = EXCLUDED.message_rkeys,
           model_name = EXCLUDED.model_name,
           input_token_count = EXCLUDED.input_token_count,
-          output_token_count = EXCLUDED.output_token_count
+          output_token_count = EXCLUDED.output_token_count,
+          published = EXCLUDED.published
       `;
 
       const values = [
@@ -442,7 +453,8 @@ export class PostgreSQLDataStorageService {
         JSON.stringify(article.messageRkeys),
         article.modelName,
         article.inputTokenCount,
-        article.outputTokenCount
+        article.outputTokenCount,
+        article.published !== false
       ];
 
       await client.query(query, values);
@@ -479,7 +491,8 @@ export class PostgreSQLDataStorageService {
         messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       }));
     } finally {
       client.release();
@@ -520,7 +533,8 @@ export class PostgreSQLDataStorageService {
         messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       }));
     } finally {
       client.release();
@@ -557,7 +571,8 @@ export class PostgreSQLDataStorageService {
         messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       }));
     } finally {
       client.release();
@@ -593,7 +608,8 @@ export class PostgreSQLDataStorageService {
         messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       }));
     } finally {
       client.release();
@@ -624,7 +640,8 @@ export class PostgreSQLDataStorageService {
         messageRkeys: row.message_rkeys || [],
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       };
     } finally {
       client.release();
@@ -880,21 +897,20 @@ export class PostgreSQLDataStorageService {
 
     try {
       const query = `
-        INSERT INTO daily_editions (id, editions, generation_time, front_page_headline, front_page_article, newspaper_name, model_feedback_positive, model_feedback_negative, topics, prompt, model_name, input_token_count, output_token_count)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        INSERT INTO daily_editions (id, editions, generation_time, front_page_headline, front_page_article, newspaper_name, topics, prompt, model_name, input_token_count, output_token_count, published)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (id) DO UPDATE SET
           editions = EXCLUDED.editions,
           generation_time = EXCLUDED.generation_time,
           front_page_headline = EXCLUDED.front_page_headline,
           front_page_article = EXCLUDED.front_page_article,
           newspaper_name = EXCLUDED.newspaper_name,
-          model_feedback_positive = EXCLUDED.model_feedback_positive,
-          model_feedback_negative = EXCLUDED.model_feedback_negative,
           topics = EXCLUDED.topics,
           prompt = EXCLUDED.prompt,
           model_name = EXCLUDED.model_name,
           input_token_count = EXCLUDED.input_token_count,
-          output_token_count = EXCLUDED.output_token_count
+          output_token_count = EXCLUDED.output_token_count,
+          published = EXCLUDED.published
       `;
 
       await client.query(query, [
@@ -904,13 +920,12 @@ export class PostgreSQLDataStorageService {
         dailyEdition.frontPageHeadline,
         dailyEdition.frontPageArticle,
         dailyEdition.newspaperName || null,
-        // dailyEdition.modelFeedbackAboutThePrompt?.positive || null,
-        // dailyEdition.modelFeedbackAboutThePrompt?.negative || null,
         JSON.stringify(dailyEdition.topics),
         dailyEdition.prompt,
         dailyEdition.modelName,
         dailyEdition.inputTokenCount,
-        dailyEdition.outputTokenCount
+        dailyEdition.outputTokenCount,
+        dailyEdition.published !== false
       ]);
     } finally {
       client.release();
@@ -935,18 +950,12 @@ export class PostgreSQLDataStorageService {
         frontPageHeadline: row.front_page_headline,
         frontPageArticle: row.front_page_article,
         newspaperName: row.newspaper_name || undefined,
-        // modelFeedbackAboutThePrompt:
-        //   row.model_feedback_positive || row.model_feedback_negative
-        //     ? {
-        //         positive: row.model_feedback_positive || "",
-        //         negative: row.model_feedback_negative || ""
-        //       }
-        //     : undefined,
         topics: row.topics,
         prompt: row.prompt,
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       }));
     } finally {
       client.release();
@@ -971,18 +980,12 @@ export class PostgreSQLDataStorageService {
         frontPageHeadline: row.front_page_headline,
         frontPageArticle: row.front_page_article,
         newspaperName: row.newspaper_name || undefined,
-        // modelFeedbackAboutThePrompt:
-        //   row.model_feedback_positive || row.model_feedback_negative
-        //     ? {
-        //         positive: row.model_feedback_positive || "",
-        //         negative: row.model_feedback_negative || ""
-        //       }
-        //     : undefined,
         topics: row.topics,
         prompt: row.prompt,
         modelName: row.model_name,
         inputTokenCount: row.input_token_count,
-        outputTokenCount: row.output_token_count
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
       };
     } finally {
       client.release();

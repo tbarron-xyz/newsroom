@@ -41,6 +41,7 @@ export function makeReporter(overrides: Partial<Reporter> = {}): Reporter {
     beats: ["politics", "tech"],
     prompt: "You are a test reporter",
     enabled: true,
+    displayName: "Test Reporter",
     ...overrides
   };
 }

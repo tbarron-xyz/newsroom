@@ -1,4 +1,4 @@
-import { Reporter, Article, Event } from "../schemas/types";
+import { Reporter, Article, Event, Editor } from "../schemas/types";
 import { IDataStorageService } from "./data-storage.interface";
 import { AIService } from "./ai.service";
 
@@ -8,7 +8,11 @@ export class ReporterService {
     private aiService: AIService
   ) {}
 
-  async generateArticlesForReporter(reporterId: string): Promise<Article[]> {
+  async generateArticlesForReporter(
+    reporterId: string,
+    modelNameOverride?: string,
+    published?: boolean
+  ): Promise<Article[]> {
     console.log(`Reporter ${reporterId}: Starting article generation...`);
 
     // Get reporter information
@@ -23,6 +27,8 @@ export class ReporterService {
       throw new Error("Editor configuration not found");
     }
 
+    const usedModelName = modelNameOverride?.trim() || editor.articleModelName;
+
     const numArticles = 1;
     const articles: Article[] = [];
 
@@ -31,7 +37,7 @@ export class ReporterService {
         const structuredArticle =
           await this.aiService.generateStructuredArticle(
             reporter,
-            editor.articleModelName
+            usedModelName
           );
 
         // Check if messageIds is empty - if so, skip generating and saving this article
@@ -81,7 +87,8 @@ export class ReporterService {
           messageTexts: messageTexts,
           messageDids: messageDids,
           messageRkeys: messageRkeys,
-          modelName: structuredArticle.response.modelName
+          modelName: structuredArticle.response.modelName,
+          published: published !== false
         };
         articles.push(article);
         console.log(`Generated article: "${article.headline}"`);
@@ -102,7 +109,11 @@ export class ReporterService {
     return articles;
   }
 
-  async generateAllReporterArticles(): Promise<{
+  async generateAllReporterArticles(
+    currentTime?: number,
+    editor?: Editor | null,
+    options?: { published?: boolean; modelName?: string }
+  ): Promise<{
     [reporterId: string]: Article[];
   }> {
     console.log("Starting article generation for all reporters...");
@@ -124,12 +135,23 @@ export class ReporterService {
       return {};
     }
 
+    if (!editor) {
+      editor = await this.dataStorageService.getEditor();
+    }
+
+    const usedModelName =
+      options?.modelName?.trim() || editor?.articleModelName;
+
     const results: { [reporterId: string]: Article[] } = {};
 
     // Generate articles for each enabled reporter
     for (const reporter of enabledReporters) {
       try {
-        const articles = await this.generateArticlesForReporter(reporter.id);
+        const articles = await this.generateArticlesForReporter(
+          reporter.id,
+          usedModelName,
+          options?.published
+        );
         results[reporter.id] = articles;
       } catch (error) {
         console.error(
@@ -421,16 +443,22 @@ export class ReporterService {
     return await this.dataStorageService.getEventsByReporter(reporterId, limit);
   }
 
-  async generateArticlesFromEvents(): Promise<{
+  async generateArticlesFromEvents(
+    currentTime?: number,
+    editor?: Editor | null,
+    options?: { published?: boolean; modelName?: string }
+  ): Promise<{
     [reporterId: string]: Article[];
   }> {
     console.log("Starting article generation from events for all reporters...");
 
     // Get editor configuration for model settings
-    const editor = await this.dataStorageService.getEditor();
-    if (!editor) {
+    const ed = editor || (await this.dataStorageService.getEditor());
+    if (!ed) {
       throw new Error("Editor configuration not found");
     }
+
+    const usedModelName = options?.modelName?.trim() || ed.articleModelName;
 
     // Get all reporters
     const reporters = await this.dataStorageService.getAllReporters();
@@ -461,7 +489,7 @@ export class ReporterService {
         const structuredArticle =
           await this.aiService.generateArticlesFromEvents(
             reporter,
-            editor.articleModelName
+            usedModelName
           );
         if (!structuredArticle) {
           continue;
@@ -514,7 +542,8 @@ export class ReporterService {
           messageTexts: messageTexts,
           messageDids: messageDids,
           messageRkeys: messageRkeys,
-          modelName: structuredArticle.response.modelName
+          modelName: structuredArticle.response.modelName,
+          published: options?.published !== false
         };
 
         await this.dataStorageService.saveArticle(article);

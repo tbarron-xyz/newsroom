@@ -157,7 +157,10 @@ export class JobQueueService {
       await dataStorageService.setJobRunning("daily", true);
       await dataStorageService.setJobLastRun("daily", Date.now());
 
-      const dailyEdition = await editorService.generateDailyEdition();
+      const dailyEdition = await editorService.generateDailyEdition({
+        published: job.data.published,
+        modelName: job.data.modelName
+      });
 
       await dataStorageService.setJobRunning("daily", false);
       await dataStorageService.setJobLastSuccess("daily", Date.now());
@@ -179,7 +182,14 @@ export class JobQueueService {
       await dataStorageService.setJobRunning("reporter", true);
       await dataStorageService.setJobLastRun("reporter", Date.now());
 
-      const results = await reporterService.generateArticlesFromEvents();
+      const results = await reporterService.generateArticlesFromEvents(
+        Date.now(),
+        null,
+        {
+          published: job.data.published,
+          modelName: job.data.modelName
+        }
+      );
 
       await dataStorageService.setJobRunning("reporter", false);
       await dataStorageService.setJobLastSuccess("reporter", Date.now());

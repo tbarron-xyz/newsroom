@@ -7,6 +7,9 @@
  * PostgreSQL data storage backend.
  *
  * Usage: npx ts-node scripts/create-postgres-schema.ts
+ *
+ * NOTE: This is a one-time setup script, not a migration system.
+ * The app assumes schemas are already up to date at startup.
  */
 
 import { Pool } from "pg";
@@ -56,7 +59,8 @@ async function createSchema() {
         id TEXT PRIMARY KEY,
         beats JSONB NOT NULL DEFAULT '[]',
         prompt TEXT NOT NULL,
-        enabled BOOLEAN NOT NULL DEFAULT true
+        enabled BOOLEAN NOT NULL DEFAULT true,
+        display_name TEXT
       )
     `);
 
@@ -118,8 +122,6 @@ async function createSchema() {
         front_page_headline TEXT NOT NULL,
         front_page_article TEXT NOT NULL,
         newspaper_name TEXT NOT NULL,
-        model_feedback_positive TEXT NOT NULL,
-        model_feedback_negative TEXT NOT NULL,
         topics JSONB NOT NULL DEFAULT '[]',
         prompt TEXT NOT NULL,
         model_name TEXT NOT NULL DEFAULT 'gpt-5-nano'

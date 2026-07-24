@@ -17,6 +17,7 @@ import { ServiceContainer } from "./service-container";
 
 export type JobType =
   | "reporter"
+  | "articles-from-sources"
   | "newspaper"
   | "daily"
   | "comments"
@@ -122,7 +123,10 @@ export class EditorService {
     return edition;
   }
 
-  async generateDailyEdition(): Promise<DailyEdition> {
+  async generateDailyEdition(options?: {
+    published?: boolean;
+    modelName?: string;
+  }): Promise<DailyEdition> {
     console.log("Editor: Starting daily edition generation...");
 
     // Get newspaper editions from the last 24 hours
@@ -168,6 +172,8 @@ export class EditorService {
       })
     );
 
+    const usedModelName =
+      options?.modelName || editor.editionSelectionModelName;
     // Use AI to generate comprehensive daily edition content
     const {
       content: dailyEditionContent,
@@ -178,7 +184,7 @@ export class EditorService {
     } = await this.aiService.selectNotableEditions(
       detailedEditions,
       editor.prompt,
-      editor.editionSelectionModelName
+      usedModelName
     );
 
     console.log(
@@ -199,7 +205,8 @@ export class EditorService {
       prompt: fullPrompt,
       modelName: modelName,
       inputTokenCount,
-      outputTokenCount
+      outputTokenCount,
+      published: options?.published !== false
     };
 
     // Save the daily edition
@@ -541,6 +548,8 @@ export class EditorService {
       count?: number;
       videoUrl?: string;
       reporterId?: string;
+      published?: boolean;
+      modelName?: string;
     } = {}
   ): Promise<JobResult> {
     const { enforceTimeConstraint = false } = options;
@@ -665,7 +674,13 @@ export class EditorService {
     jobType: JobType,
     currentTime: number,
     editor: Editor | null,
-    options: { count?: number; videoUrl?: string; reporterId?: string }
+    options: {
+      count?: number;
+      videoUrl?: string;
+      reporterId?: string;
+      published?: boolean;
+      modelName?: string;
+    }
   ): Promise<JobResult> {
     switch (jobType) {
       case "events": {
@@ -698,11 +713,45 @@ export class EditorService {
         };
       }
 
+      case "articles-from-sources": {
+        if (!this.reporterService) {
+          throw new Error("Reporter service not available");
+        }
+        const articleResults =
+          await this.reporterService.generateAllReporterArticles(
+            currentTime,
+            editor,
+            {
+              published: options.published,
+              modelName: options.modelName
+            }
+          );
+        const totalArticleCount = Object.values(articleResults).reduce(
+          (sum, articles) => sum + articles.length,
+          0
+        );
+
+        console.log(
+          `[${new Date().toISOString()}] Successfully generated ${totalArticleCount} articles from sources`
+        );
+        return {
+          message: `Article generation job completed successfully. Generated ${totalArticleCount} articles.`,
+          jobType
+        };
+      }
+
       case "reporter": {
         if (!this.reporterService) {
           throw new Error("Reporter service not available");
         }
-        const results = await this.reporterService.generateArticlesFromEvents();
+        const results = await this.reporterService.generateArticlesFromEvents(
+          currentTime,
+          editor,
+          {
+            published: options.published,
+            modelName: options.modelName
+          }
+        );
         const totalArticles = Object.values(results).reduce(
           (sum, articles) => sum + articles.length,
           0
@@ -752,7 +801,10 @@ export class EditorService {
       }
 
       case "daily": {
-        const dailyEdition = await this.generateDailyEdition();
+        const dailyEdition = await this.generateDailyEdition({
+          published: options.published,
+          modelName: options.modelName
+        });
         console.log(
           `[${new Date().toISOString()}] Successfully generated daily edition ${dailyEdition.id}`
         );

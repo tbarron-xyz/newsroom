@@ -94,6 +94,14 @@ export default function EditorPage() {
   const [numComments, setNumComments] = useState(1);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [selectedReporterId, setSelectedReporterId] = useState("");
+  const [dailyModelName, setDailyModelName] = useState("");
+  const [dailyAsDraft, setDailyAsDraft] = useState(true);
+  const [articlesModelName, setArticlesModelName] = useState("");
+  const [articlesAsDraft, setArticlesAsDraft] = useState(true);
+  const [articlesFromEventsModelName, setArticlesFromEventsModelName] =
+    useState("");
+  const [articlesFromEventsAsDraft, setArticlesFromEventsAsDraft] =
+    useState(true);
   const [researchTopic, setResearchTopic] = useState("");
   const [researchGoal, setResearchGoal] = useState("");
   const [researchStarting, setResearchStarting] = useState(false);
@@ -188,7 +196,11 @@ export default function EditorPage() {
     }
   };
 
-  const triggerJob = async (jobType: string, count?: number) => {
+  const triggerJob = async (
+    jobType: string,
+    count?: number,
+    extraOptions?: Record<string, any>
+  ) => {
     setJobTriggering(jobType);
     setMessage("");
 
@@ -199,7 +211,8 @@ export default function EditorPage() {
         ...(jobType === "youtube-transcript" &&
           youtubeUrl && { videoUrl: youtubeUrl }),
         ...(jobType === "youtube-transcript" &&
-          selectedReporterId && { reporterId: selectedReporterId })
+          selectedReporterId && { reporterId: selectedReporterId }),
+        ...extraOptions
       };
 
       const result = await apiService.post<{ message: string }>(
@@ -213,6 +226,31 @@ export default function EditorPage() {
       setMessage(error.error || `Error triggering ${jobType} job`);
       setJobTriggering(null);
       console.error(`Error triggering ${jobType} job:`, error);
+    }
+  };
+
+  const triggerDailyEdition = async () => {
+    setJobTriggering("daily");
+    setMessage("");
+
+    try {
+      const requestBody: Record<string, any> = {
+        jobType: "daily",
+        published: !dailyAsDraft,
+        ...(dailyModelName.trim() && { modelName: dailyModelName.trim() })
+      };
+
+      const result = await apiService.post<{ message: string }>(
+        "/api/editor/jobs",
+        requestBody
+      );
+      setMessage(result.message);
+      setJobTriggering(null);
+      setTimeout(() => setMessage(""), 5000);
+    } catch (error: any) {
+      setMessage(error.error || "Error triggering daily edition job");
+      setJobTriggering(null);
+      console.error("Error triggering daily edition job:", error);
     }
   };
 
@@ -1193,52 +1231,235 @@ export default function EditorPage() {
               jobs.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Reporter Articles Job */}
-              <div className="border border-[var(--tui-border)] p-4 space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-[var(--tui-primary)]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
-                      Generate Articles
-                    </h3>
-                    <p className="tui-muted">Every 15 minutes</p>
-                  </div>
+            {/* Daily Edition — own row with model name + draft checkbox */}
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-[var(--tui-primary)]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
                 </div>
-                <p className="tui-muted">
-                  Triggers article generation for all reporters in the system.
-                </p>
-                <button
-                  onClick={() => triggerJob("reporter")}
-                  disabled={
-                    jobTriggering === "reporter" ||
-                    jobStatus?.status.reporterJob ||
-                    !isAdmin
-                  }
-                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  {jobTriggering === "reporter" || jobStatus?.status.reporterJob
-                    ? jobTriggering === "reporter"
-                      ? "Generating..."
-                      : "Running..."
-                    : "Trigger Articles"}
-                </button>
+                <div>
+                  <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                    Daily Edition
+                  </h3>
+                  <p className="tui-muted">Every 24 hours</p>
+                </div>
               </div>
+              <p className="tui-muted">
+                Compiles all newspaper editions into a daily edition.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="tui-label block mb-1">
+                    Model Name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={dailyModelName}
+                    onChange={(e) => setDailyModelName(e.target.value)}
+                    placeholder="Leave empty for default"
+                    className="tui-input"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dailyAsDraft}
+                      onChange={(e) => setDailyAsDraft(e.target.checked)}
+                      className="w-4 h-4 accent-[var(--tui-primary)]"
+                    />
+                    <span className="tui-label">Save as draft</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                onClick={() => triggerDailyEdition()}
+                disabled={
+                  jobTriggering === "daily" ||
+                  jobStatus?.status.dailyJob ||
+                  !isAdmin
+                }
+                className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {jobTriggering === "daily" || jobStatus?.status.dailyJob
+                  ? jobTriggering === "daily"
+                    ? "Compiling..."
+                    : "Running..."
+                  : dailyAsDraft
+                    ? "Generate Draft"
+                    : "Generate & Publish"}
+              </button>
+            </div>
 
+            {/* Generate Articles — from source messages */}
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-[var(--tui-primary)]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                    Generate Articles
+                  </h3>
+                  <p className="tui-muted">
+                    Generates articles for all reporters from source messages.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="tui-label block mb-1">
+                    Model Name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={articlesModelName}
+                    onChange={(e) => setArticlesModelName(e.target.value)}
+                    placeholder="Leave empty for default"
+                    className="tui-input"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={articlesAsDraft}
+                      onChange={(e) => setArticlesAsDraft(e.target.checked)}
+                      className="w-4 h-4 accent-[var(--tui-primary)]"
+                    />
+                    <span className="tui-label">Save as draft</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                onClick={() =>
+                  triggerJob("articles-from-sources", undefined, {
+                    published: !articlesAsDraft,
+                    ...(articlesModelName.trim() && {
+                      modelName: articlesModelName.trim()
+                    })
+                  })
+                }
+                disabled={jobTriggering === "articles-from-sources" || !isAdmin}
+                className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {jobTriggering === "articles-from-sources"
+                  ? "Generating..."
+                  : "Generate Articles"}
+              </button>
+            </div>
+
+            {/* Generate Article From Events */}
+            <div className="border border-[var(--tui-border)] p-4 space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-[var(--tui-primary)]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-[var(--tui-primary)] font-mono text-sm">
+                    Generate Article From Events
+                  </h3>
+                  <p className="tui-muted">
+                    Generates articles for all reporters from existing events.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="tui-label block mb-1">
+                    Model Name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={articlesFromEventsModelName}
+                    onChange={(e) =>
+                      setArticlesFromEventsModelName(e.target.value)
+                    }
+                    placeholder="Leave empty for default"
+                    className="tui-input"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={articlesFromEventsAsDraft}
+                      onChange={(e) =>
+                        setArticlesFromEventsAsDraft(e.target.checked)
+                      }
+                      className="w-4 h-4 accent-[var(--tui-primary)]"
+                    />
+                    <span className="tui-label">Save as draft</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                onClick={() =>
+                  triggerJob("reporter", undefined, {
+                    published: !articlesFromEventsAsDraft,
+                    ...(articlesFromEventsModelName.trim() && {
+                      modelName: articlesFromEventsModelName.trim()
+                    })
+                  })
+                }
+                disabled={
+                  jobTriggering === "reporter" ||
+                  jobStatus?.status.reporterJob ||
+                  !isAdmin
+                }
+                className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {jobTriggering === "reporter" || jobStatus?.status.reporterJob
+                  ? jobTriggering === "reporter"
+                    ? "Generating..."
+                    : "Running..."
+                  : "Generate Article From Events"}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Newspaper Edition Job */}
               <div className="border border-[var(--tui-border)] p-4 space-y-4">
                 <div className="flex items-center space-x-3">
@@ -1275,51 +1496,6 @@ export default function EditorPage() {
                   {jobTriggering === "newspaper"
                     ? "Creating..."
                     : "Create Edition"}
-                </button>
-              </div>
-
-              {/* Daily Edition Job */}
-              <div className="border border-[var(--tui-border)] p-4 space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 border border-[var(--tui-border)] flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-[var(--tui-primary)]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-[var(--tui-primary)] font-mono text-sm">
-                      Daily Edition
-                    </h3>
-                    <p className="tui-muted">Every 24 hours</p>
-                  </div>
-                </div>
-                <p className="tui-muted">
-                  Compiles all newspaper editions into a daily edition.
-                </p>
-                <button
-                  onClick={() => triggerJob("daily")}
-                  disabled={
-                    jobTriggering === "daily" ||
-                    jobStatus?.status.dailyJob ||
-                    !isAdmin
-                  }
-                  className={`tui-btn w-full text-center ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  {jobTriggering === "daily" || jobStatus?.status.dailyJob
-                    ? jobTriggering === "daily"
-                      ? "Compiling..."
-                      : "Running..."
-                    : "Trigger Manually"}
                 </button>
               </div>
 

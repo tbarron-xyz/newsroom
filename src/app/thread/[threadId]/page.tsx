@@ -58,7 +58,7 @@ export default function ThreadViewPage() {
   const fetchThread = async () => {
     try {
       const data = await apiService.get<{ thread: Thread; posts: Post[] }>(
-        "/api/thread/${threadId}"
+        `/api/thread/${threadId}`
       );
       setThread(data.thread);
       setPosts(data.posts || []);
