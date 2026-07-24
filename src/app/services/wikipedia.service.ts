@@ -1,3 +1,9 @@
+export interface WikipediaSearchResult {
+  title: string;
+  description: string;
+  url: string;
+}
+
 export class WikipediaService {
   private async fetch(url: string): Promise<any> {
     const response = await fetch(url);
@@ -7,6 +13,28 @@ export class WikipediaService {
       );
     }
     return response.json();
+  }
+
+  async search(
+    query: string,
+    limit: number = 5
+  ): Promise<WikipediaSearchResult[]> {
+    const data = await this.fetch(
+      `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=${limit}&format=json`
+    );
+    const [, titles, descriptions, urls] = data as [
+      string,
+      string[],
+      string[],
+      string[]
+    ];
+    return titles.map((title, i) => ({
+      title,
+      description: descriptions[i] || "",
+      url:
+        urls[i] ||
+        `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`
+    }));
   }
 
   async fetchSummary(
