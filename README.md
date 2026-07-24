@@ -46,7 +46,7 @@ All users can freely access recent content without registration. Visit the follo
   - MongoDB: server with `MONGODB_URL` configured
   - PostgreSQL: server with `DATABASE_URL` configured
 
-**Note on SQLite & PostgreSQL:** Neither backend uses a migration framework. SQLite auto-creates all tables at startup via `CREATE TABLE IF NOT EXISTS`. PostgreSQL assumes the schema is already set up (or will be created at startup when wired). Schema changes must be applied by editing the `createTables()` method directly or by running the standalone script at `src/scripts/create-postgres-schema.ts`.
+See [specs/data.spec.md](specs/data.spec.md) for notes on schema management.
 
 - Docker (optional, for Docker Compose testing)
 

@@ -1,7 +1,7 @@
 # attonews Data Storage Strategy (MongoDB)
 
 ## Overview
-This document outlines the MongoDB data storage strategy for the attonews application. All data is stored in MongoDB using typed collections with appropriate indexes for efficient access and querying. The database name is configured via `MONGODB_DB` (default: `newsroom`).
+This document outlines the MongoDB data storage strategy for the attonews application. All data is stored in MongoDB using typed collections with appropriate indexes for efficient access and querying. The database name is configured via `MONGODB_DB` (default: `newsroom`). This is one of several supported storage backends (see also: [data.redis.spec.md](data.redis.spec.md), and [data.spec.md](data.spec.md) for shared notes).
 
 ## Collections and Schemas
 

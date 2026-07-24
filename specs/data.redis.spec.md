@@ -1,7 +1,7 @@
 # attonews Data Storage Strategy (Redis)
 
 ## Overview
-This document details the Redis data storage implementation for the attonews application. All data is stored in Redis using keys with structured naming conventions and appropriate data types for efficient access and querying. This is one of several supported storage backends (see also: [data.mongo.spec.md](data.mongo.spec.md)).
+This document details the Redis data storage implementation for the attonews application. All data is stored in Redis using keys with structured naming conventions and appropriate data types for efficient access and querying. This is one of several supported storage backends (see also: [data.mongo.spec.md](data.mongo.spec.md), and [data.spec.md](data.spec.md) for shared notes).
 
 ## Data Types and Structures
 

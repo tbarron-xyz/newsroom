@@ -30,8 +30,6 @@ function EditionsContent() {
   const [loadingEditions, setLoadingEditions] = useState(false);
   const [message, setMessage] = useState("");
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Newsroom";
-  const [expandedEdition, setExpandedEdition] = useState<string | null>(null);
-  const [loadingArticles, setLoadingArticles] = useState<string | null>(null);
 
   useEffect(() => {
     if (!editionId) return;
@@ -74,21 +72,6 @@ function EditionsContent() {
     loadEditions();
   }, [editionsData]);
 
-  const fetchEditionWithArticles = async (editionId: string) => {
-    setLoadingArticles(editionId);
-    try {
-      const data = await apiService.get<EditionCardEdition>(
-        `/api/editions/${editionId}`
-      );
-      setEditions((prev) => prev.map((e) => (e.id === editionId ? data : e)));
-    } catch (error) {
-      console.error("Error fetching edition articles:", error);
-    } finally {
-      setLoadingArticles(null);
-      setExpandedEdition(editionId);
-    }
-  };
-
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
       weekday: "long",
@@ -130,7 +113,6 @@ function EditionsContent() {
 
     if (!singleEdition) return null;
 
-    const showArt = expandedEdition === singleEdition.id;
     return (
       <PageContainer variant="tui" maxWidth="max-w-7xl">
         <ContentCard variant="tui" className="p-8 mb-8">
@@ -147,13 +129,7 @@ function EditionsContent() {
 
         <EditionCard
           edition={singleEdition}
-          showArticles={showArt}
-          onToggleArticles={() =>
-            setExpandedEdition(
-              expandedEdition === singleEdition.id ? null : singleEdition.id
-            )
-          }
-          articlesLoading={false}
+          showArticles={true}
           collapsePrompt
         />
 
@@ -201,21 +177,11 @@ function EditionsContent() {
       ) : (
         <div className="space-y-6">
           {editions.map((edition: EditionCardEdition) => {
-            const isExpanded = expandedEdition === edition.id;
             return (
               <EditionCard
                 key={edition.id}
                 edition={edition}
-                showArticles={isExpanded}
-                onToggleArticles={() => {
-                  if (isExpanded) {
-                    setExpandedEdition(null);
-                  } else {
-                    fetchEditionWithArticles(edition.id);
-                  }
-                }}
-                articlesLoading={loadingArticles === edition.id}
-                collapsePrompt={false}
+                showArticles={true}
                 showEditionId
               />
             );
