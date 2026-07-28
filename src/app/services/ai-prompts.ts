@@ -840,9 +840,15 @@ Return a JSON object with:
 
   static generateHomepageChatVisitorMessagePrompts(
     conversationHistory: string,
-    dailyEdition?: DailyEdition
+    dailyEdition?: DailyEdition,
+    personaKey?: OpinionPersona
   ): PromptConfig {
-    const systemPrompt = `You are a visitor in a public IRC-style chat room. Generate a short, casual message (1-2 sentences) that a random visitor might say. The message should fit naturally into the current conversation flow. Never mention that you are an AI. Use lowercase, mild abbreviations, and write like a casual IRC chatter — for example: "anyone else following the council thing", "lol yeah that tracks", "fair enough", "huh didn't know that".`;
+    let personaBlock = "";
+    if (personaKey) {
+      personaBlock = `You hold the following worldview:\n${OPINION_PERSONA_SYSTEM_PROMPTS[personaKey]}\n\n`;
+    }
+
+    const systemPrompt = `${personaBlock}You are a visitor in a public IRC-style chat room. Generate a short, casual message (1-2 sentences) that a random visitor might say. The message should fit naturally into the current conversation flow. Never mention that you are an AI. Use lowercase, mild abbreviations, and write like a casual IRC chatter — for example: "anyone else following the council thing", "lol yeah that tracks", "fair enough", "huh didn't know that".`;
 
     let contextBlock = "";
     if (dailyEdition) {

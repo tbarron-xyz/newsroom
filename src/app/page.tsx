@@ -26,7 +26,11 @@ export default function Home() {
       number,
       {
         loading: boolean;
-        data: { round1: ThinkSuggestion; round2: Round2Response } | null;
+        data: {
+          primaryArticle: string;
+          round1: ThinkSuggestion;
+          round2: Round2Response;
+        } | null;
         expanded: boolean;
       }
     >
@@ -48,6 +52,7 @@ export default function Home() {
       }));
       try {
         const result = await apiService.post<{
+          primaryArticle: string;
           round1: ThinkSuggestion;
           round2: Round2Response;
         }>("/api/think", { headline, body });

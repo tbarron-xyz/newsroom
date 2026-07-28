@@ -1585,9 +1585,13 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
         )
         .join("\n");
 
+      const personaKey: OpinionPersona =
+        OPINION_PERSONAS[Math.floor(Math.random() * OPINION_PERSONAS.length)];
+
       const config = AIPrompts.generateHomepageChatVisitorMessagePrompts(
         conversationHistory,
-        dailyEdition
+        dailyEdition,
+        personaKey
       );
 
       const result = await this.aiClient.createChatCompletion(

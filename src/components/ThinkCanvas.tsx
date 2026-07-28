@@ -17,6 +17,7 @@ interface ThinkSuggestion {
 
 interface ThinkCanvasProps {
   suggestions: {
+    primaryArticle: string;
     round1: ThinkSuggestion;
     round2: Record<Direction, ThinkSuggestion>;
   } | null;
@@ -45,21 +46,32 @@ const POSITIONS: Record<Direction, { x: number; y: number }> = {
 };
 
 const R1_DISTANCE = 110;
-const SUB_DISTANCE = 60;
+const SUB_DISTANCE = 120;
+const PRIMARY_SIZE = 128;
+
+function openWikipedia(title: string) {
+  window.open(
+    `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`,
+    "_blank"
+  );
+}
 
 function RadialLine({
   dir,
-  fromPos,
   length,
-  color
+  color,
+  startOffset
 }: {
   dir: Direction;
-  fromPos: { x: number; y: number };
   length: number;
   color: string;
+  startOffset?: number;
 }) {
   const pos = POSITIONS[dir];
   const angle = Math.atan2(pos.y, pos.x) * (180 / Math.PI);
+  const so = startOffset ?? 0;
+  const fromX = pos.x * so;
+  const fromY = pos.y * so;
   return (
     <div
       className="absolute pointer-events-none"
@@ -70,23 +82,25 @@ function RadialLine({
         background: `repeating-linear-gradient(90deg, ${color} 0, ${color} 3px, transparent 3px, transparent 7px)`,
         transformOrigin: "0 0",
         transform: `rotate(${angle}deg)`,
-        left: `calc(50% + ${fromPos.x * R1_DISTANCE}px)`,
-        top: `calc(50% + ${fromPos.y * R1_DISTANCE}px)`
+        left: `calc(50% + ${fromX}px)`,
+        top: `calc(50% + ${fromY}px)`
       }}
     />
   );
 }
 
-function ConnectorLines() {
+function ConnectorLines({ hasPrimary }: { hasPrimary: boolean }) {
+  const startOffset = hasPrimary ? PRIMARY_SIZE / 2 : 0;
+  const length = R1_DISTANCE - startOffset;
   return (
     <>
       {DIRECTIONS.map((dir) => (
         <RadialLine
           key={dir}
           dir={dir}
-          fromPos={{ x: 0, y: 0 }}
-          length={R1_DISTANCE}
+          length={length}
           color="var(--tui-border)"
+          startOffset={startOffset}
         />
       ))}
     </>
@@ -150,20 +164,38 @@ function NodeCircle({
   );
 }
 
-function CenterDot() {
+function PrimaryCircle({ title }: { title: string }) {
+  const size = PRIMARY_SIZE;
   return (
     <div
-      className="absolute"
+      onClick={() => openWikipedia(title)}
+      className="absolute flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer select-none text-xs leading-tight"
       style={{
-        width: 16,
-        height: 16,
+        width: size,
+        height: size,
         borderRadius: "50%",
-        backgroundColor: "var(--tui-primary)",
-        left: "calc(50% - 8px)",
-        top: "calc(50% - 8px)",
+        border: "2px solid var(--tui-primary)",
+        backgroundColor: "rgba(255, 255, 255, 0.03)",
+        left: `calc(50% - ${size / 2}px)`,
+        top: `calc(50% - ${size / 2}px)`,
+        padding: "10px",
         zIndex: 5
       }}
-    />
+    >
+      <span className="font-semibold text-[var(--tui-primary)] mb-0.5 block leading-tight">
+        Primary Article
+      </span>
+      <span
+        className="text-[var(--tui-muted)] block leading-tight overflow-hidden text-ellipsis"
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: 4,
+          WebkitBoxOrient: "vertical"
+        }}
+      >
+        {title}
+      </span>
+    </div>
   );
 }
 
@@ -183,7 +215,7 @@ export default function ThinkCanvas({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [expandedDir, setExpandedDir] = useState<Direction | null>(null);
+  const [hoveredDir, setHoveredDir] = useState<Direction | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
@@ -220,18 +252,10 @@ export default function ThinkCanvas({
     setIsPanning(false);
   }, []);
 
-  const handleR1Click = useCallback((dir: Direction) => {
-    setExpandedDir((prev) => (prev === dir ? null : dir));
-  }, []);
-
-  const handleCenterClick = useCallback(() => {
-    setExpandedDir(null);
-  }, []);
-
   if (!suggestions && !loading) return null;
 
   const round2Sub =
-    expandedDir && suggestions ? suggestions.round2[expandedDir] : null;
+    hoveredDir && suggestions ? suggestions.round2[hoveredDir] : null;
 
   return (
     <div
@@ -255,38 +279,42 @@ export default function ThinkCanvas({
 
         {suggestions && (
           <div className="absolute inset-0">
-            <ConnectorLines />
-            <div onClick={handleCenterClick}>
-              <CenterDot />
-            </div>
+            <ConnectorLines hasPrimary={true} />
+
+            <PrimaryCircle title={suggestions.primaryArticle} />
 
             {DIRECTIONS.map((dir) => {
               const parentPos = POSITIONS[dir];
               return (
-                <div key={dir}>
+                <div
+                  key={dir}
+                  onMouseEnter={() => setHoveredDir(dir)}
+                  onMouseLeave={() => setHoveredDir(null)}
+                >
                   <NodeCircle
                     text={suggestions.round1[dir]}
                     direction={dir}
                     isR2={false}
                     hidden={false}
-                    onClick={() => handleR1Click(dir)}
+                    onClick={() => openWikipedia(suggestions.round1[dir])}
                   />
 
-                  {round2Sub && expandedDir === dir && (
+                  {round2Sub && hoveredDir === dir && (
                     <>
                       {DIRECTIONS.map((subDir) => (
                         <RadialLine
                           key={subDir}
                           dir={subDir}
-                          fromPos={parentPos}
                           length={SUB_DISTANCE}
                           color="var(--tui-primary)"
+                          startOffset={R1_DISTANCE}
                         />
                       ))}
                       {DIRECTIONS.map((subDir) => (
                         <div
                           key={subDir}
-                          className="absolute"
+                          className="absolute flex flex-col items-center justify-center text-center cursor-pointer select-none text-[9px] leading-tight transition-all duration-300"
+                          onClick={() => openWikipedia(round2Sub[subDir])}
                           style={{
                             width: 90,
                             height: 90,
@@ -296,11 +324,6 @@ export default function ThinkCanvas({
                             border: "2px solid var(--tui-primary)",
                             backgroundColor:
                               "rgba(var(--tui-primary-rgb, 100, 200, 255), 0.08)",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
                             padding: "4px",
                             zIndex: 3
                           }}
