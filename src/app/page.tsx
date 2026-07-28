@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PageContainer from "../components/PageContainer";
 import ContentCard from "../components/ContentCard";
 import CollapsibleSection from "../components/CollapsibleSection";
-import ThinkCanvas from "../components/ThinkCanvas";
 import { apiService } from "@/app/services/api.service";
 import type { DailyEdition, OpinionArticle, Article } from "./schemas/types";
-import type { ThinkSuggestion, Round2Response } from "./schemas/think-schemas";
 import { ChatProvider } from "../components/chat/ChatProvider";
 import { AssistantModal } from "../components/assistant-ui/assistant-modal";
 import HomepageChat from "../components/HomepageChat";
@@ -21,55 +19,6 @@ export default function Home() {
   const [latestArticles, setLatestArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [thinkStates, setThinkStates] = useState<
-    Record<
-      number,
-      {
-        loading: boolean;
-        data: {
-          primaryArticle: string;
-          round1: ThinkSuggestion;
-          round2: Round2Response;
-        } | null;
-        expanded: boolean;
-      }
-    >
-  >({});
-
-  const handleThink = useCallback(
-    async (index: number, headline: string, body: string) => {
-      const state = thinkStates[index];
-      if (state?.data) {
-        setThinkStates((prev) => ({
-          ...prev,
-          [index]: { ...prev[index], expanded: !prev[index].expanded }
-        }));
-        return;
-      }
-      setThinkStates((prev) => ({
-        ...prev,
-        [index]: { loading: true, data: null, expanded: true }
-      }));
-      try {
-        const result = await apiService.post<{
-          primaryArticle: string;
-          round1: ThinkSuggestion;
-          round2: Round2Response;
-        }>("/api/think", { headline, body });
-        setThinkStates((prev) => ({
-          ...prev,
-          [index]: { loading: false, data: result, expanded: true }
-        }));
-      } catch (error) {
-        console.error("Think generation failed:", error);
-        setThinkStates((prev) => ({
-          ...prev,
-          [index]: { loading: false, data: null, expanded: false }
-        }));
-      }
-    },
-    [thinkStates]
-  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -224,28 +173,6 @@ export default function Home() {
                   <p className="tui-text-muted leading-relaxed">
                     {topic.newsStorySecondParagraph}
                   </p>
-                </div>
-                <div className="mt-4">
-                  <button
-                    onClick={() =>
-                      handleThink(
-                        index,
-                        topic.headline,
-                        `${topic.newsStoryFirstParagraph} ${topic.newsStorySecondParagraph}`
-                      )
-                    }
-                    className="text-sm tui-link"
-                  >
-                    {thinkStates[index]?.expanded ? "Hide Think" : "Think"}
-                  </button>
-                  {thinkStates[index]?.expanded && (
-                    <div className="mt-4">
-                      <ThinkCanvas
-                        suggestions={thinkStates[index]?.data ?? null}
-                        loading={thinkStates[index]?.loading ?? false}
-                      />
-                    </div>
-                  )}
                 </div>
               </ContentCard>
             ))}

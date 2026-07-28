@@ -1,6 +1,7 @@
 import { IDataStorageService } from "../../services/data-storage.interface";
 import { NextRequest, NextResponse } from "next/server";
-import { withDataStorage } from "../../utils/data-storage";
+import { withAuth } from "../../utils/auth";
+import { User } from "../../schemas/types";
 import { AIClient } from "../../services/ai-client";
 import { AIModelOption } from "../../schemas/types";
 import { zodResponseFormat } from "openai/helpers/zod";
@@ -197,8 +198,12 @@ function formatLinks(links: string[]): string {
   return links.map((title, i) => `${i + 1}. "${title}"`).join("\n");
 }
 
-export const POST = withDataStorage(
-  async (request: NextRequest, dataStorage: IDataStorageService) => {
+export const POST = withAuth(
+  async (
+    request: NextRequest,
+    user: User,
+    dataStorage: IDataStorageService
+  ) => {
     try {
       const { headline, body } = await request.json();
       if (!headline || !body) {
@@ -469,5 +474,6 @@ Return valid JSON with exactly these 4 string fields: moreGeneral, adjacentSibli
         { status: 500 }
       );
     }
-  }
+  },
+  { requiredRole: "admin" }
 );
