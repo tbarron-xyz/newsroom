@@ -30,7 +30,11 @@ import { IDataStorageService } from "./data-storage.interface";
 
 export class SQLiteDataStorageService implements IDataStorageService {
   private db: any = null;
-  private readonly dbPath = "./db.sqlite";
+  private readonly dbPath: string;
+
+  constructor(dbPath?: string) {
+    this.dbPath = dbPath || "./db.sqlite";
+  }
 
   async connect(): Promise<void> {
     this.db = new Database(this.dbPath);
@@ -1345,7 +1349,8 @@ export class SQLiteDataStorageService implements IDataStorageService {
     redis: { usedMemory: number; usedMemoryPeak: number };
     system: { totalMemory: number; usedMemory: number; freeMemory: number };
   }> {
-    const dbFileSize = statSync(this.dbPath).size;
+    const dbFileSize =
+      this.dbPath === ":memory:" ? 0 : statSync(this.dbPath).size;
 
     const os = await import("os");
     const totalMemory = os.totalmem();

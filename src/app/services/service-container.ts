@@ -42,7 +42,9 @@ export class ServiceContainer {
 
       if (storageBackend === "sqlite") {
         console.log("Using SQLite data storage backend");
-        this.dataStorageService = new SQLiteDataStorageService();
+        this.dataStorageService = new SQLiteDataStorageService(
+          process.env.SQLITE_DB_PATH
+        );
       } else if (storageBackend === "mongodb" || storageBackend === "mongo") {
         console.log("Using MongoDB data storage backend");
         this.dataStorageService = new MongoDBDataStorageService();

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { SQLiteDataStorageService } from "./sqlite-data-storage.service";
 import { ServiceContainer } from "./service-container";
 
+const MEMORY_DB = ":memory:";
 const reporterId = "reporter_test_1";
 
 const mockMessages = [
@@ -74,6 +75,7 @@ describe("Article generation pipeline", () => {
   beforeEach(async () => {
     process.env.OPENAI_API_KEY = "test-key-for-mocking";
     process.env.DATA_STORAGE_BACKEND = "sqlite";
+    process.env.SQLITE_DB_PATH = ":memory:";
 
     await ServiceContainer.getInstance().disconnect();
 
@@ -90,7 +92,7 @@ describe("Article generation pipeline", () => {
       async () => mockMessages
     );
 
-    storage = new SQLiteDataStorageService();
+    storage = new SQLiteDataStorageService(MEMORY_DB);
     await storage.connect();
     await storage.clearAllData();
 
@@ -106,6 +108,7 @@ describe("Article generation pipeline", () => {
     mock.reset();
     delete process.env.OPENAI_API_KEY;
     delete process.env.DATA_STORAGE_BACKEND;
+    delete process.env.SQLITE_DB_PATH;
   });
 
   it("generates an article and persists it to storage", async () => {
@@ -141,10 +144,16 @@ describe("Article generation pipeline", () => {
   });
 
   it("serves persisted articles through the API endpoint", async () => {
+    const container = ServiceContainer.getInstance();
+    const dataStorage = await container.getDataStorageService();
+    const { makeEditor, makeReporter } = await import("./test-data-factories");
+    await dataStorage.saveEditor(makeEditor());
+    await dataStorage.saveReporter(makeReporter({ id: reporterId }));
+
     const { AIService } = await import("./ai.service");
     const { ReporterService } = await import("./reporter.service");
-    const aiService = new AIService(storage);
-    const reporterService = new ReporterService(storage, aiService);
+    const aiService = new AIService(dataStorage);
+    const reporterService = new ReporterService(dataStorage, aiService);
 
     await reporterService.generateArticlesForReporter(reporterId);
 
@@ -166,5 +175,81 @@ describe("Article generation pipeline", () => {
     assert.ok(typeof data[0].id === "string");
     assert.ok(typeof data[0].body === "string");
     assert.ok(Array.isArray(data[0].messageTexts));
+  });
+
+  it("rejects article with empty headline", async () => {
+    const emptyHeadlineContent = JSON.stringify({
+      ...JSON.parse(mockCompletionContent),
+      headline: ""
+    });
+    const emptyHeadlineChatCompletion = {
+      ...mockChatCompletion,
+      choices: [
+        {
+          ...mockChatCompletion.choices[0],
+          message: {
+            ...mockChatCompletion.choices[0].message,
+            content: emptyHeadlineContent
+          }
+        }
+      ]
+    };
+
+    const { AIClient } = await import("./ai-client");
+    mock.method(AIClient.prototype, "createChatCompletion", async () => ({
+      response: emptyHeadlineChatCompletion as any,
+      modelUsed: "gpt-4"
+    }));
+
+    const { AIService } = await import("./ai.service");
+    const { ReporterService } = await import("./reporter.service");
+    const aiService = new AIService(storage);
+    const reporterService = new ReporterService(storage, aiService);
+
+    const articles =
+      await reporterService.generateArticlesForReporter(reporterId);
+
+    assert.equal(articles.length, 0);
+
+    const saved = await storage.getArticlesByReporter(reporterId);
+    assert.equal(saved.length, 0);
+  });
+
+  it("rejects article with whitespace-only headline", async () => {
+    const whitespaceHeadlineContent = JSON.stringify({
+      ...JSON.parse(mockCompletionContent),
+      headline: "   "
+    });
+    const whitespaceHeadlineChatCompletion = {
+      ...mockChatCompletion,
+      choices: [
+        {
+          ...mockChatCompletion.choices[0],
+          message: {
+            ...mockChatCompletion.choices[0].message,
+            content: whitespaceHeadlineContent
+          }
+        }
+      ]
+    };
+
+    const { AIClient } = await import("./ai-client");
+    mock.method(AIClient.prototype, "createChatCompletion", async () => ({
+      response: whitespaceHeadlineChatCompletion as any,
+      modelUsed: "gpt-4"
+    }));
+
+    const { AIService } = await import("./ai.service");
+    const { ReporterService } = await import("./reporter.service");
+    const aiService = new AIService(storage);
+    const reporterService = new ReporterService(storage, aiService);
+
+    const articles =
+      await reporterService.generateArticlesForReporter(reporterId);
+
+    assert.equal(articles.length, 0);
+
+    const saved = await storage.getArticlesByReporter(reporterId);
+    assert.equal(saved.length, 0);
   });
 });

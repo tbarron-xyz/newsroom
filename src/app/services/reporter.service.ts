@@ -90,6 +90,12 @@ export class ReporterService {
           modelName: structuredArticle.response.modelName,
           published: published !== false
         };
+        if (!article.headline || !article.headline.trim()) {
+          console.log(
+            `Skipping article for reporter ${reporterId} - empty headline returned`
+          );
+          continue;
+        }
         articles.push(article);
         console.log(`Generated article: "${article.headline}"`);
       } catch (error) {
@@ -545,6 +551,13 @@ export class ReporterService {
           modelName: structuredArticle.response.modelName,
           published: options?.published !== false
         };
+
+        if (!article.headline || !article.headline.trim()) {
+          console.log(
+            `Skipping article from events for reporter ${reporter.id} - empty headline returned`
+          );
+          continue;
+        }
 
         await this.dataStorageService.saveArticle(article);
         results[reporter.id] = [article];

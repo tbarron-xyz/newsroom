@@ -13,11 +13,13 @@ import {
   makeOpinionArticle
 } from "./test-data-factories";
 
+const MEMORY_DB = ":memory:";
+
 describe("SQLiteDataStorageService", () => {
   let storage: SQLiteDataStorageService;
 
   beforeEach(async () => {
-    storage = new SQLiteDataStorageService();
+    storage = new SQLiteDataStorageService(MEMORY_DB);
     await storage.connect();
     await storage.clearAllData();
   });
@@ -29,7 +31,7 @@ describe("SQLiteDataStorageService", () => {
 
   describe("connection lifecycle", () => {
     it("connects and disconnects without error", async () => {
-      const s = new SQLiteDataStorageService();
+      const s = new SQLiteDataStorageService(MEMORY_DB);
       await s.connect();
       await s.disconnect();
     });

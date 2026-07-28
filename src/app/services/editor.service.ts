@@ -876,6 +876,16 @@ export class EditorService {
           reporterId || "youtube-reporter"
         );
 
+        if (!result.article.headline || !result.article.headline.trim()) {
+          console.log(
+            `[${new Date().toISOString()}] Skipping YouTube transcript article - empty headline (video: ${videoId})`
+          );
+          return {
+            message: "YouTube transcript article skipped - empty headline",
+            jobType
+          };
+        }
+
         await this.dataStorageService.saveArticle(result.article);
 
         console.log(
