@@ -594,6 +594,54 @@ export class RedisDataStorageService implements IDataStorageService {
   }
 
   /**
+   * O(m) where m = number of articles scanned in the latest set. Sequential loop.
+   */
+  async getLatestPublishedArticles(limit?: number): Promise<Article[]> {
+    const count = limit || 100;
+    const articleIds = await this.client.ZRANGE(
+      REDIS_KEYS.ARTICLES_LATEST,
+      0,
+      -1,
+      { REV: true }
+    );
+
+    const articles: Article[] = [];
+    for (const articleId of articleIds) {
+      if (articles.length >= count) break;
+      const article = await this.getArticle(articleId);
+      if (article && article.published !== false) {
+        articles.push(article);
+      }
+    }
+
+    return articles;
+  }
+
+  /**
+   * O(m) where m = number of articles scanned in the latest set. Sequential loop.
+   */
+  async getDraftArticles(limit?: number): Promise<Article[]> {
+    const count = limit || 100;
+    const articleIds = await this.client.ZRANGE(
+      REDIS_KEYS.ARTICLES_LATEST,
+      0,
+      -1,
+      { REV: true }
+    );
+
+    const articles: Article[] = [];
+    for (const articleId of articleIds) {
+      if (articles.length >= count) break;
+      const article = await this.getArticle(articleId);
+      if (article && article.published === false) {
+        articles.push(article);
+      }
+    }
+
+    return articles;
+  }
+
+  /**
    * O(n) where n = number of articles in the latest set.
    */
   async searchArticles(query: string, limit?: number): Promise<Article[]> {

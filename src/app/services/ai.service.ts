@@ -204,7 +204,8 @@ export class AIService {
             }
           ],
           response_format: config.responseFormat
-        }
+        },
+        modelName
       );
 
       await this.logAIResponse(
@@ -910,7 +911,8 @@ User: Given the following articles and editorial guidelines: "${editorPrompt}", 
             }
           ],
           response_format: config.responseFormat
-        }
+        },
+        modelName
       );
 
       // Track KPI usage

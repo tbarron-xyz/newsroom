@@ -7,7 +7,7 @@ export const GET = withDataStorage(
     const url = new URL(request.url);
     const limit = parseInt(url.searchParams.get("limit") || "5", 10);
 
-    const articles = await dataStorage.getLatestArticles(limit);
+    const articles = await dataStorage.getLatestPublishedArticles(limit);
 
     return NextResponse.json(articles);
   }

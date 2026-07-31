@@ -10,7 +10,7 @@ services:
       - /app/node_modules
     depends_on:
       - redis
-    command: node --import tsx --test
+    command: node --import tsx --experimental-test-module-mocks --test
 
   redis:
     image: redis:7-alpine

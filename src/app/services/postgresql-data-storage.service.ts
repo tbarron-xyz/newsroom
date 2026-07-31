@@ -467,6 +467,68 @@ export class PostgreSQLDataStorageService {
     return [];
   }
 
+  async getLatestPublishedArticles(limit = 100): Promise<Article[]> {
+    const client = await this.pool.connect();
+    try {
+      const sql = `
+        SELECT * FROM articles
+        WHERE published = TRUE
+        ORDER BY generation_time DESC
+        LIMIT $1
+      `;
+      const result = await client.query(sql, [limit]);
+      return result.rows.map((row: any) => ({
+        id: row.id,
+        reporterId: row.reporter_id,
+        headline: row.headline,
+        body: row.body,
+        generationTime: row.generation_time,
+        prompt: row.prompt,
+        messageIds: row.message_ids,
+        messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
+        modelName: row.model_name,
+        inputTokenCount: row.input_token_count,
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
+      }));
+    } finally {
+      client.release();
+    }
+  }
+
+  async getDraftArticles(limit = 100): Promise<Article[]> {
+    const client = await this.pool.connect();
+    try {
+      const sql = `
+        SELECT * FROM articles
+        WHERE published = FALSE
+        ORDER BY generation_time DESC
+        LIMIT $1
+      `;
+      const result = await client.query(sql, [limit]);
+      return result.rows.map((row: any) => ({
+        id: row.id,
+        reporterId: row.reporter_id,
+        headline: row.headline,
+        body: row.body,
+        generationTime: row.generation_time,
+        prompt: row.prompt,
+        messageIds: row.message_ids,
+        messageTexts: row.message_texts,
+        messageDids: row.message_dids || [],
+        messageRkeys: row.message_rkeys || [],
+        modelName: row.model_name,
+        inputTokenCount: row.input_token_count,
+        outputTokenCount: row.output_token_count,
+        published: row.published === null ? true : row.published
+      }));
+    } finally {
+      client.release();
+    }
+  }
+
   async searchArticles(query: string, limit = 20): Promise<Article[]> {
     const client = await this.pool.connect();
     try {

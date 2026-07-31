@@ -169,6 +169,42 @@ describe("SQLiteDataStorageService", () => {
       assert.equal(all[1].id, "a2");
     });
 
+    it("getLatestPublishedArticles excludes drafts and respects limit", async () => {
+      const a1 = makeArticle({ id: "a1", generationTime: 100 });
+      const a2 = makeArticle({
+        id: "a2",
+        generationTime: 200,
+        published: false
+      });
+      const a3 = makeArticle({ id: "a3", generationTime: 300 });
+      await storage.saveArticle(a1);
+      await storage.saveArticle(a2);
+      await storage.saveArticle(a3);
+      const all = await storage.getLatestPublishedArticles(2);
+      assert.deepEqual(
+        all.map((a) => a.id),
+        ["a3", "a1"]
+      );
+    });
+
+    it("getDraftArticles returns only drafts and respects limit", async () => {
+      const a1 = makeArticle({ id: "a1", generationTime: 100 });
+      const a2 = makeArticle({
+        id: "a2",
+        generationTime: 200,
+        published: false
+      });
+      const a3 = makeArticle({ id: "a3", generationTime: 300 });
+      await storage.saveArticle(a1);
+      await storage.saveArticle(a2);
+      await storage.saveArticle(a3);
+      const all = await storage.getDraftArticles(10);
+      assert.deepEqual(
+        all.map((a) => a.id),
+        ["a2"]
+      );
+    });
+
     it("getArticlesByReporter filters by reporterId", async () => {
       const a1 = makeArticle({ id: "a1", reporterId: "rep_a" });
       const a2 = makeArticle({ id: "a2", reporterId: "rep_b" });

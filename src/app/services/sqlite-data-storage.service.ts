@@ -450,6 +450,30 @@ export class SQLiteDataStorageService implements IDataStorageService {
     return rows.map((row) => this.mapArticleRow(row));
   }
 
+  async getLatestPublishedArticles(limit?: number): Promise<Article[]> {
+    const db = this.getDb();
+    const rows = db
+      .prepare(
+        `
+      SELECT * FROM articles WHERE published = 1 ORDER BY generationTime DESC LIMIT ?
+    `
+      )
+      .all(limit || 100) as any[];
+    return rows.map((row) => this.mapArticleRow(row));
+  }
+
+  async getDraftArticles(limit?: number): Promise<Article[]> {
+    const db = this.getDb();
+    const rows = db
+      .prepare(
+        `
+      SELECT * FROM articles WHERE published = 0 ORDER BY generationTime DESC LIMIT ?
+    `
+      )
+      .all(limit || 100) as any[];
+    return rows.map((row) => this.mapArticleRow(row));
+  }
+
   async getArticlesByReporter(
     reporterId: string,
     limit?: number

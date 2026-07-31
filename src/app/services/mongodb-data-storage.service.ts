@@ -182,6 +182,24 @@ export class MongoDBDataStorageService implements IDataStorageService {
     return docs.map((d) => this.mapArticle(d));
   }
 
+  async getLatestPublishedArticles(limit = 100): Promise<Article[]> {
+    const docs = await this.coll("articles")
+      .find({ published: { $ne: false } })
+      .sort({ generationTime: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map((d) => this.mapArticle(d));
+  }
+
+  async getDraftArticles(limit = 100): Promise<Article[]> {
+    const docs = await this.coll("articles")
+      .find({ published: false })
+      .sort({ generationTime: -1 })
+      .limit(limit)
+      .toArray();
+    return docs.map((d) => this.mapArticle(d));
+  }
+
   async getArticlesByReporter(
     reporterId: string,
     limit = 100

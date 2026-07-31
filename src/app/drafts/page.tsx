@@ -2,20 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { apiService } from "../services/api.service";
 import DailyEditionFullView from "../components/DailyEditionFullView";
 import ContentCard from "../../components/ContentCard";
-import type { DailyEdition } from "../schemas/types";
+import type { DailyEdition, Article } from "../schemas/types";
 
 type Tab = "articles" | "editions" | "daily-editions";
 
 export default function DraftsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("daily-editions");
   const [dailyEditions, setDailyEditions] = useState<DailyEdition[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [selectedDraft, setSelectedDraft] = useState<DailyEdition | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditor, setIsEditor] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [publishingArticleId, setPublishingArticleId] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -56,6 +61,9 @@ export default function DraftsPage() {
           "/api/drafts/daily-editions"
         );
         setDailyEditions(data.filter((e) => e.published === false));
+      } else if (activeTab === "articles") {
+        const data = await apiService.get<Article[]>("/api/drafts/articles");
+        setArticles(data);
       }
     } catch (error) {
       console.error("Error fetching drafts:", error);
@@ -77,6 +85,20 @@ export default function DraftsPage() {
       console.error("Error publishing draft:", error);
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const publishArticle = async (articleId: string) => {
+    setPublishingArticleId(articleId);
+    try {
+      await apiService.post<{ success: boolean }>(
+        `/api/drafts/articles/${articleId}/publish`
+      );
+      setArticles((prev) => prev.filter((a) => a.id !== articleId));
+    } catch (error) {
+      console.error("Error publishing article:", error);
+    } finally {
+      setPublishingArticleId(null);
     }
   };
 
@@ -233,12 +255,85 @@ export default function DraftsPage() {
           </div>
         )}
 
-        {/* Articles Drafts - placeholder */}
+        {/* Articles Drafts */}
         {activeTab === "articles" && (
           <div className="border border-[var(--tui-border)] p-6">
-            <div className="text-center py-8">
-              <p className="tui-muted">Article drafts coming soon.</p>
-            </div>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="text-[var(--tui-primary)] font-mono text-sm animate-pulse">
+                  $ Loading drafts...
+                </div>
+              </div>
+            ) : articles.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="tui-muted">No draft articles found.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {articles.map((article) => (
+                  <div
+                    key={article.id}
+                    className="w-full text-left border border-[var(--tui-border)] p-4 hover:bg-[var(--tui-hover-bg)] transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3 gap-4">
+                      <div className="min-w-0">
+                        <Link
+                          href={`/articles/${article.id}`}
+                          className="block text-[var(--tui-primary)] font-mono text-sm hover:underline"
+                        >
+                          {article.headline || "Untitled"}
+                        </Link>
+                        <p className="tui-muted text-xs mt-1">
+                          {article.id} &middot;{" "}
+                          {article.generationTime
+                            ? new Date(article.generationTime).toLocaleString()
+                            : "Unknown time"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[#ffb000] font-mono text-xs border border-[#ffb000] px-2 py-0.5">
+                          DRAFT
+                        </span>
+                        <button
+                          onClick={() => publishArticle(article.id)}
+                          disabled={publishingArticleId === article.id}
+                          className={`px-3 py-1 font-mono text-xs border transition-colors ${
+                            publishingArticleId === article.id
+                              ? "border-[#557755] text-[#557755] cursor-not-allowed"
+                              : "border-[var(--tui-primary)] text-[var(--tui-primary)] hover:bg-[var(--tui-primary)] hover:text-black"
+                          }`}
+                        >
+                          {publishingArticleId === article.id
+                            ? "Publishing..."
+                            : "Publish"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {article.body && (
+                      <p className="tui-muted text-sm mb-3 line-clamp-2">
+                        {article.body}
+                      </p>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2 text-xs tui-muted">
+                      {article.reporterId && (
+                        <div>
+                          <span className="text-white/40">Reporter: </span>
+                          {article.reporterId}
+                        </div>
+                      )}
+                      {article.modelName && (
+                        <div>
+                          <span className="text-white/40">Model: </span>
+                          {article.modelName}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
